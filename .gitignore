@@ -1,4 +1,4 @@
-tutorial/Audio/
+# tutorial/Audio/
 # Environment
 .env
 .venv
