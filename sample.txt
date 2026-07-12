@@ -1,0 +1,85 @@
+Here's your SRT file converted to clean plain text with all timestamps, numbering, and table formatting removed:
+
+---
+
+**PHASE 1 — FOUNDATION**
+
+Welcome to Phase 1 of building a production-grade Financial AI Agent.
+
+This is the foundation. The bedrock. Everything else we build over the coming hours and phases rests on what we create right now.
+
+By the end of this two-hour session, you'll have a complete, working Python project with a modern structure, comprehensive configuration, a production-ready database layer, and everything tested and verified.
+
+Let me show you the big picture. Data comes from SEC EDGAR — tens of thousands of financial filings. We ingest them, parse them, chunk them, and store them in a vector database. Then when you ask a question, we retrieve the most relevant chunks and generate an answer using an LLM.
+
+But this is just Phase 1. In later phases, we'll add multi-agent orchestration, real-time data streaming, and predictive analytics. For now, we're building the foundation that makes all of that possible.
+
+Let's start with the prerequisites. You need Python 3.11 or higher, Docker, Docker Compose, and Git. If you don't have these, pause the video, get them installed, and come right back.
+
+You do not need an OpenAI API key for this phase. We use local services exclusively until we're ready to connect to the cloud. This means no cost, no API limits, and you can run everything on your local machine.
+
+Let's begin by creating the project directory. Open your terminal and run: mkdir financial-rag-agent
+
+Then change into that directory with: cd financial-rag-agent. And initialize Git: git init
+
+Now, here's where many tutorials go wrong. They just throw files everywhere. We're going to use what's called the "src layout" — a modern standard for Python packages that prevents import conflicts and makes your code actually installable.
+
+The src layout is the industry standard because it forces you to be intentional about what you're importing. You import from 'financial_rag', not from the root directory. This ensures your package works when installed — not just when you're running it locally.
+
+Think of it like this: a flat layout is like having all your files on your desktop. It works when you're the only one using it. But as soon as you have multiple projects or multiple people, it becomes chaos.
+
+The src layout is like having a well-organized filing system. Everything has its place. You always know where to find things. And when someone else looks at your project, they immediately understand the structure.
+
+Here's the command to scaffold all directories at once. Run this in your terminal: mkdir -p src/financial_rag/{config,storage}
+
+Let me break down what each of these directories does, because understanding this structure is the key to understanding the entire system.
+
+'config' holds all settings and environment configuration. This is the single source of truth for how your application behaves. Every other component reads from here. If you want to change the database host, the embedding model, or the logging level, you change it here.
+
+'storage' contains database clients, cache clients, and repositories. This is your data access layer — everything that talks to PostgreSQL, Redis, or any other data store. This is where the actual data lives and how we interact with it.
+
+We also need Python package marker files. These are empty __init__.py files that tell Python, "Hey, this directory is a package you can import from."
+
+Without these, Python would not recognize these folders as importable packages. It's a small detail that trips up beginners all the time — so let's get it right from the start.
+
+Run this command to create __init__.py files in every directory: find src -type d -exec touch {}/__init__.py \;
+
+Now, let's examine the most important file in any modern Python project: pyproject.toml. This single file replaces setup.py, requirements.txt, setup.cfg, flake8.ini, mypy.ini, and pytest.ini.
+
+Think about what that means. Instead of managing six different configuration files, you have one. One file to rule them all. This simplifies project management enormously and reduces the cognitive load of setting up a new project.
+
+At the top, we specify the build system. We use hatchling, which is lightweight and doesn't need a MANIFEST.in file. It's the modern Python standard.
+
+Under the project section, we define the package name, version, description, and Python version requirement. This is the metadata that makes your package findable and installable.
+
+The dependencies section lists all production dependencies. These are the packages your application actually needs to run. Every dependency here is carefully chosen for a specific purpose.
+
+FastAPI is our web framework. It's modern, fast, and built on Python type hints. Uvicorn is the ASGI server that runs FastAPI. Pydantic handles configuration validation and data parsing. Pydantic-settings reads from .env files.
+
+SQLAlchemy 2.0 provides async database access. asyncpg is the PostgreSQL driver. pgvector adds vector search to PostgreSQL. Alembic handles database migrations.
+
+Redis provides caching. OpenAI is for LLM and embedding integration. tiktoken counts tokens. httpx is our HTTP client. BeautifulSoup4 parses HTML. structlog provides structured logging. tenacity handles retry logic.
+
+The dev dependencies are separate from production dependencies. These are not installed in production — they're only used during development and testing.
+
+pytest is the testing framework. pytest-asyncio enables async tests. pytest-cov measures test coverage. mypy is the static type checker. ruff is the fast linter that replaces black, isort, and flake8. pre-commit runs hooks before commits.
+
+This tells hatchling where to find our package. The packages are in src/financial_rag. This is where the build system looks for the code.
+
+Now let's look at the pytest configuration. asyncio_mode is set to 'auto' — this enables async test support. testpaths is set to 'tests' — this is where pytest looks for tests.
+
+pythonpath includes 'src' — this allows imports to work correctly. Without this, pytest wouldn't be able to find your application code. This is a common pitfall that I want you to avoid.
+
+python_files matches test_*.py. python_classes matches Test*. python_functions matches test_*. These patterns tell pytest what to look for.
+
+We define markers: 'unit' for unit tests and 'integration' for integration tests. Integration tests require external services like PostgreSQL and Redis to be running. This separation is crucial for fast test feedback.
+
+You can run just unit tests with: pytest -m unit. Or just integration tests with: pytest -m integration. This flexibility is incredibly useful in CI/CD pipelines.
+
+---
+
+**END OF PHASE 1 — FOUNDATION**
+
+---
+
+**✅ Done!** The SRT has been converted to clean plain text with all timestamps, numbering, and table formatting removed.

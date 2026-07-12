@@ -1,0 +1,444 @@
+1
+00:00:00,100 --> 00:00:09,787
+Here's your SRT file converted to clean plain text with all timestamps, numbering, and table formatting removed:
+
+2
+00:00:09,737 --> 00:00:15,362
+**PHASE 1 — FOUNDATION**
+
+3
+00:00:15,362 --> 00:00:21,362
+Welcome to Phase 1 of building a production-grade Financial AI Agent.
+
+4
+00:00:21,362 --> 00:00:24,081
+This is the foundation.
+
+5
+00:00:24,081 --> 00:00:26,096
+The bedrock.
+
+6
+00:00:26,096 --> 00:00:32,909
+Everything else we build over the coming hours and phases rests on what we create right now.
+
+7
+00:00:32,909 --> 00:00:47,659
+By the end of this two-hour session, you'll have a complete, working Python project with a modern structure, comprehensive configuration, a production-ready database layer, and everything tested and verified.
+
+8
+00:00:47,659 --> 00:00:50,690
+Let me show you the big picture.
+
+9
+00:00:50,690 --> 00:00:56,799
+Data comes from SEC EDGAR — tens of thousands of financial filings.
+
+10
+00:00:56,799 --> 00:01:03,503
+We ingest them, parse them, chunk them, and store them in a vector database.
+
+11
+00:01:03,503 --> 00:01:11,206
+Then when you ask a question, we retrieve the most relevant chunks and generate an answer using an LLM.
+
+12
+00:01:11,206 --> 00:01:14,174
+But this is just Phase 1.
+
+13
+00:01:14,174 --> 00:01:22,878
+In later phases, we'll add multi-agent orchestration, real-time data streaming, and predictive analytics.
+
+14
+00:01:22,878 --> 00:01:28,299
+For now, we're building the foundation that makes all of that possible.
+
+15
+00:01:28,299 --> 00:01:31,565
+Let's start with the prerequisites.
+
+16
+00:01:31,565 --> 00:01:39,049
+You need Python 3.11 or higher, Docker, Docker Compose, and Git.
+
+17
+00:01:39,049 --> 00:01:45,690
+If you don't have these, pause the video, get them installed, and come right back.
+
+18
+00:01:45,690 --> 00:01:50,565
+You do not need an OpenAI API key for this phase.
+
+19
+00:01:50,565 --> 00:01:56,565
+We use local services exclusively until we're ready to connect to the cloud.
+
+20
+00:01:56,565 --> 00:02:04,221
+This means no cost, no API limits, and you can run everything on your local machine.
+
+21
+00:02:04,221 --> 00:02:08,346
+Let's begin by creating the project directory.
+
+22
+00:02:08,346 --> 00:02:13,393
+Open your terminal and run: mkdir financial-rag-agent
+
+23
+00:02:13,393 --> 00:02:19,253
+Then change into that directory with: cd financial-rag-agent.
+
+24
+00:02:19,253 --> 00:02:23,956
+And initialize Git: git init
+
+25
+00:02:23,956 --> 00:02:28,409
+Now, here's where many tutorials go wrong.
+
+26
+00:02:28,409 --> 00:02:31,487
+They just throw files everywhere.
+
+27
+00:02:31,487 --> 00:02:42,721
+We're going to use what's called the "src layout" — a modern standard for Python packages that prevents import conflicts and makes your code actually installable.
+
+28
+00:02:42,721 --> 00:02:50,456
+The src layout is the industry standard because it forces you to be intentional about what you're importing.
+
+29
+00:02:50,456 --> 00:02:56,174
+You import from 'financial_rag', not from the root directory.
+
+30
+00:02:56,174 --> 00:03:02,424
+This ensures your package works when installed — not just when you're running it locally.
+
+31
+00:03:02,424 --> 00:03:09,003
+Think of it like this: a flat layout is like having all your files on your desktop.
+
+32
+00:03:09,003 --> 00:03:12,799
+It works when you're the only one using it.
+
+33
+00:03:12,799 --> 00:03:19,159
+But as soon as you have multiple projects or multiple people, it becomes chaos.
+
+34
+00:03:19,159 --> 00:03:24,690
+The src layout is like having a well-organized filing system.
+
+35
+00:03:24,690 --> 00:03:27,424
+Everything has its place.
+
+36
+00:03:27,424 --> 00:03:31,018
+You always know where to find things.
+
+37
+00:03:31,018 --> 00:03:37,378
+And when someone else looks at your project, they immediately understand the structure.
+
+38
+00:03:37,378 --> 00:03:42,049
+Here's the command to scaffold all directories at once.
+
+39
+00:03:42,049 --> 00:03:50,112
+Run this in your terminal: mkdir -p src/financial_rag/{config,storage}
+
+40
+00:03:50,112 --> 00:03:59,643
+Let me break down what each of these directories does, because understanding this structure is the key to understanding the entire system.
+
+41
+00:03:59,643 --> 00:04:04,737
+config' holds all settings and environment configuration.
+
+42
+00:04:04,737 --> 00:04:10,221
+This is the single source of truth for how your application behaves.
+
+43
+00:04:10,221 --> 00:04:13,659
+Every other component reads from here.
+
+44
+00:04:13,659 --> 00:04:21,393
+If you want to change the database host, the embedding model, or the logging level, you change it here.
+
+45
+00:04:21,393 --> 00:04:27,721
+storage' contains database clients, cache clients, and repositories.
+
+46
+00:04:27,721 --> 00:04:36,456
+This is your data access layer — everything that talks to PostgreSQL, Redis, or any other data store.
+
+47
+00:04:36,456 --> 00:04:41,549
+This is where the actual data lives and how we interact with it.
+
+48
+00:04:41,549 --> 00:04:45,799
+We also need Python package marker files.
+
+49
+00:04:45,799 --> 00:04:57,690
+These are empty __init__.py files that tell Python, "Hey, this directory is a package you can import from.
+
+50
+00:04:57,690 --> 00:05:04,237
+Without these, Python would not recognize these folders as importable packages.
+
+51
+00:05:04,237 --> 00:05:11,284
+It's a small detail that trips up beginners all the time — so let's get it right from the start.
+
+52
+00:05:11,284 --> 00:05:28,393
+Run this command to create __init__.py files in every directory: find src -type d -exec touch {}/__init__.py \;
+
+53
+00:05:28,393 --> 00:05:36,128
+Now, let's examine the most important file in any modern Python project: pyproject.toml.
+
+54
+00:05:36,128 --> 00:05:49,362
+This single file replaces setup.py, requirements.txt, setup.cfg, flake8.ini, mypy.ini, and pytest.ini.
+
+55
+00:05:49,684 --> 00:05:52,699
+Think about what that means.
+
+56
+00:05:52,649 --> 00:05:58,446
+Instead of managing six different configuration files, you have one.
+
+57
+00:05:58,446 --> 00:06:01,446
+One file to rule them all.
+
+58
+00:06:01,446 --> 00:06:09,212
+This simplifies project management enormously and reduces the cognitive load of setting up a new project.
+
+59
+00:06:09,212 --> 00:06:13,337
+At the top, we specify the build system.
+
+60
+00:06:13,337 --> 00:06:19,774
+We use hatchling, which is lightweight and doesn't need a MANIFEST.in file.
+
+61
+00:06:19,774 --> 00:06:22,930
+It's the modern Python standard.
+
+62
+00:06:22,930 --> 00:06:31,508
+Under the project section, we define the package name, version, description, and Python version requirement.
+
+63
+00:06:31,508 --> 00:06:36,712
+This is the metadata that makes your package findable and installable.
+
+64
+00:06:36,712 --> 00:06:41,821
+The dependencies section lists all production dependencies.
+
+65
+00:06:41,821 --> 00:06:46,680
+These are the packages your application actually needs to run.
+
+66
+00:06:46,680 --> 00:06:52,337
+Every dependency here is carefully chosen for a specific purpose.
+
+67
+00:06:52,337 --> 00:06:56,383
+FastAPI is our web framework.
+
+68
+00:06:56,383 --> 00:07:01,493
+It's modern, fast, and built on Python type hints.
+
+69
+00:07:01,493 --> 00:07:06,758
+Uvicorn is the ASGI server that runs FastAPI.
+
+70
+00:07:06,758 --> 00:07:12,258
+Pydantic handles configuration validation and data parsing.
+
+71
+00:07:12,258 --> 00:07:16,696
+Pydantic-settings reads from .env files.
+
+72
+00:07:16,696 --> 00:07:22,696
+SQLAlchemy 2.0 provides async database access.
+
+73
+00:07:22,696 --> 00:07:27,290
+asyncpg is the PostgreSQL driver.
+
+74
+00:07:27,290 --> 00:07:32,212
+pgvector adds vector search to PostgreSQL.
+
+75
+00:07:32,212 --> 00:07:36,227
+Alembic handles database migrations.
+
+76
+00:07:36,227 --> 00:07:39,071
+Redis provides caching.
+
+77
+00:07:39,071 --> 00:07:43,524
+OpenAI is for LLM and embedding integration.
+
+78
+00:07:43,524 --> 00:07:46,649
+tiktoken counts tokens.
+
+79
+00:07:46,649 --> 00:07:51,555
+httpx is our HTTP client.
+
+80
+00:07:51,555 --> 00:07:55,477
+BeautifulSoup4 parses HTML.
+
+81
+00:07:55,477 --> 00:07:59,196
+structlog provides structured logging.
+
+82
+00:07:59,196 --> 00:08:02,915
+tenacity handles retry logic.
+
+83
+00:08:02,915 --> 00:08:07,962
+The dev dependencies are separate from production dependencies.
+
+84
+00:08:07,962 --> 00:08:14,462
+These are not installed in production — they're only used during development and testing.
+
+85
+00:08:14,462 --> 00:08:17,899
+pytest is the testing framework.
+
+86
+00:08:17,899 --> 00:08:22,165
+pytest-asyncio enables async tests.
+
+87
+00:08:22,165 --> 00:08:25,712
+pytest-cov measures test coverage.
+
+88
+00:08:25,712 --> 00:08:29,758
+mypy is the static type checker.
+
+89
+00:08:29,758 --> 00:08:35,977
+ruff is the fast linter that replaces black, isort, and flake8.
+
+90
+00:08:35,977 --> 00:08:39,540
+pre-commit runs hooks before commits.
+
+91
+00:08:39,540 --> 00:08:43,758
+This tells hatchling where to find our package.
+
+92
+00:08:43,758 --> 00:08:48,790
+The packages are in src/financial_rag.
+
+93
+00:08:48,790 --> 00:08:52,712
+This is where the build system looks for the code.
+
+94
+00:08:52,712 --> 00:08:56,696
+Now let's look at the pytest configuration.
+
+95
+00:08:56,696 --> 00:09:03,446
+asyncio_mode is set to 'auto' — this enables async test support.
+
+96
+00:09:03,446 --> 00:09:09,493
+testpaths is set to 'tests' — this is where pytest looks for tests.
+
+97
+00:09:09,493 --> 00:09:16,071
+pythonpath includes 'src' — this allows imports to work correctly.
+
+98
+00:09:16,071 --> 00:09:21,758
+Without this, pytest wouldn't be able to find your application code.
+
+99
+00:09:21,758 --> 00:09:25,852
+This is a common pitfall that I want you to avoid.
+
+100
+00:09:25,852 --> 00:09:31,790
+python_files matches test_*.py.
+
+101
+00:09:31,790 --> 00:09:35,962
+python_classes matches Test*.
+
+102
+00:09:35,962 --> 00:09:40,883
+python_functions matches test_*.
+
+103
+00:09:40,883 --> 00:09:44,837
+These patterns tell pytest what to look for.
+
+104
+00:09:44,837 --> 00:09:52,008
+We define markers: 'unit' for unit tests and 'integration' for integration tests.
+
+105
+00:09:52,008 --> 00:09:59,368
+Integration tests require external services like PostgreSQL and Redis to be running.
+
+106
+00:09:59,368 --> 00:10:04,149
+This separation is crucial for fast test feedback.
+
+107
+00:10:04,149 --> 00:10:09,133
+You can run just unit tests with: pytest -m unit.
+
+108
+00:10:09,133 --> 00:10:14,383
+Or just integration tests with: pytest -m integration.
+
+109
+00:10:14,383 --> 00:10:21,008
+This flexibility is incredibly useful in CI/CD pipelines.
+
+110
+00:10:21,008 --> 00:10:27,008
+**END OF PHASE 1 — FOUNDATION**
+
+111
+00:10:27,008 --> 00:10:40,696
+**✅ Done!** The SRT has been converted to clean plain text with all timestamps, numbering, and table formatting removed.
+
