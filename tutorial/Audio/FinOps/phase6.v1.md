@@ -1,11 +1,14 @@
-# Series 6: Storage & Database Cost Controls
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your complete Series 6 SRT with all Type: lines and their corresponding Pronounced at: lines edited to type-along, precedential style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: The Costs That Never Go Down
-**Timestamp:** 00:00 – 05:00
+Series 6: Storage & Database Cost Controls
+Complete 24-Segment SRT — 2 Hours
+
+---
+
+SEGMENT 1: The Costs That Never Go Down
+Timestamp: 00:00 – 05:00
 
 ```
 1
@@ -70,10 +73,12 @@ Environment verification:
 [Types: export REGION=us-east-1]
 [Types: export START=$(date -d '30 days ago' +%Y-%m-%d)]
 [Types: export END=$(date +%Y-%m-%d)]
+▶ Pronounced as: "Now setting our environment variables with ACCOUNT_ID, REGION, START, and END."
 
 16
 00:02:30,000 --> 00:02:40,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --filter '{"Dimensions":{"Key":"SERVICE","Values":["Amazon Simple Storage Service","Amazon Relational Database Service","Amazon ElastiCache","Amazon EC2 Container Registry (ECR)"]}}' --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now querying Cost Explorer for our combined storage and database services baseline."
 
 17
 00:02:40,000 --> 00:02:50,000
@@ -142,8 +147,8 @@ See you in Segment 2.
 
 ---
 
-### SEGMENT 2: S3 Analysis — Finding the Expensive Buckets
-**Timestamp:** 05:00 – 10:00
+SEGMENT 2: S3 Analysis — Finding the Expensive Buckets
+Timestamp: 05:00 – 10:00
 
 ```
 33
@@ -165,6 +170,7 @@ Let's find your most expensive buckets by data size and estimated cost.
 37
 00:05:40,000 --> 00:05:50,000
 [Types: aws s3api list-buckets --query 'Buckets[].Name' --output text | tr '\t' '\n' | while read bucket; do size=$(aws s3api list-objects-v2 --bucket $bucket --query 'sum(Contents[].Size)' --output text 2>/dev/null || echo 0); size_gb=$(echo "scale=2; ${size:-0} / 1073741824" | bc); cost=$(echo "scale=4; $size_gb * 0.023" | bc); echo "$bucket | ${size_gb}GB | \$${cost}/month"; done | sort -t'|' -k3 -rn | head -20]
+▶ Pronounced as: "Now listing all buckets, calculating their size in GB, and showing estimated monthly cost at Standard tier rates."
 
 38
 00:05:50,000 --> 00:06:00,000
@@ -181,6 +187,7 @@ Now check the storage class distribution in your most expensive bucket.
 41
 00:06:20,000 --> 00:06:30,000
 [Types: TARGET_BUCKET="your-most-expensive-bucket"; aws s3api list-objects-v2 --bucket $TARGET_BUCKET --query 'Contents[].StorageClass' --output text | tr '\t' '\n' | sort | uniq -c | awk '{ class=$2; count=$1; if (class=="STANDARD") cost=0.023; if (class=="STANDARD_IA") cost=0.0125; if (class=="GLACIER_IR") cost=0.004; if (class=="GLACIER") cost=0.0036; if (class=="DEEP_ARCHIVE") cost=0.00099; printf "%-25s objects: %8d  rate: $%.4f/GB\n", class, count, cost }']
+▶ Pronounced as: "Now checking the storage class distribution of the target bucket."
 
 42
 00:06:30,000 --> 00:06:40,000
@@ -201,6 +208,7 @@ Now find all buckets with no lifecycle policy. These are your immediate targets.
 46
 00:07:10,000 --> 00:07:20,000
 [Types: aws s3api list-buckets --query 'Buckets[].Name' --output text | tr '\t' '\n' | while read bucket; do lc=$(aws s3api get-bucket-lifecycle-configuration --bucket $bucket 2>/dev/null | jq '.Rules | length' || echo 0); if [ "$lc" = "0" ] || [ -z "$lc" ]; then size=$(aws s3 ls --summarize --recursive s3://$bucket 2>/dev/null | grep "Total Size" | awk '{print $3}'); size_gb=$(echo "scale=1; ${size:-0} / 1073741824" | bc); echo "NO LIFECYCLE: $bucket  (${size_gb}GB unmanaged)"; fi; done]
+▶ Pronounced as: "Now finding all buckets with no lifecycle policy."
 
 47
 00:07:20,000 --> 00:07:30,000
@@ -233,8 +241,8 @@ See you in Segment 3.
 
 ---
 
-### SEGMENT 3: S3 Lifecycle Policies — The financial-rag Policy
-**Timestamp:** 10:00 – 15:00
+SEGMENT 3: S3 Lifecycle Policies — The financial-rag Policy
+Timestamp: 10:00 – 15:00
 
 ```
 54
@@ -301,6 +309,7 @@ Create the financial-rag lifecycle policy:
   ]
 }
 EOF]
+▶ Pronounced as: "Now creating the lifecycle policy JSON file with cat and heredoc."
 
 60
 00:11:00,000 --> 00:11:10,000
@@ -334,6 +343,7 @@ Now apply this policy to the financial-rag-documents bucket:
 00:12:10,000 --> 00:12:20,000
 [Types: aws s3api put-bucket-lifecycle-configuration --bucket financial-rag-documents --lifecycle-configuration file://financial-rag-lifecycle.json]
 [Types: echo "Lifecycle policy applied to financial-rag-documents"]
+▶ Pronounced as: "Now applying the lifecycle policy to the financial-rag-documents bucket."
 
 68
 00:12:20,000 --> 00:12:30,000
@@ -342,6 +352,7 @@ Now verify it was applied:
 69
 00:12:30,000 --> 00:12:40,000
 [Types: aws s3api get-bucket-lifecycle-configuration --bucket financial-rag-documents --query 'Rules[*].{ID:ID,Status:Status}' --output table]
+▶ Pronounced as: "Now verifying the lifecycle policy was applied with get-bucket-lifecycle-configuration."
 
 70
 00:12:40,000 --> 00:12:50,000
@@ -386,8 +397,8 @@ See you in Segment 4.
 
 ---
 
-### SEGMENT 4: Bulk S3 Lifecycle & ECR Image Cleanup
-**Timestamp:** 15:00 – 20:00
+SEGMENT 4: Bulk S3 Lifecycle & ECR Image Cleanup
+Timestamp: 15:00 – 20:00
 
 ```
 80
@@ -431,11 +442,13 @@ aws s3api list-buckets --query 'Buckets[].Name' --output text | \
     fi
   done
 EOF]
+▶ Pronounced as: "Now creating the bulk lifecycle application script."
 
 83
 00:15:30,000 --> 00:15:40,000
 [Types: chmod +x bulk-apply-lifecycle.sh]
 [Types: ./bulk-apply-lifecycle.sh]
+▶ Pronounced as: "Now making the script executable and running it."
 
 84
 00:15:40,000 --> 00:15:50,000
@@ -464,6 +477,7 @@ Audit your ECR repositories:
 90
 00:16:40,000 --> 00:16:50,000
 [Types: aws ecr describe-repositories --query 'repositories[].[repositoryName]' --output text | tr '\t' '\n' | while read repo; do count=$(aws ecr list-images --repository-name $repo --query 'length(imageIds)' --output text); size=$(aws ecr describe-images --repository-name $repo --query 'sum(imageDetails[].imageSizeInBytes)' --output text 2>/dev/null || echo 0); size_gb=$(echo "scale=2; ${size:-0} / 1073741824" | bc); cost=$(echo "scale=4; $size_gb * 0.10" | bc); echo "$repo | images: $count | size: ${size_gb}GB | cost: \$${cost}/month"; done]
+▶ Pronounced as: "Now auditing all ECR repositories with image count, size, and estimated cost."
 
 91
 00:16:50,000 --> 00:17:00,000
@@ -503,10 +517,12 @@ Apply lifecycle policy to all ECR repositories — keep 20 most recent images, d
   ]
 }
 EOF]
+▶ Pronounced as: "Now creating the ECR lifecycle policy JSON file."
 
 94
 00:17:20,000 --> 00:17:30,000
 [Types: aws ecr describe-repositories --query 'repositories[].repositoryName' --output text | tr '\t' '\n' | while read repo; do aws ecr put-lifecycle-policy --repository-name $repo --lifecycle-policy-text file://ecr-lifecycle-policy.json; echo "ECR lifecycle applied: $repo"; done]
+▶ Pronounced as: "Now applying the lifecycle policy to all ECR repositories."
 
 95
 00:17:30,000 --> 00:17:40,000
@@ -543,8 +559,8 @@ See you in Segment 5.
 
 ---
 
-### SEGMENT 5: RDS Stop/Start Schedules & Reserved Instances
-**Timestamp:** 20:00 – 25:00
+SEGMENT 5: RDS Stop/Start Schedules & Reserved Instances
+Timestamp: 20:00 – 25:00
 
 ```
 103
@@ -601,14 +617,17 @@ def lambda_handler(event, context):
 
     return {"action": action, "results": results}
 EOF]
+▶ Pronounced as: "Now creating the RDS scheduler Lambda function in Python."
 
 109
 00:21:00,000 --> 00:21:10,000
 [Types: zip /tmp/rds_scheduler.zip /tmp/rds_scheduler.py]
+▶ Pronounced as: "Now zipping the Lambda function."
 
 110
 00:21:10,000 --> 00:21:20,000
 [Types: aws lambda create-function --function-name rds-scheduler --runtime python3.11 --handler rds_scheduler.lambda_handler --zip-file fileb:///tmp/rds_scheduler.zip --role arn:aws:iam::${ACCOUNT_ID}:role/LambdaRDSSchedulerRole]
+▶ Pronounced as: "Now creating the Lambda function with AWS Lambda create-function."
 
 111
 00:21:20,000 --> 00:21:30,000
@@ -618,6 +637,7 @@ Now create the EventBridge rules that trigger the Lambda at the right times:
 00:21:30,000 --> 00:21:40,000
 [Types: aws events put-rule --name "rds-stop-dev" --schedule-expression "cron(0 20 ? * MON-FRI *)" --state ENABLED]
 [Types: aws events put-rule --name "rds-start-dev" --schedule-expression "cron(0 7 ? * MON-FRI *)" --state ENABLED]
+▶ Pronounced as: "Now creating EventBridge rules for stopping at 8 PM and starting at 7 AM on weekdays."
 
 113
 00:21:40,000 --> 00:21:50,000
@@ -627,6 +647,7 @@ Now add targets to the rules:
 00:21:50,000 --> 00:22:00,000
 [Types: aws events put-targets --rule rds-stop-dev --targets "Id=1,Arn=arn:aws:lambda:${REGION}:${ACCOUNT_ID}:function:rds-scheduler,Input='{\"action\":\"stop\"}'"]
 [Types: aws events put-targets --rule rds-start-dev --targets "Id=1,Arn=arn:aws:lambda:${REGION}:${ACCOUNT_ID}:function:rds-scheduler,Input='{\"action\":\"start\"}'"]
+▶ Pronounced as: "Now adding targets to the EventBridge rules with the stop and start actions."
 
 115
 00:22:00,000 --> 00:22:10,000
@@ -635,6 +656,7 @@ Now tag your dev databases to opt in:
 116
 00:22:10,000 --> 00:22:20,000
 [Types: for db_id in financial-rag-dev riskoracle-dev riskoracle-staging; do aws rds add-tags-to-resource --resource-name $(aws rds describe-db-instances --db-instance-identifier $db_id --query 'DBInstances[0].DBInstanceArn' --output text) --tags Key=Schedule,Value=dev-hours; echo "Scheduled: $db_id"; done]
+▶ Pronounced as: "Now tagging dev databases with Schedule=dev-hours to opt in to the scheduler."
 
 117
 00:22:20,000 --> 00:22:30,000
@@ -655,6 +677,7 @@ Reserved Instances deliver 40 to 60% savings for a 1-year commitment. Check Cost
 121
 00:23:00,000 --> 00:23:10,000
 [Types: aws ce get-reservation-purchase-recommendation --service "Amazon RDS" --lookback-period-in-days SIXTY_DAYS --term-in-years ONE_YEAR --payment-option NO_UPFRONT --query 'Recommendations[0].RecommendationDetails[0].[InstanceDetails,EstimatedMonthlySavingsAmount]' --output table]
+▶ Pronounced as: "Now getting RDS Reserved Instance purchase recommendations from Cost Explorer."
 
 122
 00:23:10,000 --> 00:23:20,000
@@ -672,6 +695,7 @@ Purchase the Reserved Instance:
 00:23:40,000 --> 00:23:50,000
 [Types: OFFERING_ID=$(aws rds describe-reserved-db-instances-offerings --db-instance-class db.r6g.large --product-description postgresql --duration 31536000 --offering-type "No Upfront" --query 'ReservedDBInstancesOfferings[0].ReservedDBInstancesOfferingId' --output text)]
 [Types: aws rds purchase-reserved-db-instances-offering --reserved-db-instances-offering-id $OFFERING_ID --reserved-db-instance-id "financial-rag-ri-$(date +%Y%m)" --db-instance-count 1]
+▶ Pronounced as: "Now finding the offering ID and purchasing the Reserved Instance."
 
 126
 00:23:50,000 --> 00:24:00,000
@@ -687,6 +711,7 @@ Now update the baseline document:
 [Types: echo "Total Series 6 saving: \$596/month | \$7,152/year" >> ~/finops-baseline.txt]
 [Types: echo "Running bill total: ~\$19,404/month → series 7-10 locks this in permanently" >> ~/finops-baseline.txt]
 [Types: echo "" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending Series 6 results to the baseline document."
 
 128
 00:24:10,000 --> 00:24:20,000
@@ -719,8 +744,8 @@ See you in Series 7.
 
 ---
 
-### SEGMENT 6: Deep Dive — Understanding S3 Storage Classes
-**Timestamp:** 25:00 – 30:00
+SEGMENT 6: Deep Dive — Understanding S3 Storage Classes
+Timestamp: 25:00 – 30:00
 
 ```
 135
@@ -806,8 +831,8 @@ See you in Segment 7.
 
 ---
 
-### SEGMENT 7: Deep Dive — S3 Lifecycle Policy Design Patterns
-**Timestamp:** 30:00 – 35:00
+SEGMENT 7: Deep Dive — S3 Lifecycle Policy Design Patterns
+Timestamp: 30:00 – 35:00
 
 ```
 155
@@ -901,8 +926,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: S3 Intelligent-Tiering — When to Use It
-**Timestamp:** 35:00 – 40:00
+SEGMENT 8: S3 Intelligent-Tiering — When to Use It
+Timestamp: 35:00 – 40:00
 
 ```
 177
@@ -956,6 +981,7 @@ To enable Intelligent-Tiering, use the put-bucket-intelligent-tiering-configurat
 189
 00:37:00,000 --> 00:37:10,000
 [Types: aws s3api put-bucket-intelligent-tiering-configuration --bucket your-bucket-name --id config1 --intelligent-tiering-configuration '{"Status":"Enabled","Tierings":[{"Days":30,"AccessTier":"ARCHIVE_ACCESS"}]}']
+▶ Pronounced as: "Now enabling Intelligent-Tiering on a bucket with Archive Access after 30 days."
 
 190
 00:37:10,000 --> 00:37:20,000
@@ -988,8 +1014,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Deep Dive — ECR Lifecycle Policy Rules
-**Timestamp:** 40:00 – 45:00
+SEGMENT 9: Deep Dive — ECR Lifecycle Policy Rules
+Timestamp: 40:00 – 45:00
 
 ```
 197
@@ -1030,6 +1056,7 @@ The second is the image count rule. This keeps a maximum number of images per re
 
 203
 00:41:00,000 --> 00:41:10,000
+
 ```json
 {
   "rulePriority": 2,
@@ -1049,6 +1076,7 @@ The third is the tag prefix rule. This keeps a maximum number of images for each
 
 205
 00:41:20,000 --> 00:41:30,000
+
 ```json
 {
   "rulePriority": 3,
@@ -1093,6 +1121,7 @@ Now let's look at a complete ECR lifecycle policy:
 
 213
 00:42:40,000 --> 00:42:50,000
+
 ```json
 {
   "rules": [
@@ -1151,14 +1180,16 @@ In the next segment, we look at ECR repository scanning and security.
 218
 00:43:30,000 --> 00:43:40,000
 See you in Segment 10.
+
 ```
 
 ---
 
-### SEGMENT 10: ECR Repository Scanning & Security
-**Timestamp:** 45:00 – 50:00
+**SEGMENT 10: ECR Repository Scanning & Security**
+*Timestamp: 45:00 – 50:00*
 
 ```
+
 219
 00:45:00,000 --> 00:45:10,000
 Welcome to Segment 10. We are going to look at ECR repository scanning and security.
@@ -1186,6 +1217,7 @@ Enable scanning on all repositories:
 225
 00:46:00,000 --> 00:46:10,000
 [Types: aws ecr put-image-scanning-configuration --repository-name your-repository --image-scanning-configuration scanOnPush=true]
+▶ Pronounced as: "Now enabling image scanning on a repository."
 
 226
 00:46:10,000 --> 00:46:20,000
@@ -1194,6 +1226,7 @@ Check scan results:
 227
 00:46:20,000 --> 00:46:30,000
 [Types: aws ecr describe-image-scan-findings --repository-name your-repository --image-id imageTag=latest]
+▶ Pronounced as: "Now checking scan findings for the latest image."
 
 228
 00:46:30,000 --> 00:46:40,000
@@ -1205,6 +1238,7 @@ Another important security practice is limiting repository access. Use IAM polic
 
 230
 00:46:50,000 --> 00:47:00,000
+
 ```json
 {
   "Version": "2012-10-17",
@@ -1234,6 +1268,7 @@ Now let's look at image immutability. This prevents images from being overwritte
 234
 00:47:30,000 --> 00:47:40,000
 [Types: aws ecr put-image-tag-mutability --repository-name your-repository --image-tag-mutability IMMUTABLE]
+▶ Pronounced as: "Now enabling image immutability on a repository."
 
 235
 00:47:40,000 --> 00:47:50,000
@@ -1246,6 +1281,7 @@ Now let's look at ECR repository encryption. Encryption is enabled by default. B
 237
 00:48:00,000 --> 00:48:10,000
 [Types: aws ecr put-encryption-configuration --repository-name your-repository --encryption-configuration encryptionType=KMS,kmsKey=arn:aws:kms:us-east-1:123456789012:key/your-key-id]
+▶ Pronounced as: "Now setting customer-managed KMS encryption on a repository."
 
 238
 00:48:10,000 --> 00:48:20,000
@@ -1262,14 +1298,16 @@ In the next segment, we look at RDS instance types and pricing.
 241
 00:48:40,000 --> 00:48:50,000
 See you in Segment 11.
+
 ```
 
 ---
 
-### SEGMENT 11: Deep Dive — RDS Instance Types & Pricing
-**Timestamp:** 50:00 – 55:00
+**SEGMENT 11: Deep Dive — RDS Instance Types & Pricing**
+*Timestamp: 50:00 – 55:00*
 
 ```
+
 242
 00:50:00,000 --> 00:50:10,000
 Welcome to Segment 11. We are going to look at RDS instance types and pricing.
@@ -1357,6 +1395,7 @@ Now let's look at how to change the instance type.
 263
 00:53:30,000 --> 00:53:40,000
 [Types: aws rds modify-db-instance --db-instance-identifier your-database --db-instance-class db.m6g.large --apply-immediately]
+▶ Pronounced as: "Now modifying an RDS instance to change its instance type immediately."
 
 264
 00:53:40,000 --> 00:53:50,000
@@ -1369,6 +1408,7 @@ You can also schedule the change during the next maintenance window:
 266
 00:54:00,000 --> 00:54:10,000
 [Types: aws rds modify-db-instance --db-instance-identifier your-database --db-instance-class db.m6g.large --no-apply-immediately]
+▶ Pronounced as: "Now scheduling the instance type change during the next maintenance window."
 
 267
 00:54:10,000 --> 00:54:20,000
@@ -1381,14 +1421,16 @@ In the next segment, we look at RDS Performance Insights and cost optimization.
 269
 00:54:30,000 --> 00:54:40,000
 See you in Segment 12.
+
 ```
 
 ---
 
-### SEGMENT 12: RDS Performance Insights & Cost Optimization
-**Timestamp:** 55:00 – 60:00
+**SEGMENT 12: RDS Performance Insights & Cost Optimization**
+*Timestamp: 55:00 – 60:00*
 
 ```
+
 270
 00:55:00,000 --> 00:55:10,000
 Welcome to Segment 12. We are going to look at RDS Performance Insights and cost optimization.
@@ -1408,6 +1450,7 @@ Enable Performance Insights when you create or modify a database:
 274
 00:55:40,000 --> 00:55:50,000
 [Types: aws rds modify-db-instance --db-instance-identifier your-database --enable-performance-insights --performance-insights-retention-period 7]
+▶ Pronounced as: "Now enabling Performance Insights on an RDS instance."
 
 275
 00:55:50,000 --> 00:56:00,000
@@ -1420,6 +1463,7 @@ Now let's look at the top SQL queries. This shows you which queries are consumin
 277
 00:56:10,000 --> 00:56:20,000
 [Types: aws rds get-performance-insights-query --db-instance-identifier your-database --group-by "db.sql" --metric "db.load.average" --start-time $(date -d '1 hour ago' -u +%Y-%m-%dT%H:%M:%SZ) --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ)]
+▶ Pronounced as: "Now getting top SQL queries from Performance Insights."
 
 278
 00:56:20,000 --> 00:56:30,000
@@ -1436,6 +1480,7 @@ Now let's look at the top wait events. This shows you what the database is waiti
 281
 00:56:50,000 --> 00:57:00,000
 [Types: aws rds get-performance-insights-query --db-instance-identifier your-database --group-by "db.wait_event" --metric "db.load.average" --start-time $(date -d '1 hour ago' -u +%Y-%m-%dT%H:%M:%SZ) --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ)]
+▶ Pronounced as: "Now getting top wait events from Performance Insights."
 
 282
 00:57:00,000 --> 00:57:10,000
@@ -1472,6 +1517,7 @@ You can change the storage type of a database:
 290
 00:58:20,000 --> 00:58:30,000
 [Types: aws rds modify-db-instance --db-instance-identifier your-database --storage-type gp3 --iops 3000 --apply-immediately]
+▶ Pronounced as: "Now changing the storage type to gp3."
 
 291
 00:58:30,000 --> 00:58:40,000
@@ -1484,14 +1530,16 @@ In the next segment, we look at RDS automated backups and snapshot management.
 293
 00:58:50,000 --> 00:59:00,000
 See you in Segment 13.
+
 ```
 
 ---
 
-### SEGMENT 13: RDS Automated Backups & Snapshot Management
-**Timestamp:** 60:00 – 65:00
+**SEGMENT 13: RDS Automated Backups & Snapshot Management**
+*Timestamp: 60:00 – 65:00*
 
 ```
+
 294
 01:00:00,000 --> 01:00:10,000
 Welcome to Segment 13. We are going to look at RDS automated backups and snapshot management.
@@ -1515,6 +1563,7 @@ You can reduce backup storage by reducing the retention period. 7 days is usuall
 299
 01:00:50,000 --> 01:01:00,000
 [Types: aws rds modify-db-instance --db-instance-identifier your-database --backup-retention-period 7 --apply-immediately]
+▶ Pronounced as: "Now setting backup retention to 7 days."
 
 300
 01:01:00,000 --> 01:01:10,000
@@ -1531,6 +1580,7 @@ Create a manual snapshot:
 303
 01:01:30,000 --> 01:01:40,000
 [Types: aws rds create-db-snapshot --db-instance-identifier your-database --db-snapshot-identifier your-database-snapshot-$(date +%Y%m%d)]
+▶ Pronounced as: "Now creating a manual snapshot."
 
 304
 01:01:40,000 --> 01:01:50,000
@@ -1539,6 +1589,7 @@ List your manual snapshots:
 305
 01:01:50,000 --> 01:02:00,000
 [Types: aws rds describe-db-snapshots --snapshot-type manual --query 'DBSnapshots[*].[DBSnapshotIdentifier,SnapshotCreateTime,AllocatedStorage]' --output table]
+▶ Pronounced as: "Now listing manual snapshots."
 
 306
 01:02:00,000 --> 01:02:10,000
@@ -1547,6 +1598,7 @@ Delete old manual snapshots to save cost:
 307
 01:02:10,000 --> 01:02:20,000
 [Types: aws rds delete-db-snapshot --db-snapshot-identifier your-old-snapshot]
+▶ Pronounced as: "Now deleting an old manual snapshot."
 
 308
 01:02:20,000 --> 01:02:30,000
@@ -1559,6 +1611,7 @@ Choose a backup window during low traffic hours. This minimizes performance impa
 310
 01:02:40,000 --> 01:02:50,000
 [Types: aws rds modify-db-instance --db-instance-identifier your-database --preferred-backup-window "03:00-04:00" --apply-immediately]
+▶ Pronounced as: "Now setting the backup window to 3-4 AM."
 
 311
 01:02:50,000 --> 01:03:00,000
@@ -1567,6 +1620,7 @@ Now let's look at point-in-time recovery. RDS can restore a database to any poin
 312
 01:03:00,000 --> 01:03:10,000
 [Types: aws rds restore-db-instance-to-point-in-time --source-db-instance-identifier your-database --target-db-instance-identifier your-database-restored --restore-time 2024-01-15T12:00:00Z]
+▶ Pronounced as: "Now performing point-in-time recovery."
 
 313
 01:03:10,000 --> 01:03:20,000
@@ -1583,14 +1637,16 @@ In the next segment, we look at RDS Reserved Instance purchase options.
 316
 01:03:40,000 --> 01:03:50,000
 See you in Segment 14.
+
 ```
 
 ---
 
-### SEGMENT 14: Deep Dive — RDS Reserved Instance Purchase Options
-**Timestamp:** 65:00 – 70:00
+**SEGMENT 14: Deep Dive — RDS Reserved Instance Purchase Options**
+*Timestamp: 65:00 – 70:00*
 
 ```
+
 317
 01:05:00,000 --> 01:05:10,000
 Welcome to Segment 14. We are going to look at RDS Reserved Instance purchase options.
@@ -1662,6 +1718,7 @@ First, find the offering ID:
 334
 01:07:50,000 --> 01:08:00,000
 [Types: OFFERING_ID=$(aws rds describe-reserved-db-instances-offerings --db-instance-class db.m6g.large --product-description postgresql --duration 31536000 --offering-type "No Upfront" --query 'ReservedDBInstancesOfferings[0].ReservedDBInstancesOfferingId' --output text)]
+▶ Pronounced as: "Now finding the Reserved Instance offering ID."
 
 335
 01:08:00,000 --> 01:08:10,000
@@ -1670,6 +1727,7 @@ Then purchase it:
 336
 01:08:10,000 --> 01:08:20,000
 [Types: aws rds purchase-reserved-db-instances-offering --reserved-db-instances-offering-id $OFFERING_ID --reserved-db-instance-id "your-ri-$(date +%Y%m)" --db-instance-count 1]
+▶ Pronounced as: "Now purchasing the Reserved Instance."
 
 337
 01:08:20,000 --> 01:08:30,000
@@ -1698,14 +1756,16 @@ In the next segment, we look at ElastiCache Reserved Nodes.
 343
 01:09:20,000 --> 01:09:30,000
 See you in Segment 15.
+
 ```
 
 ---
 
-### SEGMENT 15: ElastiCache Reserved Nodes — Cost Optimization
-**Timestamp:** 70:00 – 75:00
+**SEGMENT 15: ElastiCache Reserved Nodes — Cost Optimization**
+*Timestamp: 70:00 – 75:00*
 
 ```
+
 344
 01:10:00,000 --> 01:10:10,000
 Welcome to Segment 15. We are going to look at ElastiCache Reserved Nodes.
@@ -1757,6 +1817,7 @@ First, find the offering ID:
 356
 01:12:00,000 --> 01:12:10,000
 [Types: OFFERING_ID=$(aws elasticache describe-reserved-cache-nodes-offerings --cache-node-type cache.r6g.large --product-description redis --duration 31536000 --offering-type "No Upfront" --query 'ReservedCacheNodesOfferings[0].ReservedCacheNodesOfferingId' --output text)]
+▶ Pronounced as: "Now finding the ElastiCache Reserved Node offering ID."
 
 357
 01:12:10,000 --> 01:12:20,000
@@ -1765,6 +1826,7 @@ Then purchase it:
 358
 01:12:20,000 --> 01:12:30,000
 [Types: aws elasticache purchase-reserved-cache-nodes-offering --reserved-cache-nodes-offering-id $OFFERING_ID --reserved-cache-node-id "your-ri-$(date +%Y%m)" --cache-node-count 1]
+▶ Pronounced as: "Now purchasing the Reserved Node."
 
 359
 01:12:30,000 --> 01:12:40,000
@@ -1797,6 +1859,7 @@ Now let's look at how to monitor ElastiCache costs.
 366
 01:13:40,000 --> 01:13:50,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --filter '{"Dimensions":{"Key":"SERVICE","Values":["Amazon ElastiCache"]}}' --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now querying Cost Explorer for ElastiCache costs."
 
 367
 01:13:50,000 --> 01:14:00,000
@@ -1813,14 +1876,16 @@ In the next segment, we look at Terraform enforcement for S3 lifecycle policies.
 370
 01:14:20,000 --> 01:14:30,000
 See you in Segment 16.
+
 ```
 
 ---
 
-### SEGMENT 16: Deep Dive — ElastiCache Node Types & Pricing
-**Timestamp:** 75:00 – 80:00
+**SEGMENT 16: Deep Dive — ElastiCache Node Types & Pricing**
+*Timestamp: 75:00 – 80:00*
 
 ```
+
 371
 01:15:00,000 --> 01:15:10,000
 Welcome to Segment 16. We are going to look at ElastiCache node types and pricing in detail.
@@ -1924,14 +1989,16 @@ In the next segment, we look at Terraform enforcement for S3 lifecycle policies.
 396
 01:19:10,000 --> 01:19:20,000
 See you in Segment 17.
+
 ```
 
 ---
 
-### SEGMENT 17: Terraform Enforcement — S3 Lifecycle Policies
-**Timestamp:** 80:00 – 85:00
+**SEGMENT 17: Terraform Enforcement — S3 Lifecycle Policies**
+*Timestamp: 80:00 – 85:00*
 
 ```
+
 397
 01:20:00,000 --> 01:20:10,000
 Welcome to Segment 17. We are going to look at Terraform enforcement for S3 lifecycle policies.
@@ -1950,6 +2017,7 @@ Create a Terraform module for S3 buckets:
 
 401
 01:20:40,000 --> 01:20:50,000
+
 ```hcl
 # modules/s3-bucket/main.tf
 resource "aws_s3_bucket" "this" {
@@ -2016,6 +2084,7 @@ Use the module in your environment:
 
 404
 01:21:10,000 --> 01:21:20,000
+
 ```hcl
 module "financial_rag_documents" {
   source = "./modules/s3-bucket"
@@ -2039,6 +2108,7 @@ You can also use Terraform to audit existing buckets. Use the data source to che
 
 407
 01:21:40,000 --> 01:21:50,000
+
 ```hcl
 data "aws_s3_bucket" "all" {
   for_each = local.bucket_names
@@ -2066,14 +2136,16 @@ In the next segment, we look at Terraform enforcement for ECR lifecycle policies
 411
 01:22:20,000 --> 01:22:30,000
 See you in Segment 18.
+
 ```
 
 ---
 
-### SEGMENT 18: Terraform Enforcement — ECR Lifecycle Policies
-**Timestamp:** 85:00 – 90:00
+**SEGMENT 18: Terraform Enforcement — ECR Lifecycle Policies**
+*Timestamp: 85:00 – 90:00*
 
 ```
+
 412
 01:25:00,000 --> 01:25:10,000
 Welcome to Segment 18. We are going to look at Terraform enforcement for ECR lifecycle policies.
@@ -2088,6 +2160,7 @@ Create a Terraform module for ECR repositories:
 
 415
 01:25:30,000 --> 01:25:40,000
+
 ```hcl
 # modules/ecr-repository/main.tf
 resource "aws_ecr_repository" "this" {
@@ -2135,6 +2208,7 @@ Use the module in your environment:
 
 418
 01:26:00,000 --> 01:26:10,000
+
 ```hcl
 module "financial_rag_api" {
   source = "./modules/ecr-repository"
@@ -2157,6 +2231,7 @@ You can also use Terraform to audit existing repositories. Use the data source t
 
 421
 01:26:30,000 --> 01:26:40,000
+
 ```hcl
 data "aws_ecr_repository" "all" {
   for_each = local.repository_names
@@ -2184,14 +2259,16 @@ In the next segment, we look at Terraform enforcement for RDS configuration.
 425
 01:27:10,000 --> 01:27:20,000
 See you in Segment 19.
+
 ```
 
 ---
 
-### SEGMENT 19: Terraform Enforcement — RDS Configuration
-**Timestamp:** 90:00 – 95:00
+**SEGMENT 19: Terraform Enforcement — RDS Configuration**
+*Timestamp: 90:00 – 95:00*
 
 ```
+
 426
 01:30:00,000 --> 01:30:10,000
 Welcome to Segment 19. We are going to look at Terraform enforcement for RDS configuration.
@@ -2206,6 +2283,7 @@ Create a Terraform module for RDS instances:
 
 429
 01:30:30,000 --> 01:30:40,000
+
 ```hcl
 # modules/rds-instance/main.tf
 resource "aws_db_instance" "this" {
@@ -2245,6 +2323,7 @@ Use the module in your environment:
 
 433
 01:31:10,000 --> 01:31:20,000
+
 ```hcl
 module "financial_rag_db" {
   source = "./modules/rds-instance"
@@ -2273,6 +2352,7 @@ You can also use Terraform to audit existing databases. Use the data source to c
 
 436
 01:31:40,000 --> 01:31:50,000
+
 ```hcl
 data "aws_db_instance" "all" {
   for_each = local.db_identifiers
@@ -2295,14 +2375,16 @@ In the next segment, we look at OPA policies for storage and database compliance
 440
 01:32:20,000 --> 01:32:30,000
 See you in Segment 20.
+
 ```
 
 ---
 
-### SEGMENT 20: OPA Policies for Storage & Database Compliance
-**Timestamp:** 95:00 – 100:00
+**SEGMENT 20: OPA Policies for Storage & Database Compliance**
+*Timestamp: 95:00 – 100:00*
 
 ```
+
 441
 01:35:00,000 --> 01:35:10,000
 Welcome to Segment 20. We are going to look at OPA policies for storage and database compliance.
@@ -2321,6 +2403,7 @@ Create an OPA policy for S3 buckets:
 
 445
 01:35:40,000 --> 01:35:50,000
+
 ```rego
 # policies/storage.rego
 package financial_rag.storage
@@ -2349,6 +2432,7 @@ Create an OPA policy for ECR repositories:
 
 448
 01:36:10,000 --> 01:36:20,000
+
 ```rego
 # policies/ecr.rego
 package financial_rag.ecr
@@ -2377,6 +2461,7 @@ Create an OPA policy for RDS instances:
 
 451
 01:36:40,000 --> 01:36:50,000
+
 ```rego
 # policies/rds.rego
 package financial_rag.rds
@@ -2407,6 +2492,7 @@ Run OPA with your Terraform plan:
 
 454
 01:37:10,000 --> 01:37:20,000
+
 ```bash
 terraform plan -out=tfplan
 terraform show -json tfplan > tfplan.json
@@ -2428,14 +2514,16 @@ In the next segment, we do a workshop on auditing your storage costs.
 458
 01:37:50,000 --> 01:38:00,000
 See you in Segment 21.
+
 ```
 
 ---
 
-### SEGMENT 21: Workshop — Auditing Your Storage Costs
-**Timestamp:** 100:00 – 105:00
+**SEGMENT 21: Workshop — Auditing Your Storage Costs**
+*Timestamp: 100:00 – 105:00*
 
 ```
+
 459
 01:40:00,000 --> 01:40:10,000
 Welcome to Segment 21. This is the storage cost audit workshop.
@@ -2450,6 +2538,7 @@ First, find your most expensive buckets:
 
 462
 01:40:30,000 --> 01:40:40,000
+
 ```bash
 aws s3api list-buckets --query 'Buckets[].Name' --output text | \
   tr '\t' '\n' | while read bucket; do
@@ -2467,6 +2556,7 @@ Second, check which buckets have lifecycle policies:
 
 464
 01:40:50,000 --> 01:41:00,000
+
 ```bash
 aws s3api list-buckets --query 'Buckets[].Name' --output text | \
   tr '\t' '\n' | while read bucket; do
@@ -2487,6 +2577,7 @@ Third, check ECR repository sizes:
 
 466
 01:41:10,000 --> 01:41:20,000
+
 ```bash
 aws ecr describe-repositories --query 'repositories[].[repositoryName]' \
   --output text | tr '\t' '\n' | while read repo; do
@@ -2506,6 +2597,7 @@ Fourth, check RDS database costs:
 
 468
 01:41:30,000 --> 01:41:40,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,DBInstanceClass,Engine,AllocatedStorage,DBInstanceStatus]' --output table
 ```
@@ -2516,6 +2608,7 @@ Fifth, check ElastiCache costs:
 
 470
 01:41:50,000 --> 01:42:00,000
+
 ```bash
 aws elasticache describe-cache-clusters --query 'CacheClusters[].[CacheClusterId,Engine,CacheNodeType,NumCacheNodes,CacheClusterStatus]' --output table
 ```
@@ -2539,14 +2632,16 @@ In the next segment, we do a workshop on database cost optimization.
 475
 01:42:40,000 --> 01:42:50,000
 See you in Segment 22.
+
 ```
 
 ---
 
-### SEGMENT 22: Workshop — Database Cost Optimization Review
-**Timestamp:** 105:00 – 110:00
+**SEGMENT 22: Workshop — Database Cost Optimization Review**
+*Timestamp: 105:00 – 110:00*
 
 ```
+
 476
 01:45:00,000 --> 01:45:10,000
 Welcome to Segment 22. This is the database cost optimization workshop.
@@ -2561,6 +2656,7 @@ First, review RDS instance types:
 
 479
 01:45:30,000 --> 01:45:40,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,DBInstanceClass,Engine,AllocatedStorage]' --output table
 ```
@@ -2571,6 +2667,7 @@ Second, check RDS utilization:
 
 481
 01:45:50,000 --> 01:46:00,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[].DBInstanceArn' \
   --output text | tr '\t' '\n' | while read arn; do
@@ -2589,6 +2686,7 @@ Third, check RDS storage utilization:
 
 483
 01:46:10,000 --> 01:46:20,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,AllocatedStorage,StorageType]' --output table
 ```
@@ -2599,6 +2697,7 @@ Fourth, check RDS backup retention:
 
 485
 01:46:30,000 --> 01:46:40,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,BackupRetentionPeriod]' --output table
 ```
@@ -2609,6 +2708,7 @@ Fifth, check RDS tags for dev-hour scheduling:
 
 487
 01:46:50,000 --> 01:47:00,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,Tags]' --output table
 ```
@@ -2619,6 +2719,7 @@ Now identify optimization opportunities:
 
 489
 01:47:10,000 --> 01:47:20,000
+
 1. Instances with CPU below 20% can be downsized.
 2. Instances without dev-hour tags can be scheduled.
 3. Production instances can have Reserved Instances.
@@ -2631,6 +2732,7 @@ Calculate the potential savings:
 
 491
 01:47:30,000 --> 01:47:40,000
+
 ```bash
 echo "=== DATABASE OPTIMIZATION SUMMARY ==="
 echo "Instances with CPU below 20%: [count]"
@@ -2650,14 +2752,16 @@ In the next segment, we do the Q&A for Series 6.
 494
 01:48:00,000 --> 01:48:10,000
 See you in Segment 23.
+
 ```
 
 ---
 
-### SEGMENT 23: Series 6 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+**SEGMENT 23: Series 6 Q&A — Common Questions Answered**
+*Timestamp: 110:00 – 115:00*
 
 ```
+
 495
 01:50:00,000 --> 01:50:10,000
 Welcome to Segment 23. This is the Q&A for Series 6.
@@ -2684,6 +2788,7 @@ Deep Archive retrieval takes 12 to 48 hours. You need to initiate a restore requ
 
 501
 01:51:00,000 --> 01:51:10,000
+
 ```bash
 aws s3api restore-object --bucket your-bucket --key your-key --restore-request Days=30
 ```
@@ -2706,6 +2811,7 @@ Check the Lambda logs in CloudWatch. You can also check the RDS instance status 
 
 506
 01:51:50,000 --> 01:52:00,000
+
 ```bash
 aws rds describe-db-instances --query 'DBInstances[*].[DBInstanceIdentifier,DBInstanceStatus]' --output table
 ```
@@ -2765,14 +2871,16 @@ In the next segment, we do the knowledge check and look ahead to Series 7.
 520
 01:54:10,000 --> 01:54:20,000
 See you in Segment 24.
+
 ```
 
 ---
 
-### SEGMENT 24: Series 6 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+**SEGMENT 24: Series 6 Knowledge Check & Next Steps**
+*Timestamp: 115:00 – 120:00*
 
 ```
+
 521
 01:55:00,000 --> 01:55:10,000
 Welcome to Segment 24. This is the knowledge check for Series 6.
@@ -2851,11 +2959,11 @@ Before you start Series 7, verify these four things:
 
 540
 01:58:10,000 --> 01:58:20,000
-One: S3 lifecycle policies applied. Check with `aws s3api get-bucket-lifecycle-configuration`.
+One: S3 lifecycle policies applied. Check with aws s3api get-bucket-lifecycle-configuration.
 
 541
 01:58:20,000 --> 01:58:30,000
-Two: ECR lifecycle policies applied. Check with `aws ecr get-lifecycle-policy`.
+Two: ECR lifecycle policies applied. Check with aws ecr get-lifecycle-policy.
 
 542
 01:58:30,000 --> 01:58:40,000
@@ -2888,4 +2996,5 @@ Now we move to the platform track. Series 7 begins now.
 549
 01:59:40,000 --> 01:59:50,000
 See you in Series 7.
+
 ```
