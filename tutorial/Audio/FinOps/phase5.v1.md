@@ -1,11 +1,14 @@
-# Series 5: Spot Instance Engineering for ML Workloads
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your **complete Series 5 SRT** with all `Type:` lines and their corresponding `Pronounced at:` lines edited to **type-along, precedential** style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: The Fear That Costs You 70%
-**Timestamp:** 00:00 – 05:00
+**Series 5: Spot Instance Engineering for ML Workloads**
+**Complete 24-Segment SRT — 2 Hours**
+
+---
+
+**SEGMENT 1: The Fear That Costs You 70%**
+*Timestamp: 00:00 – 05:00*
 
 ```
 1
@@ -119,12 +122,12 @@ Before we write any code, environment verification:
 28
 00:04:30,000 --> 00:04:40,000
 [Types: export CHECKPOINT_BUCKET="riskoracle-checkpoints-${ACCOUNT_ID}"]
-▶ Pronounced as: "Export, CHECKPOINT, underscore, BUCKET, equals, quote, riskoracle, dash, checkpoints, dash, dollar, ACCOUNT, underscore, ID, quote"
+▶ Pronounced as: "Now export CHECKPOINT_BUCKET with our account ID appended."
 
 29
 00:04:40,000 --> 00:04:50,000
 [Types: kubectl get pods -n karpenter]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, karpenter"
+▶ Pronounced as: "Now kubectl get pods in the karpenter namespace to verify Karpenter is running."
 
 30
 00:04:50,000 --> 00:05:00,000
@@ -133,8 +136,8 @@ Karpenter from Series 4 must be running. The NodePools must be applied. Without 
 
 ---
 
-### SEGMENT 2: Spot Price History Analysis & Instance Selection
-**Timestamp:** 05:00 – 10:00
+**SEGMENT 2: Spot Price History Analysis & Instance Selection**
+*Timestamp: 05:00 – 10:00*
 
 ```
 31
@@ -160,7 +163,7 @@ Let's run the Spot price stability analysis script.
 36
 00:05:50,000 --> 00:06:00,000
 [Types: for instance_type in g4dn.xlarge g4dn.2xlarge g5.xlarge g5.2xlarge p3.2xlarge; do prices=$(aws ec2 describe-spot-price-history --instance-types $instance_type --product-descriptions "Linux/UNIX" --start-time $(date -d '168 hours ago' -u +%Y-%m-%dT%H:%M:%SZ) --query 'SpotPriceHistory[].SpotPrice' --output text 2>/dev/null | tr '\t' '\n'); if [ -z "$prices" ]; then echo "$instance_type: No Spot capacity available"; continue; fi; stats=$(echo "$prices" | python3 -c "import sys, statistics; prices=[float(x) for x in sys.stdin.read().split() if x]; if not prices: print('no_data'); sys.exit(); avg=statistics.mean(prices); stddev=statistics.stdev(prices) if len(prices)>1 else 0; min_p=min(prices); max_p=max(prices); current=prices[-1]; cv=(stddev/avg*100) if avg>0 else 0; stability='HIGH' if cv<5 else ('MEDIUM' if cv<15 else 'LOW'); print(f'avg={avg:.4f} min={min_p:.4f} max={max_p:.4f} current={current:.4f} cv={cv:.1f}% stability={stability}')"); echo "[$instance_type]"; echo "  $stats"; echo ""; done]
-▶ Pronounced as: "For, instance, underscore, type, in, g-four-d-n, dot, xlarge..."
+▶ Pronounced as: "Now looping through GPU instance types, querying Spot price history for the last 168 hours, and calculating the coefficient of variation."
 
 37
 00:06:00,000 --> 00:06:10,000
@@ -205,12 +208,12 @@ Now let's set up the S3 checkpoint bucket. This is where all checkpoints will be
 47
 00:07:40,000 --> 00:07:50,000
 [Types: aws s3api create-bucket --bucket $CHECKPOINT_BUCKET --region $REGION]
-▶ Pronounced as: "AWS, S-three, API, create, bucket..."
+▶ Pronounced as: "Now creating the S3 checkpoint bucket with AWS S3 API create-bucket."
 
 48
 00:07:50,000 --> 00:08:00,000
 [Types: aws s3api put-bucket-versioning --bucket $CHECKPOINT_BUCKET --versioning-configuration Status=Enabled]
-▶ Pronounced as: "AWS, S-three, API, put, bucket, versioning..."
+▶ Pronounced as: "Now enabling versioning on the bucket with put-bucket-versioning."
 
 49
 00:08:00,000 --> 00:08:10,000
@@ -219,7 +222,7 @@ We are enabling versioning on the checkpoint bucket. This lets you recover from 
 50
 00:08:10,000 --> 00:08:20,000
 [Types: aws s3api put-bucket-lifecycle-configuration --bucket $CHECKPOINT_BUCKET --lifecycle-configuration '{"Rules":[{"ID":"delete-old-checkpoints","Status":"Enabled","Filter":{"Prefix":"checkpoints/"},"NoncurrentVersionExpiration":{"NoncurrentDays":3},"AbortIncompleteMultipartUpload":{"DaysAfterInitiation":1}}]}']
-▶ Pronounced as: "AWS, S-three, API, put, bucket, lifecycle, configuration..."
+▶ Pronounced as: "Now setting a lifecycle policy to keep only the last three versions of checkpoints."
 
 51
 00:08:20,000 --> 00:08:30,000
@@ -228,7 +231,7 @@ We are setting a lifecycle policy to keep only the last three checkpoints per jo
 52
 00:08:30,000 --> 00:08:40,000
 [Types: aws s3api put-bucket-encryption --bucket $CHECKPOINT_BUCKET --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms"}}]}']
-▶ Pronounced as: "AWS, S-three, API, put, bucket, encryption..."
+▶ Pronounced as: "Now enabling server-side encryption on the bucket."
 
 53
 00:08:40,000 --> 00:08:50,000
@@ -258,7 +261,7 @@ Design decisions:
 - Separate metadata from weights (fast status checks)
 """
 ]
-▶ Pronounced as: "Cat, greater-than, checkpoint, underscore, manager, dot, py..."
+▶ Pronounced as: "Now creating checkpoint_manager.py with cat and heredoc."
 
 57
 00:09:20,000 --> 00:09:30,000
@@ -279,8 +282,8 @@ Third, SHA-256 verification. This detects corruption before loading. A corrupted
 
 ---
 
-### SEGMENT 3: S3 Checkpoint Bucket & Core Checkpointing Implementation
-**Timestamp:** 10:00 – 15:00
+**SEGMENT 3: S3 Checkpoint Bucket & Core Checkpointing Implementation**
+*Timestamp: 10:00 – 15:00*
 
 ```
 61
@@ -446,7 +449,7 @@ When detected: triggers checkpoint save, then graceful exit.
 Run as a sidecar thread alongside your training loop.
 """
 ]
-▶ Pronounced as: "Cat, greater-than, spot, underscore, watcher, dot, py..."
+▶ Pronounced as: "Now creating spot_watcher.py with cat and heredoc."
 
 79
 00:13:00,000 --> 00:13:10,000
@@ -505,7 +508,7 @@ Production training script with full Spot instance engineering.
 Combines CheckpointManager + SpotTerminationWatcher + structured logging.
 """
 ]
-▶ Pronounced as: "Cat, greater-than, train, dot, py..."
+▶ Pronounced as: "Now creating train.py with cat and heredoc."
 
 85
 00:14:00,000 --> 00:14:10,000
@@ -583,7 +586,7 @@ spec:
               memory: 24Gi
               nvidia.com/gpu: "1"
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating the Kubernetes Job configuration with kubectl apply."
 
 90
 00:14:50,000 --> 00:15:00,000
@@ -592,8 +595,8 @@ Let me walk you through this Job configuration. backoffLimit: 10 is your retry b
 
 ---
 
-### SEGMENT 4: IMDS Spot Termination Watcher & Kubernetes Job Config
-**Timestamp:** 15:00 – 20:00
+**SEGMENT 4: IMDS Spot Termination Watcher & Kubernetes Job Config**
+*Timestamp: 15:00 – 20:00*
 
 ```
 91
@@ -631,7 +634,7 @@ Now let's create the IAM policy for S3 checkpoint access. The training pod needs
 99
 00:16:20,000 --> 00:16:30,000
 [Types: aws iam create-policy --policy-name RiskoracleCheckpointPolicy --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\",\"s3:DeleteObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::$CHECKPOINT_BUCKET\",\"arn:aws:s3:::$CHECKPOINT_BUCKET/*\"]}]}"]
-▶ Pronounced as: "AWS, I-A-M, create, policy..."
+▶ Pronounced as: "Now creating the IAM policy for S3 checkpoint access."
 
 100
 00:16:30,000 --> 00:16:40,000
@@ -644,12 +647,12 @@ Now create the service account with IRSA annotation:
 102
 00:16:50,000 --> 00:17:00,000
 [Types: kubectl create serviceaccount riskoracle-training -n riskoracle]
-▶ Pronounced as: "Kubectl, create, serviceaccount..."
+▶ Pronounced as: "Now creating the service account with kubectl create serviceaccount."
 
 103
 00:17:00,000 --> 00:17:10,000
 [Types: kubectl annotate serviceaccount riskoracle-training -n riskoracle "eks.amazonaws.com/role-arn=arn:aws:iam::${ACCOUNT_ID}:role/RiskoracleTrainingRole"]
-▶ Pronounced as: "Kubectl, annotate, serviceaccount..."
+▶ Pronounced as: "Now annotating the service account with the IAM role ARN."
 
 104
 00:17:10,000 --> 00:17:20,000
@@ -669,7 +672,7 @@ spec:
     matchLabels:
       app.kubernetes.io/component: training
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating the PodDisruptionBudget with kubectl apply."
 
 106
 00:17:30,000 --> 00:17:40,000
@@ -682,17 +685,17 @@ Now let's test the checkpoint recovery. We will simulate an interruption and ver
 108
 00:17:50,000 --> 00:18:00,000
 [Types: kubectl get jobs -n riskoracle]
-▶ Pronounced as: "Kubectl, get, jobs, dash, n, riskoracle"
+▶ Pronounced as: "Now kubectl get jobs to verify the training job exists."
 
 109
 00:18:00,000 --> 00:18:10,000
 [Types: kubectl get pods -n riskoracle -l app.kubernetes.io/component=training]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, riskoracle..."
+▶ Pronounced as: "Now listing training pods with kubectl get pods."
 
 110
 00:18:10,000 --> 00:18:20,000
 [Types: POD_NAME=$(kubectl get pods -n riskoracle -l app.kubernetes.io/component=training --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')]
-▶ Pronounced as: "POD, underscore, NAME, equals..."
+▶ Pronounced as: "Now capturing the running pod name."
 
 111
 00:18:20,000 --> 00:18:30,000
@@ -702,12 +705,12 @@ Now, look at that output. We have captured the pod name.
 112
 00:18:30,000 --> 00:18:40,000
 [Types: kubectl logs -n riskoracle $POD_NAME --tail=50]
-▶ Pronounced as: "Kubectl, logs, dash, n, riskoracle..."
+▶ Pronounced as: "Now checking the training pod logs."
 
 113
 00:18:40,000 --> 00:18:50,000
 [Types: aws s3 ls s3://$CHECKPOINT_BUCKET/checkpoints/ --recursive]
-▶ Pronounced as: "AWS, S-three, L-S..."
+▶ Pronounced as: "Now listing checkpoints in S3."
 
 114
 00:18:50,000 --> 00:19:00,000
@@ -716,17 +719,17 @@ Now simulate an interruption by deleting the pod:
 115
 00:19:00,000 --> 00:19:10,000
 [Types: kubectl delete pod -n riskoracle $POD_NAME]
-▶ Pronounced as: "Kubectl, delete, pod..."
+▶ Pronounced as: "Now deleting the pod to simulate an interruption."
 
 116
 00:19:10,000 --> 00:19:20,000
 [Types: kubectl get pods -n riskoracle -l app.kubernetes.io/component=training -w]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, riskoracle... dash, w"
+▶ Pronounced as: "Now watching the new pod start."
 
 117
 00:19:20,000 --> 00:19:30,000
 [Types: NEW_POD_NAME=$(kubectl get pods -n riskoracle -l app.kubernetes.io/component=training --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')]
-▶ Pronounced as: "NEW, underscore, POD, underscore, NAME..."
+▶ Pronounced as: "Now capturing the new pod name."
 
 118
 00:19:30,000 --> 00:19:40,000
@@ -736,7 +739,7 @@ Now, look at that output. We have captured the new pod name.
 119
 00:19:40,000 --> 00:19:50,000
 [Types: kubectl logs -n riskoracle $NEW_POD_NAME --tail=50 | grep -E "checkpoint|resuming|interruption"]
-▶ Pronounced as: "Kubectl, logs..."
+▶ Pronounced as: "Now checking the new pod logs for checkpoint recovery messages."
 
 120
 00:19:50,000 --> 00:20:00,000
@@ -745,8 +748,8 @@ Now, look at that output. You should see messages like "Found existing checkpoin
 
 ---
 
-### SEGMENT 5: Multi-AZ Diversification, Savings Measurement & Series 6 Preview
-**Timestamp:** 20:00 – 25:00
+**SEGMENT 5: Multi-AZ Diversification, Savings Measurement & Series 6 Preview**
+*Timestamp: 20:00 – 25:00*
 
 ```
 121
@@ -778,7 +781,7 @@ Spread across AZs and you reduce correlated interruption risk significantly.
     }
   }
 }']
-▶ Pronounced as: "Kubectl, patch, nodepool..."
+▶ Pronounced as: "Now patching the GPU NodePool to include multiple availability zones."
 
 125
 00:20:40,000 --> 00:20:50,000
@@ -787,12 +790,12 @@ Now check your Spot interruption rate after running for a week:
 126
 00:20:50,000 --> 00:21:00,000
 [Types: kubectl get events --field-selector reason=SpotInterruption --all-namespaces --sort-by='.metadata.creationTimestamp' | tail -20]
-▶ Pronounced as: "Kubectl, get, events..."
+▶ Pronounced as: "Now listing Spot interruption events."
 
 127
 00:21:00,000 --> 00:21:10,000
 [Types: kubectl get events --field-selector reason=SpotInterruption --all-namespaces -o json | jq '[.items[] | select(.metadata.creationTimestamp > "'$(date -d '7 days ago' -Iseconds)'")] | length']
-▶ Pronounced as: "Kubectl, get, events..."
+▶ Pronounced as: "Now counting Spot interruptions in the last 7 days."
 
 128
 00:21:10,000 --> 00:21:20,000
@@ -805,7 +808,7 @@ Now measure the savings:
 130
 00:21:30,000 --> 00:21:40,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --filter '{"Tags":{"Key":"workload","Values":["ml-training"]}}' --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
-▶ Pronounced as: "AWS, C-E, get, cost, and, usage..."
+▶ Pronounced as: "Now querying Cost Explorer for ML training workload cost."
 
 131
 00:21:40,000 --> 00:21:50,000
@@ -821,6 +824,7 @@ Now update the baseline document:
 [Types: echo "Interruptions in first month: [your number here]" >> ~/finops-baseline.txt]
 [Types: echo "Jobs failed due to interruption: 0 (checkpoint recovery successful)" >> ~/finops-baseline.txt]
 [Types: echo "" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending Series 5 savings to the baseline document."
 
 133
 00:22:00,000 --> 00:22:10,000
@@ -917,8 +921,8 @@ See you in Series 6.
 
 ---
 
-### SEGMENT 6: Understanding Spot Instance Interruption
-**Timestamp:** 25:00 – 30:00
+**SEGMENT 6: Understanding Spot Instance Interruption**
+*Timestamp: 25:00 – 30:00*
 
 ```
 156
@@ -1004,8 +1008,8 @@ See you in Segment 7.
 
 ---
 
-### SEGMENT 7: Deep Dive: Spot vs On-Demand Economics
-**Timestamp:** 30:00 – 35:00
+**SEGMENT 7: Deep Dive: Spot vs On-Demand Economics**
+*Timestamp: 30:00 – 35:00*
 
 ```
 176
@@ -1099,8 +1103,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: Choosing the Right Instance Types for Spot
-**Timestamp:** 35:00 – 40:00
+**SEGMENT 8: Choosing the Right Instance Types for Spot**
+*Timestamp: 35:00 – 40:00*
 
 ```
 198
@@ -1170,7 +1174,7 @@ Now let's look at how to monitor Spot availability in real time.
 214
 00:37:40,000 --> 00:37:50,000
 [Types: aws ec2 describe-instance-type-offerings --location-type availability-zone --filters Name=instance-type,Values=g4dn.xlarge --output table]
-▶ Pronounced as: "AWS, E-C-two, describe, instance, type, offerings..."
+▶ Pronounced as: "Now checking instance type availability with AWS EC2 describe-instance-type-offerings."
 
 215
 00:37:50,000 --> 00:38:00,000
@@ -1195,8 +1199,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Understanding Spot Price History Analysis
-**Timestamp:** 40:00 – 45:00
+**SEGMENT 9: Understanding Spot Price History Analysis**
+*Timestamp: 40:00 – 45:00*
 
 ```
 220
@@ -1262,7 +1266,7 @@ Now let's look at how to get Spot price history data in a usable format.
 235
 00:42:30,000 --> 00:42:40,000
 [Types: aws ec2 describe-spot-price-history --instance-types g4dn.xlarge --product-descriptions "Linux/UNIX" --start-time $(date -d '7 days ago' -u +%Y-%m-%dT%H:%M:%SZ) --query 'SpotPriceHistory[].SpotPrice' --output text | tr '\t' '\n' | head -20]
-▶ Pronounced as: "AWS, E-C-two, describe, spot, price, history..."
+▶ Pronounced as: "Now getting Spot price history for g4dn.xlarge over the last 7 days."
 
 236
 00:42:40,000 --> 00:42:50,000
@@ -1287,8 +1291,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Deep Dive: Checkpointing Strategies
-**Timestamp:** 45:00 – 50:00
+**SEGMENT 10: Deep Dive: Checkpointing Strategies**
+*Timestamp: 45:00 – 50:00*
 
 ```
 241
@@ -1388,8 +1392,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Workshop: Implementing Checkpointing for Your Workload
-**Timestamp:** 50:00 – 55:00
+**SEGMENT 11: Workshop: Implementing Checkpointing for Your Workload**
+*Timestamp: 50:00 – 55:00*
 
 ```
 264
@@ -1518,7 +1522,7 @@ Step 10: Test the implementation. Run the training job and verify checkpoints ar
 284
 00:53:20,000 --> 00:53:30,000
 [Types: aws s3 ls s3://$CHECKPOINT_BUCKET/checkpoints/]
-▶ Pronounced as: "AWS, S-three, L-S..."
+▶ Pronounced as: "Now verifying checkpoints in S3."
 
 285
 00:53:30,000 --> 00:53:40,000
@@ -1543,8 +1547,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Deep Dive: IMDS Metadata Service
-**Timestamp:** 55:00 – 60:00
+**SEGMENT 12: Deep Dive: IMDS Metadata Service**
+*Timestamp: 55:00 – 60:00*
 
 ```
 290
@@ -1588,7 +1592,7 @@ If the endpoint returns a timestamp, Spot termination is imminent. The timestamp
 299
 00:56:30,000 --> 00:56:40,000
 [Types: curl -s http://169.254.169.254/latest/meta-data/spot/termination-time]
-▶ Pronounced as: "Curl, dash, s..."
+▶ Pronounced as: "Now checking for Spot termination notice."
 
 300
 00:56:40,000 --> 00:56:50,000
@@ -1603,7 +1607,7 @@ The IMDS service also provides other metadata. You can get the instance type, th
 [Types: curl -s http://169.254.169.254/latest/meta-data/instance-type]
 [Types: curl -s http://169.254.169.254/latest/meta-data/instance-id]
 [Types: curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone]
-▶ Pronounced as: "Curl, dash, s..."
+▶ Pronounced as: "Now fetching instance metadata."
 
 303
 00:57:10,000 --> 00:57:20,000
@@ -1616,7 +1620,7 @@ The instance lifecycle attribute tells you if the instance is Spot or On-Demand.
 305
 00:57:30,000 --> 00:57:40,000
 [Types: curl -s http://169.254.169.254/latest/meta-data/instance-life-cycle]
-▶ Pronounced as: "Curl, dash, s..."
+▶ Pronounced as: "Now checking instance lifecycle type."
 
 306
 00:57:40,000 --> 00:57:50,000
@@ -1645,8 +1649,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: Understanding SIGTERM & Graceful Shutdown
-**Timestamp:** 60:00 – 65:00
+**SEGMENT 13: Understanding SIGTERM & Graceful Shutdown**
+*Timestamp: 60:00 – 65:00*
 
 ```
 312
@@ -1745,8 +1749,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Advanced Spot Handling Patterns
-**Timestamp:** 65:00 – 70:00
+**SEGMENT 14: Advanced Spot Handling Patterns**
+*Timestamp: 65:00 – 70:00*
 
 ```
 333
@@ -1855,8 +1859,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: Kubernetes Job Configuration for Spot Workloads
-**Timestamp:** 70:00 – 75:00
+**SEGMENT 15: Kubernetes Job Configuration for Spot Workloads**
+*Timestamp: 70:00 – 75:00*
 
 ```
 355
@@ -2018,8 +2022,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Understanding PodDisruptionBudgets for Spot
-**Timestamp:** 75:00 – 80:00
+**SEGMENT 16: Understanding PodDisruptionBudgets for Spot**
+*Timestamp: 75:00 – 80:00*
 
 ```
 374
@@ -2104,8 +2108,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: Workshop: Deploying Your Training Job
-**Timestamp:** 80:00 – 85:00
+**SEGMENT 17: Workshop: Deploying Your Training Job**
+*Timestamp: 80:00 – 85:00*
 
 ```
 391
@@ -2252,8 +2256,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: Monitoring Spot Interruption Rates
-**Timestamp:** 85:00 – 90:00
+**SEGMENT 18: Monitoring Spot Interruption Rates**
+*Timestamp: 85:00 – 90:00*
 
 ```
 420
@@ -2349,8 +2353,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: Handling Spot Interruptions — Advanced Strategies
-**Timestamp:** 90:00 – 95:00
+**SEGMENT 19: Handling Spot Interruptions — Advanced Strategies**
+*Timestamp: 90:00 – 95:00*
 
 ```
 440
@@ -2455,8 +2459,8 @@ See you in Segment 20.
 
 ---
 
-### SEGMENT 20: Understanding Multi-AZ Diversification
-**Timestamp:** 95:00 – 100:00
+**SEGMENT 20: Understanding Multi-AZ Diversification**
+*Timestamp: 95:00 – 100:00*
 
 ```
 461
@@ -2538,8 +2542,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Calculating Your Spot Savings
-**Timestamp:** 100:00 – 105:00
+**SEGMENT 21: Calculating Your Spot Savings**
+*Timestamp: 100:00 – 105:00*
 
 ```
 476
@@ -2639,8 +2643,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Spot Best Practices for Production
-**Timestamp:** 105:00 – 110:00
+**SEGMENT 22: Spot Best Practices for Production**
+*Timestamp: 105:00 – 110:00*
 
 ```
 495
@@ -2726,8 +2730,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 5 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+**SEGMENT 23: Series 5 Q&A — Common Questions Answered**
+*Timestamp: 110:00 – 115:00*
 
 ```
 515
@@ -2843,8 +2847,8 @@ See you in Segment 24.
 
 ---
 
-### SEGMENT 24: Series 5 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+**SEGMENT 24: Series 5 Knowledge Check & Next Steps**
+*Timestamp: 115:00 – 120:00*
 
 ```
 542

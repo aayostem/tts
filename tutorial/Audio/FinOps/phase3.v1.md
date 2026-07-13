@@ -1,11 +1,14 @@
-# Series 3: Kubernetes Cost Visibility — Kubecost on EKS
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your **complete Series 3 SRT** with all `Type:` lines and their corresponding `Pronounced at:` lines edited to **type-along, precedential** style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: Why Cost Explorer Is Not Enough
-**Timestamp:** 00:00 – 05:00
+**Series 3: Kubernetes Cost Visibility — Kubecost on EKS**
+**Complete 24-Segment SRT — 2 Hours**
+
+---
+
+**SEGMENT 1: Why Cost Explorer Is Not Enough**
+*Timestamp: 00:00 – 05:00*
 
 ```
 1
@@ -91,7 +94,7 @@ Before we deploy Kubecost, let's verify your environment. Follow along with me.
 21
 00:03:20,000 --> 00:03:30,000
 [Types: kubectl get nodes]
-▶ Pronounced as: "Kubectl, get, nodes"
+▶ Pronounced as: "Now I'm verifying our cluster with kubectl get nodes."
 
 22
 00:03:30,000 --> 00:03:40,000
@@ -100,7 +103,7 @@ Now, look at that output. You should see three or more nodes with status Ready. 
 23
 00:03:40,000 --> 00:03:50,000
 [Types: kubectl cluster-info]
-▶ Pronounced as: "Kubectl, cluster, dash, info"
+▶ Pronounced as: "Now kubectl cluster-info to confirm the control plane is accessible."
 
 24
 00:03:50,000 --> 00:04:00,000
@@ -109,7 +112,7 @@ Now, look at that output. You should see your Kubernetes control plane URL. This
 25
 00:04:00,000 --> 00:04:10,000
 [Types: helm version]
-▶ Pronounced as: "Helm, version"
+▶ Pronounced as: "Now helm version to verify Helm is installed."
 
 26
 00:04:10,000 --> 00:04:20,000
@@ -118,7 +121,7 @@ Now, look at that output. You should see version information for Helm. If you ge
 27
 00:04:20,000 --> 00:04:30,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
-▶ Pronounced as: "AWS, C-E, get, cost, and, usage..."
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage to confirm Cost Explorer access for the cloud integration."
 
 28
 00:04:30,000 --> 00:04:40,000
@@ -131,12 +134,12 @@ Now let's add the Kubecost Helm repository. This is where we get the Kubecost ch
 30
 00:04:50,000 --> 00:05:00,000
 [Types: helm repo add kubecost https://kubecost.github.io/cost-analyzer/]
-▶ Pronounced as: "Helm, repo, add, kubecost, H-T-T-P-S, colon, slash, slash, kubecost, dot, github, dot, io, slash, cost, dash, analyzer"
+▶ Pronounced as: "Now helm repo add kubecost with the Kubecost repository URL."
 
 31
 00:05:00,000 --> 00:05:10,000
 [Types: helm repo update]
-▶ Pronounced as: "Helm, repo, update"
+▶ Pronounced as: "Now helm repo update to refresh the repository index."
 
 32
 00:05:10,000 --> 00:05:20,000
@@ -149,12 +152,12 @@ Now let's create the kubecost namespace. This is where all Kubecost components w
 34
 00:05:30,000 --> 00:05:40,000
 [Types: kubectl create namespace kubecost]
-▶ Pronounced as: "Kubectl, create, namespace, kubecost"
+▶ Pronounced as: "Now kubectl create namespace kubecost."
 
 35
 00:05:40,000 --> 00:05:50,000
 [Types: kubectl get namespace kubecost]
-▶ Pronounced as: "Kubectl, get, namespace, kubecost"
+▶ Pronounced as: "Now kubectl get namespace kubecost to verify it was created."
 
 36
 00:05:50,000 --> 00:06:00,000
@@ -167,7 +170,7 @@ Now let's install Kubecost. This is the main installation command. Follow along 
 38
 00:06:10,000 --> 00:06:20,000
 [Types: helm install kubecost kubecost/cost-analyzer --namespace kubecost --set kubecostToken="your-email@company.com" --set global.aws.enabled=true --set global.aws.cloudIntegrationEnabled=true --set prometheus.server.persistentVolume.enabled=false --set kubecostProductConfigs.clusterName="finops-cluster" --set kubecostProductConfigs.currencyCode="USD"]
-▶ Pronounced as: "Helm, install, kubecost, kubecost, slash, cost, dash, analyzer, dash, dash, namespace, kubecost, dash, dash, set, kubecostToken, equals, quote, your-email, at, company, dot, com, quote..."
+▶ Pronounced as: "Now helm install kubecost. We're passing flags to enable AWS pricing, cloud integration, and set the cluster name."
 
 39
 00:06:20,000 --> 00:06:30,000
@@ -192,7 +195,7 @@ Now let's wait for all pods to be running. This takes a few minutes.
 44
 00:07:10,000 --> 00:07:20,000
 [Types: kubectl get pods -n kubecost -w]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, kubecost, dash, w"
+▶ Pronounced as: "Now kubectl get pods -n kubecost -w to watch the pods come up."
 
 45
 00:07:20,000 --> 00:07:30,000
@@ -205,7 +208,7 @@ If a pod stays in CrashLoopBackOff, check the logs. The most common causes are i
 47
 00:07:40,000 --> 00:07:50,000
 [Types: kubectl logs -n kubecost <pod-name> --previous]
-▶ Pronounced as: "Kubectl, logs, dash, n, kubecost, less-than, pod, dash, name, greater-than, dash, dash, previous"
+▶ Pronounced as: "Now kubectl logs -n kubecost with the pod name and --previous flag to see the crash logs."
 
 48
 00:07:50,000 --> 00:08:00,000
@@ -214,7 +217,7 @@ Now let's access the Kubecost dashboard. We'll use port-forwarding to access it 
 49
 00:08:00,000 --> 00:08:10,000
 [Types: kubectl port-forward --namespace kubecost service/kubecost-cost-analyzer 9090:9090 &]
-▶ Pronounced as: "Kubectl, port, dash, forward, dash, dash, namespace, kubecost, service, slash, kubecost, dash, cost, dash, analyzer, nine-zero-nine-zero, colon, nine-zero-nine-zero, ampersand"
+▶ Pronounced as: "Now kubectl port-forward to expose the Kubecost service on localhost port 9090."
 
 50
 00:08:10,000 --> 00:08:20,000
@@ -255,7 +258,7 @@ Now let's get the same data from the CLI. This is how you automate cost reportin
 59
 00:09:40,000 --> 00:09:50,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=7d&aggregate=namespace' | jq '.data[0] | to_entries[] | {namespace: .key, totalCost: .value.totalCost, efficiency: .value.efficiency, cpuCost: .value.cpuCost, ramCost: .value.ramCost}']
-▶ Pronounced as: "Kubectl, exec, dash, n, kubecost, deploy, slash, kubecost, dash, cost, dash, analyzer, dash, dash, curl, dash, s, quote, H-T-T-P, colon, slash, slash, localhost, colon, nine-zero-nine-zero..."
+▶ Pronounced as: "Now kubectl exec into the cost-analyzer pod and curl the allocation API with a 7-day window, aggregating by namespace, then piping to jq."
 
 60
 00:09:50,000 --> 00:10:00,000
@@ -284,7 +287,7 @@ Now let's find overprovisioned namespaces. These are the ones with efficiency be
 66
 00:10:50,000 --> 00:11:00,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=7d&aggregate=namespace' | jq '.data[0] | to_entries[] | select(.value.efficiency < 0.7) | {namespace: .key, efficiency: .value.efficiency, wastedCPU: .value.cpuCores, wastedRAMGB: (.value.ramBytes / 1073741824 | floor), monthlyCost: .value.totalCost}']
-▶ Pronounced as: "Kubectl, exec... curl... jq... select..."
+▶ Pronounced as: "Now the same curl but with a jq filter to select only namespaces with efficiency below 0.7."
 
 67
 00:11:00,000 --> 00:11:10,000
@@ -317,8 +320,8 @@ See you in Segment 2.
 
 ---
 
-### SEGMENT 2: Installing Kubecost on EKS
-**Timestamp:** 10:00 – 15:00
+**SEGMENT 2: Installing Kubecost on EKS**
+*Timestamp: 10:00 – 15:00*
 
 ```
 74
@@ -332,7 +335,7 @@ In the previous segment, you started the installation. Now we verify everything 
 76
 00:12:30,000 --> 00:12:40,000
 [Types: kubectl get pods -n kubecost]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, kubecost"
+▶ Pronounced as: "Now kubectl get pods -n kubecost to check all pods are running."
 
 77
 00:12:40,000 --> 00:12:50,000
@@ -341,7 +344,7 @@ Now, look at that output. All pods should show Running and 1/1 in the READY colu
 78
 00:12:50,000 --> 00:13:00,000
 [Types: kubectl logs -n kubecost deployment/kubecost-cost-analyzer --tail=20]
-▶ Pronounced as: "Kubectl, logs, dash, n, kubecost, deployment, slash, kubecost, dash, cost, dash, analyzer, dash, dash, tail, equals, twenty"
+▶ Pronounced as: "Now kubectl logs from the cost-analyzer deployment with tail=20 to see recent logs."
 
 79
 00:13:00,000 --> 00:13:10,000
@@ -354,7 +357,7 @@ If you see error messages, they will tell you what is wrong. Common issues: insu
 81
 00:13:20,000 --> 00:13:30,000
 [Types: kubectl port-forward --namespace kubecost service/kubecost-cost-analyzer 9090:9090 &]
-▶ Pronounced as: "Kubectl, port, dash, forward, dash, dash, namespace, kubecost, service, slash, kubecost, dash, cost, dash, analyzer, nine-zero-nine-zero, colon, nine-zero-nine-zero, ampersand"
+▶ Pronounced as: "Now kubectl port-forward to access the dashboard again."
 
 82
 00:13:30,000 --> 00:13:40,000
@@ -371,7 +374,7 @@ If you see "No data available", wait five minutes and refresh. Kubecost needs ti
 85
 00:14:00,000 --> 00:14:10,000
 [Types: kubectl get pods -n kubecost -l app=kubecost-network-costs]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, kubecost, dash, l, app, equals, kubecost, dash, network, dash, costs"
+▶ Pronounced as: "Now kubectl get pods with label selector for network-costs to verify the DaemonSet."
 
 86
 00:14:10,000 --> 00:14:20,000
@@ -388,7 +391,7 @@ Now let's verify the cloud integration is working. This is what connects Kubecos
 89
 00:14:40,000 --> 00:14:50,000
 [Types: kubectl exec -n kubecost deployment/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/model/allocation?window=1d' | jq '.data[0] | keys | length']
-▶ Pronounced as: "Kubectl, exec, dash, n, kubecost, deployment, slash, kubecost, dash, cost, dash, analyzer..."
+▶ Pronounced as: "Now kubectl exec and curl the model allocation API with a 1-day window, then jq to count the number of keys."
 
 90
 00:14:50,000 --> 00:15:00,000
@@ -396,8 +399,8 @@ Now, look at that output. If you see a number greater than zero, Kubecost is suc
 
 91
 00:15:00,000 --> 00:15:10,000
-[Types: kubectl exec -n kubecost deployment/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/model/allocation?window=30d&aggregate=namespace' | jq '.data[0] | to_entries[] | select(.value.totalCost > 0) | .key']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+[Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/model/allocation?window=30d&aggregate=namespace' | jq '.data[0] | to_entries[] | select(.value.totalCost > 0) | .key']
+▶ Pronounced as: "Now the same curl with a 30-day window and namespace aggregation, filtering for namespaces with cost greater than zero."
 
 92
 00:15:10,000 --> 00:15:20,000
@@ -418,8 +421,8 @@ See you in Segment 3.
 
 ---
 
-### SEGMENT 3: Cost by Namespace — Finding the Expensive Workloads
-**Timestamp:** 15:00 – 20:00
+**SEGMENT 3: Cost by Namespace — Finding the Expensive Workloads**
+*Timestamp: 15:00 – 20:00*
 
 ```
 96
@@ -429,7 +432,7 @@ Now let's explore cost by namespace. This is where you find the expensive worklo
 97
 00:16:00,000 --> 00:16:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.totalCost | . * 100 | round / 100)"' | sort -t$'\t' -k2 -rn | awk 'BEGIN{print "NAMESPACE\t\tCOST/MONTH"} {printf "%-30s\t$%s\n", $1, $2}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now kubectl exec and curl the allocation API with a 30-day window, aggregating by namespace with accumulate true. We're piping to jq to extract namespace and total cost, sorting by cost, and formatting as a table."
 
 98
 00:16:10,000 --> 00:16:20,000
@@ -446,7 +449,7 @@ Now let's look at the efficiency breakdown. This shows you how much compute you 
 101
 00:16:40,000 --> 00:16:50,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.cpuEfficiency | . * 100 | round)%\t\(.value.ramEfficiency | . * 100 | round)%"' | awk 'BEGIN{print "NAMESPACE\t\t\tCPU EFF\t\tMEM EFF"} {printf "%-30s\t%s\t\t%s\n", $1, $2, $3}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now the same curl but extracting CPU and RAM efficiency percentages instead of cost."
 
 102
 00:16:50,000 --> 00:17:00,000
@@ -467,7 +470,7 @@ Now let's look at cost by deployment. This tells you which deployment in a names
 106
 00:17:30,000 --> 00:17:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=deployment&accumulate=true' | jq -r '.data[0] | to_entries[] | select(.value.totalCost > 0) | "\(.key)\t\(.value.totalCost | . * 100 | round / 100)"' | sort -t$'\t' -k2 -rn | head -10 | awk 'BEGIN{print "DEPLOYMENT\t\tCOST/MONTH"} {printf "%-30s\t$%s\n", $1, $2}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now the same curl but aggregating by deployment instead of namespace, taking the top 10."
 
 107
 00:17:40,000 --> 00:17:50,000
@@ -484,7 +487,7 @@ Now let's look at cost by service. This shows you cost by the service label.
 110
 00:18:10,000 --> 00:18:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=service&accumulate=true' | jq -r '.data[0] | to_entries[] | select(.value.totalCost > 0) | "\(.key)\t\(.value.totalCost | . * 100 | round / 100)"' | sort -t$'\t' -k2 -rn | head -10 | awk 'BEGIN{print "SERVICE\t\tCOST/MONTH"} {printf "%-30s\t$%s\n", $1, $2}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by service label instead."
 
 111
 00:18:20,000 --> 00:18:30,000
@@ -499,7 +502,7 @@ Now let's update your baseline document with these findings.
 [Types: echo "=== SERIES 3: COST BY NAMESPACE ===" >> ~/finops-baseline.txt]
 [Types: echo "Date: $(date)" >> ~/finops-baseline.txt]
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key): $\(.value.totalCost | . * 100 | round / 100) (efficiency: \(.value.cpuEfficiency | . * 100 | round)%)"' >> ~/finops-baseline.txt]
-▶ Pronounced as: "Echo... kubectl exec... curl... jq..."
+▶ Pronounced as: "Now appending the cost by namespace data to our baseline document."
 
 114
 00:18:50,000 --> 00:19:00,000
@@ -516,8 +519,8 @@ See you in Segment 4.
 
 ---
 
-### SEGMENT 4: Rightsizing Recommendations & Applying Them Safely
-**Timestamp:** 20:00 – 25:00
+**SEGMENT 4: Rightsizing Recommendations & Applying Them Safely**
+*Timestamp: 20:00 – 25:00*
 
 ```
 117
@@ -527,7 +530,7 @@ Now let's look at rightsizing recommendations. This is where the savings really 
 118
 00:19:30,000 --> 00:19:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/savings/requestSizing?window=30d&targetCPUUtilization=0.75&targetRAMUtilization=0.75' | jq -r '.recommendations[] | "\(.containerName)\t\(.currentCPUReq)→\(.recommendedCPUReq)\t\(.currentRAMReq)→\(.recommendedRAMReq)\t$\(.monthlySavings)"' | sort -t'$' -k2 -rn | head -10 | awk 'BEGIN{print "CONTAINER\t\tCPU\t\tRAM\t\tSAVINGS/MONTH"} {printf "%-25s\t%s\t%s\t%s\n", $1, $2, $3, $4}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now kubectl exec and curl the savings requestSizing API with a 30-day window and 75 percent target utilization. We're extracting container name, current and recommended CPU and RAM, and monthly savings."
 
 119
 00:19:40,000 --> 00:19:50,000
@@ -548,7 +551,7 @@ Apply the recommendation for one deployment first. Start with a non-critical ser
 123
 00:20:20,000 --> 00:20:30,000
 [Types: kubectl patch deployment rag-retrieval --namespace financial-rag --type=merge -p '{"spec":{"template":{"spec":{"containers":[{"name":"rag-retrieval","resources":{"requests":{"cpu":"280m","memory":"800Mi"},"limits":{"cpu":"560m","memory":"1.6Gi"}}}]}}}}']
-▶ Pronounced as: "Kubectl, patch, deployment, rag, dash, retrieval, dash, dash, namespace, financial, dash, rag..."
+▶ Pronounced as: "Now kubectl patch deployment rag-retrieval in the financial-rag namespace. We're merging the spec with new resource requests and limits."
 
 124
 00:20:30,000 --> 00:20:40,000
@@ -557,7 +560,7 @@ This patches the deployment with the recommended resource requests and limits.
 125
 00:20:40,000 --> 00:20:50,000
 [Types: kubectl rollout status deployment/rag-retrieval -n financial-rag]
-▶ Pronounced as: "Kubectl, rollout, status, deployment, slash, rag, dash, retrieval, dash, n, financial, dash, rag"
+▶ Pronounced as: "Now kubectl rollout status to wait for the new pods to be ready."
 
 126
 00:20:50,000 --> 00:21:00,000
@@ -566,7 +569,7 @@ Now, look at that output. You should see "deployment successfully rolled out" wh
 127
 00:21:00,000 --> 00:21:10,000
 [Types: kubectl top pods -n financial-rag -l app=rag-retrieval --containers]
-▶ Pronounced as: "Kubectl, top, pods, dash, n, financial, dash, rag..."
+▶ Pronounced as: "Now kubectl top pods to see current CPU and memory usage."
 
 128
 00:21:10,000 --> 00:21:20,000
@@ -583,7 +586,7 @@ If you see usage at forty to sixty percent of the new limit, you have headroom t
 131
 00:21:40,000 --> 00:21:50,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/metrics' | grep -c "throttled" || echo "0"]
-▶ Pronounced as: "Kubectl, exec... curl... grep..."
+▶ Pronounced as: "Now checking for CPU throttling by curling the metrics endpoint and grepping for throttled."
 
 132
 00:21:50,000 --> 00:22:00,000
@@ -596,7 +599,7 @@ CPU throttling is silent performance degradation. Your pods are running, but the
 134
 00:22:10,000 --> 00:22:20,000
 [Types: kubectl describe pod -n financial-rag -l app=rag-retrieval | grep -A5 "OOMKilled" || echo "No OOMKills"]
-▶ Pronounced as: "Kubectl, describe, pod..."
+▶ Pronounced as: "Now checking for OOMKills with kubectl describe pod and grepping for OOMKilled."
 
 135
 00:22:20,000 --> 00:22:30,000
@@ -621,8 +624,8 @@ See you in Segment 5.
 
 ---
 
-### SEGMENT 5: Savings Summary & Baseline Update
-**Timestamp:** 25:00 – 30:00
+**SEGMENT 5: Savings Summary & Baseline Update**
+*Timestamp: 25:00 – 30:00*
 
 ```
 140
@@ -632,7 +635,7 @@ Now let's look at the total savings from rightsizing.
 141
 00:23:20,000 --> 00:23:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/savings/requestSizing?window=30d&targetCPUUtilization=0.75&targetRAMUtilization=0.75' | jq '.totalMonthlySavings']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now curling the savings API and extracting totalMonthlySavings with jq."
 
 142
 00:23:30,000 --> 00:23:40,000
@@ -680,6 +683,7 @@ Update the baseline document:
 [Types: echo "riskoracle namespace: \$9,000 → \$5,600/month (61% → 82% efficiency)" >> ~/finops-baseline.txt]
 [Types: echo "Total namespace savings: \$8,800/month | \$105,600/year" >> ~/finops-baseline.txt]
 [Types: echo "" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the rightsizing savings summary to our baseline document."
 
 152
 00:25:10,000 --> 00:25:20,000
@@ -708,8 +712,8 @@ See you in Segment 6.
 
 ---
 
-### SEGMENT 6: Cost by Team Label — Chargeback-Ready Data
-**Timestamp:** 30:00 – 35:00
+**SEGMENT 6: Cost by Team Label — Chargeback-Ready Data**
+*Timestamp: 30:00 – 35:00*
 
 ```
 158
@@ -725,12 +729,12 @@ Before you can query cost by team, you need to add team labels to your namespace
 [Types: kubectl label namespace financial-rag team=financial-rag]
 [Types: kubectl label namespace riskoracle team=riskoracle]
 [Types: kubectl label namespace monitoring team=platform]
-▶ Pronounced as: "Kubectl, label, namespace, financial, dash, rag, team, equals, financial, dash, rag..."
+▶ Pronounced as: "Now kubectl label namespace to add the team label to each namespace."
 
 161
 00:30:30,000 --> 00:30:40,000
 [Types: kubectl get namespaces --show-labels | grep team]
-▶ Pronounced as: "Kubectl, get, namespaces, dash, dash, show, dash, labels..."
+▶ Pronounced as: "Now kubectl get namespaces with --show-labels and grepping for team to verify."
 
 162
 00:30:40,000 --> 00:30:50,000
@@ -743,7 +747,7 @@ Now query cost by team:
 164
 00:31:00,000 --> 00:31:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=label:team&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.totalCost | . * 100 | round / 100)"' | sort -t$'\t' -k2 -rn | awk 'BEGIN{print "TEAM\t\tCOST/MONTH"} {printf "%-25s\t$%s\n", $1, $2}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now kubectl exec and curl the allocation API with aggregate=label:team to group by the team label."
 
 165
 00:31:10,000 --> 00:31:20,000
@@ -766,7 +770,7 @@ Now let's update the baseline document with this data.
 [Types: echo "" >> ~/finops-baseline.txt]
 [Types: echo "--- COST BY TEAM ---" >> ~/finops-baseline.txt]
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=label:team&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key): $\(.value.totalCost | . * 100 | round / 100)"' >> ~/finops-baseline.txt]
-▶ Pronounced as: "Echo... kubectl exec... curl... jq..."
+▶ Pronounced as: "Now appending cost by team to the baseline document."
 
 170
 00:32:00,000 --> 00:32:10,000
@@ -779,7 +783,7 @@ Now let's look at efficiency by team. This shows you which teams are wasting the
 172
 00:32:20,000 --> 00:32:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=label:team&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.cpuEfficiency | . * 100 | round)%\t\(.value.ramEfficiency | . * 100 | round)%"' | awk 'BEGIN{print "TEAM\t\t\tCPU EFF\t\tMEM EFF"} {printf "%-25s\t%s\t\t%s\n", $1, $2, $3}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now extracting efficiency by team as well."
 
 173
 00:32:30,000 --> 00:32:40,000
@@ -804,8 +808,8 @@ See you in Segment 7.
 
 ---
 
-### SEGMENT 7: Idle Cost Analysis — Finding the Gap Between Requested and Actual
-**Timestamp:** 35:00 – 40:00
+**SEGMENT 7: Idle Cost Analysis — Finding the Gap Between Requested and Actual**
+*Timestamp: 35:00 – 40:00*
 
 ```
 178
@@ -819,7 +823,7 @@ Idle costs are resources you are paying for but not using—the gap between requ
 180
 00:35:20,000 --> 00:35:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&idle=true&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.idleCost | . * 100 | round / 100)\t\(.value.totalCost | . * 100 | round / 100)"' | awk 'BEGIN{print "NAMESPACE\t\tIDLE COST\tTOTAL COST"} {printf "%-30s\t$%s\t\t$%s\n", $1, $2, $3}' | sort -t$'\t' -k2 -rn]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now kubectl exec and curl the allocation API with idle=true to include idle cost, then extracting idle cost and total cost."
 
 181
 00:35:30,000 --> 00:35:40,000
@@ -844,7 +848,7 @@ Now let's look at cluster-wide efficiency. This single number tells your CTO how
 186
 00:36:20,000 --> 00:36:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=cluster&accumulate=true' | jq -r '.data[0] | to_entries[] | "Cluster efficiency: \(.value.cpuEfficiency | . * 100 | round)% | \(.value.ramEfficiency | . * 100 | round)%"']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by cluster to get overall efficiency."
 
 187
 00:36:30,000 --> 00:36:40,000
@@ -871,7 +875,7 @@ Now let's update the baseline document with the idle cost data.
 [Types: echo "" >> ~/finops-baseline.txt]
 [Types: echo "--- IDLE COST ANALYSIS ---" >> ~/finops-baseline.txt]
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&idle=true&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key): idle cost $\(.value.idleCost | . * 100 | round / 100) of $\(.value.totalCost | . * 100 | round / 100)"' >> ~/finops-baseline.txt]
-▶ Pronounced as: "Echo... kubectl exec... curl... jq..."
+▶ Pronounced as: "Now appending idle cost analysis to the baseline document."
 
 193
 00:37:30,000 --> 00:37:40,000
@@ -888,8 +892,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: Network Cost Attribution — Finding Traffic Pattern Waste
-**Timestamp:** 40:00 – 45:00
+**SEGMENT 8: Network Cost Attribution — Finding Traffic Pattern Waste**
+*Timestamp: 40:00 – 45:00*
 
 ```
 196
@@ -899,7 +903,7 @@ Now let's look at network cost attribution. This is where you find silent waste 
 197
 00:40:10,000 --> 00:40:20,000
 [Types: kubectl get pods -n kubecost -l app=kubecost-network-costs]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, kubecost, dash, l, app, equals, kubecost, dash, network, dash, costs"
+▶ Pronounced as: "Now kubectl get pods with label selector for network-costs to verify the DaemonSet is running."
 
 198
 00:40:20,000 --> 00:40:30,000
@@ -908,7 +912,7 @@ Now, look at that output. You should see one network cost pod per node. This use
 199
 00:40:30,000 --> 00:40:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.networkCost | . * 100 | round / 100)\t\(.value.networkCrossZoneCost | . * 100 | round / 100)\t\(.value.networkInternetCost | . * 100 | round / 100)"' | awk 'BEGIN{print "NAMESPACE\t\tNETWORK\tCROSS-ZONE\tINTERNET"} {printf "%-30s\t$%s\t$%s\t$%s\n", $1, $2, $3, $4}' | sort -t$'\t' -k2 -rn]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now curling the allocation API and extracting networkCost, networkCrossZoneCost, and networkInternetCost."
 
 200
 00:40:40,000 --> 00:40:50,000
@@ -951,7 +955,7 @@ Now let's update the baseline document with the network cost data.
 [Types: echo "" >> ~/finops-baseline.txt]
 [Types: echo "--- NETWORK COST BY NAMESPACE ---" >> ~/finops-baseline.txt]
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key): network cost $\(.value.networkCost | . * 100 | round / 100)"' >> ~/finops-baseline.txt]
-▶ Pronounced as: "Echo... kubectl exec... curl... jq..."
+▶ Pronounced as: "Now appending network cost data to the baseline document."
 
 210
 00:42:20,000 --> 00:42:30,000
@@ -968,8 +972,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Storage Cost Attribution — Finding PVC Waste
-**Timestamp:** 45:00 – 50:00
+**SEGMENT 9: Storage Cost Attribution — Finding PVC Waste**
+*Timestamp: 45:00 – 50:00*
 
 ```
 213
@@ -979,7 +983,7 @@ Now let's look at persistent volume cost attribution. Storage costs are often in
 214
 00:45:10,000 --> 00:45:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.storageCost | . * 100 | round / 100)"' | awk 'BEGIN{print "NAMESPACE\t\tSTORAGE COST"} {printf "%-30s\t$%s\n", $1, $2}' | sort -t$'\t' -k2 -rn]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now curling the allocation API and extracting storageCost by namespace."
 
 215
 00:45:20,000 --> 00:45:30,000
@@ -996,7 +1000,7 @@ Second, PVCs for terminated pods still allocated. Delete them. Third, multiple P
 218
 00:45:50,000 --> 00:46:00,000
 [Types: kubectl get pvc --all-namespaces -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,CAPACITY:.spec.resources.requests.storage,STATUS:.status.phase' | grep -v "Bound"]
-▶ Pronounced as: "Kubectl, get, pvc, dash, dash, all, dash, namespaces..."
+▶ Pronounced as: "Now kubectl get pvc across all namespaces, showing namespace, name, capacity, and status, filtering out Bound PVCs."
 
 219
 00:46:00,000 --> 00:46:10,000
@@ -1005,7 +1009,7 @@ Now, look at that output. This shows you all PVCs that are not in Bound status. 
 220
 00:46:10,000 --> 00:46:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=pvc&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key)\t\(.value.storageCost | . * 100 | round / 100)"' | awk 'BEGIN{print "PVC\t\tSTORAGE COST"} {printf "%-40s\t$%s\n", $1, $2}' | sort -t$'\t' -k2 -rn | head -10]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by PVC to see the top 10 most expensive persistent volume claims."
 
 221
 00:46:20,000 --> 00:46:30,000
@@ -1024,7 +1028,7 @@ Now let's update the baseline document with the storage cost data.
 [Types: echo "" >> ~/finops-baseline.txt]
 [Types: echo "--- STORAGE COST BY NAMESPACE ---" >> ~/finops-baseline.txt]
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&accumulate=true' | jq -r '.data[0] | to_entries[] | "\(.key): storage cost $\(.value.storageCost | . * 100 | round / 100)"' >> ~/finops-baseline.txt]
-▶ Pronounced as: "Echo... kubectl exec... curl... jq..."
+▶ Pronounced as: "Now appending storage cost data to the baseline document."
 
 225
 00:47:00,000 --> 00:47:10,000
@@ -1041,8 +1045,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Setting Up Cost Alerts in Kubecost
-**Timestamp:** 50:00 – 55:00
+**SEGMENT 10: Setting Up Cost Alerts in Kubecost**
+*Timestamp: 50:00 – 55:00*
 
 ```
 228
@@ -1052,7 +1056,7 @@ Now let's set up cost alerts in Kubecost. This is how you get notified when cost
 229
 00:50:10,000 --> 00:50:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/alerts' -H 'Content-Type: application/json' -d '{"alerts":[{"type":"anomaly","threshold":50,"slackWebhookUrl":"https://hooks.slack.com/services/your-webhook","window":"1d"}]}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now kubectl exec and curl POST to the alerts endpoint to create an anomaly alert with a 50 dollar threshold."
 
 230
 00:50:20,000 --> 00:50:30,000
@@ -1065,7 +1069,7 @@ You can also set budget alerts by namespace.
 232
 00:50:40,000 --> 00:50:50,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/alerts' -H 'Content-Type: application/json' -d '{"alerts":[{"type":"budget","namespace":"financial-rag","threshold":1000,"slackWebhookUrl":"https://hooks.slack.com/services/your-webhook","window":"monthly"}]}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now creating a budget alert for the financial-rag namespace with a 1000 dollar monthly threshold."
 
 233
 00:50:50,000 --> 00:51:00,000
@@ -1078,7 +1082,7 @@ You can also set alerts for efficiency drops.
 235
 00:51:10,000 --> 00:51:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/alerts' -H 'Content-Type: application/json' -d '{"alerts":[{"type":"efficiency","namespace":"financial-rag","threshold":60,"slackWebhookUrl":"https://hooks.slack.com/services/your-webhook"}]}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now creating an efficiency alert for the financial-rag namespace with a 60 percent threshold."
 
 236
 00:51:20,000 --> 00:51:30,000
@@ -1087,7 +1091,7 @@ This creates an efficiency alert. You get notified when efficiency drops below s
 237
 00:51:30,000 --> 00:51:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/alerts' | jq '.alerts[] | {type: .type, namespace: .namespace, threshold: .threshold}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now listing all active alerts with jq."
 
 238
 00:51:40,000 --> 00:51:50,000
@@ -1112,8 +1116,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Creating Custom Dashboards in Kubecost
-**Timestamp:** 55:00 – 60:00
+**SEGMENT 11: Creating Custom Dashboards in Kubecost**
+*Timestamp: 55:00 – 60:00*
 
 ```
 243
@@ -1127,7 +1131,7 @@ Kubecost supports custom dashboards. You can create views that show cost by name
 245
 00:55:20,000 --> 00:55:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/dashboards' | jq '.dashboards[] | {name: .name, description: .description}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now curling the dashboards endpoint to list available dashboards."
 
 246
 00:55:30,000 --> 00:55:40,000
@@ -1152,7 +1156,7 @@ You can also create a dashboard for cost by service. This shows you which servic
 251
 00:56:20,000 --> 00:56:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/dashboards/save' -H 'Content-Type: application/json' -d '{"name":"Financial RAG Team Cost","description":"Cost view for the financial-rag team","filter":{"namespace":"financial-rag"},"aggregate":"namespace"}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now using the dashboard save API to create a custom dashboard for the financial-rag team."
 
 252
 00:56:30,000 --> 00:56:40,000
@@ -1173,8 +1177,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Exporting Kubecost Data for Reporting
-**Timestamp:** 60:00 – 65:00
+**SEGMENT 12: Exporting Kubecost Data for Reporting**
+*Timestamp: 60:00 – 65:00*
 
 ```
 256
@@ -1188,12 +1192,12 @@ Kubecost exports data in CSV, JSON, and API formats. You can integrate it with y
 258
 01:00:20,000 --> 01:00:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&format=csv' --output /tmp/kubecost-allocation.csv]
-▶ Pronounced as: "Kubectl, exec... curl... format, equals, csv..."
+▶ Pronounced as: "Now curling the allocation API with format=csv to export as CSV and saving to /tmp."
 
 259
 01:00:30,000 --> 01:00:40,000
 [Types: cat /tmp/kubecost-allocation.csv | head -20]
-▶ Pronounced as: "Cat, slash, tmp, slash, kubecost, dash, allocation, dot, csv..."
+▶ Pronounced as: "Now cat to view the first 20 lines of the CSV."
 
 260
 01:00:40,000 --> 01:00:50,000
@@ -1206,12 +1210,12 @@ You can also export data using the Kubecost API. This is how you automate report
 262
 01:01:00,000 --> 01:01:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/savings/requestSizing?window=30d' | jq '.' > /tmp/kubecost-rightsizing.json]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now exporting rightsizing recommendations as JSON."
 
 263
 01:01:10,000 --> 01:01:20,000
 [Types: cat /tmp/kubecost-rightsizing.json | head -30]
-▶ Pronounced as: "Cat, slash, tmp, slash, kubecost, dash, rightsizing, dot, json..."
+▶ Pronounced as: "Now viewing the first 30 lines of the JSON export."
 
 264
 01:01:20,000 --> 01:01:30,000
@@ -1225,7 +1229,7 @@ You can also export data to S3 for long-term storage.
 01:01:40,000 --> 01:01:50,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&format=csv' --output /tmp/kubecost-allocation.csv]
 [Types: aws s3 cp /tmp/kubecost-allocation.csv s3://your-bucket/kubecost-data/allocation-$(date +%Y-%m-%d).csv]
-▶ Pronounced as: "Kubectl, exec... curl... aws, S-three, cp..."
+▶ Pronounced as: "Now copying the CSV export to S3 with a date-stamped filename."
 
 267
 01:01:50,000 --> 01:02:00,000
@@ -1246,8 +1250,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: Integrating Kubecost with Slack
-**Timestamp:** 65:00 – 70:00
+**SEGMENT 13: Integrating Kubecost with Slack**
+*Timestamp: 65:00 – 70:00*
 
 ```
 271
@@ -1273,7 +1277,7 @@ Now configure Kubecost to send alerts to Slack.
 276
 01:05:50,000 --> 01:06:00,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/alerts' -H 'Content-Type: application/json' -d '{"alerts":[{"type":"anomaly","threshold":50,"slackWebhookUrl":"https://hooks.slack.com/services/your-webhook","window":"1d","channel":"#finops-alerts"}]}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now creating an anomaly alert with Slack webhook integration and specifying the #finops-alerts channel."
 
 277
 01:06:00,000 --> 01:06:10,000
@@ -1286,7 +1290,7 @@ You can also send daily cost summaries to Slack.
 279
 01:06:20,000 --> 01:06:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/slack' -H 'Content-Type: application/json' -d '{"channel":"#finops-alerts","message":"Daily cost summary: $2,345.67 | Top namespace: financial-rag ($1,234.56)"}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now sending a daily cost summary message to Slack."
 
 280
 01:06:30,000 --> 01:06:40,000
@@ -1295,7 +1299,7 @@ This sends a daily cost summary to Slack. You can schedule this as a cron job.
 281
 01:06:40,000 --> 01:06:50,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/slack' -H 'Content-Type: application/json' -d '{"channel":"#finops-alerts","message":"Efficiency alert: financial-rag namespace efficiency dropped to 48%!"}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now sending an efficiency alert message to Slack."
 
 282
 01:06:50,000 --> 01:07:00,000
@@ -1308,7 +1312,7 @@ Now let's verify Slack is connected:
 284
 01:07:10,000 --> 01:07:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/slack/status']
-▶ Pronounced as: "Kubectl, exec... curl... status"
+▶ Pronounced as: "Now checking Slack connection status."
 
 285
 01:07:20,000 --> 01:07:30,000
@@ -1329,8 +1333,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Workshop — Analyzing Your Cluster Costs
-**Timestamp:** 70:00 – 75:00
+**SEGMENT 14: Workshop — Analyzing Your Cluster Costs**
+*Timestamp: 70:00 – 75:00*
 
 ```
 289
@@ -1348,7 +1352,7 @@ Command 1: What is the total cost of your cluster?
 292
 01:10:30,000 --> 01:10:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=cluster' | jq -r '.data[0] | to_entries[] | "Total cluster cost: $\(.value.totalCost | . * 100 | round / 100)"']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by cluster to get total cluster cost."
 
 293
 01:10:40,000 --> 01:10:50,000
@@ -1361,7 +1365,7 @@ Command 2: What are the top three namespaces by cost?
 295
 01:11:00,000 --> 01:11:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace' | jq -r '.data[0] | to_entries[] | "\(.key): $\(.value.totalCost | . * 100 | round / 100)"' | head -3]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by namespace and taking the top 3."
 
 296
 01:11:10,000 --> 01:11:20,000
@@ -1374,7 +1378,7 @@ Command 3: What is the efficiency of your most expensive namespace?
 298
 01:11:30,000 --> 01:11:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace' | jq -r '.data[0] | to_entries[] | select(.key=="financial-rag") | "\(.key) efficiency: \(.value.cpuEfficiency | . * 100 | round)%"']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now filtering for the financial-rag namespace to get its efficiency."
 
 299
 01:11:40,000 --> 01:11:50,000
@@ -1387,7 +1391,7 @@ Command 4: What are the top rightsizing recommendations?
 301
 01:12:00,000 --> 01:12:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/savings/requestSizing?window=30d' | jq -r '.recommendations[:3][] | "\(.containerName): save $\(.monthlySavings | . * 100 | round / 100)/month"']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now getting the top 3 rightsizing recommendations."
 
 302
 01:12:10,000 --> 01:12:20,000
@@ -1400,7 +1404,7 @@ Command 5: What is the idle cost in your most expensive namespace?
 304
 01:12:30,000 --> 01:12:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=namespace&idle=true' | jq -r '.data[0] | to_entries[] | select(.key=="financial-rag") | "\(.key) idle cost: $\(.value.idleCost | . * 100 | round / 100)"']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now getting idle cost for the financial-rag namespace."
 
 305
 01:12:40,000 --> 01:12:50,000
@@ -1421,8 +1425,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: Optimizing Kubernetes Resource Requests
-**Timestamp:** 75:00 – 80:00
+**SEGMENT 15: Optimizing Kubernetes Resource Requests**
+*Timestamp: 75:00 – 80:00*
 
 ```
 309
@@ -1452,7 +1456,7 @@ The solution: use Kubecost recommendations. They are based on actual usage data.
 315
 01:16:00,000 --> 01:16:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/savings/requestSizing?window=30d&targetCPUUtilization=0.75&targetRAMUtilization=0.75' | jq -r '.recommendations[] | "\(.containerName): CPU \(.currentCPUReq) → \(.recommendedCPUReq) | RAM \(.currentRAMReq) → \(.recommendedRAMReq) | save $\(.monthlySavings)"' | head -5]
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now getting the top 5 rightsizing recommendations with current and recommended values."
 
 316
 01:16:10,000 --> 01:16:20,000
@@ -1465,17 +1469,17 @@ Apply recommendations one at a time. Monitor after each change.
 318
 01:16:30,000 --> 01:16:40,000
 [Types: kubectl patch deployment llm-ingest --namespace financial-rag --type=merge -p '{"spec":{"template":{"spec":{"containers":[{"name":"llm-ingest","resources":{"requests":{"cpu":"450m","memory":"1.2Gi"},"limits":{"cpu":"900m","memory":"2.4Gi"}}}]}}}}']
-▶ Pronounced as: "Kubectl, patch, deployment..."
+▶ Pronounced as: "Now patching the llm-ingest deployment with new CPU and memory requests and limits."
 
 319
 01:16:40,000 --> 01:16:50,000
 [Types: kubectl rollout status deployment/llm-ingest -n financial-rag]
-▶ Pronounced as: "Kubectl, rollout, status..."
+▶ Pronounced as: "Now checking rollout status."
 
 320
 01:16:50,000 --> 01:17:00,000
 [Types: kubectl top pods -n financial-rag -l app=llm-ingest]
-▶ Pronounced as: "Kubectl, top, pods..."
+▶ Pronounced as: "Now checking pod resource usage."
 
 321
 01:17:00,000 --> 01:17:10,000
@@ -1500,8 +1504,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Understanding HPA & Cost Implications
-**Timestamp:** 80:00 – 85:00
+**SEGMENT 16: Understanding HPA & Cost Implications**
+*Timestamp: 80:00 – 85:00*
 
 ```
 326
@@ -1523,7 +1527,7 @@ When configured incorrectly, HPA wastes money by scaling up too aggressively.
 330
 01:20:40,000 --> 01:20:50,000
 [Types: kubectl get hpa --all-namespaces]
-▶ Pronounced as: "Kubectl, get, hpa, dash, dash, all, dash, namespaces"
+▶ Pronounced as: "Now kubectl get hpa across all namespaces to list all Horizontal Pod Autoscalers."
 
 331
 01:20:50,000 --> 01:21:00,000
@@ -1552,7 +1556,7 @@ The goal is to find the right balance. Enough replicas to handle traffic. Not so
 337
 01:21:50,000 --> 01:22:00,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/hpa' | jq '.hpas[] | {name: .name, minReplicas: .minReplicas, maxReplicas: .maxReplicas, targetCPUUtilization: .targetCPUUtilization}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now curling the HPA endpoint in Kubecost to see HPA configuration."
 
 338
 01:22:00,000 --> 01:22:10,000
@@ -1573,8 +1577,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: Kubecost Best Practices for Production
-**Timestamp:** 85:00 – 90:00
+**SEGMENT 17: Kubecost Best Practices for Production**
+*Timestamp: 85:00 – 90:00*
 
 ```
 342
@@ -1592,7 +1596,7 @@ Best practice 1: Use persistent storage for Prometheus. Without persistent stora
 345
 01:25:30,000 --> 01:25:40,000
 [Types: helm upgrade kubecost kubecost/cost-analyzer --namespace kubecost --set prometheus.server.persistentVolume.enabled=true --set prometheus.server.persistentVolume.size=50Gi]
-▶ Pronounced as: "Helm, upgrade, kubecost..."
+▶ Pronounced as: "Now helm upgrade to enable persistent storage for Prometheus with 50Gi."
 
 346
 01:25:40,000 --> 01:25:50,000
@@ -1601,7 +1605,7 @@ Best practice 2: Set up multi-cluster monitoring. If you have multiple clusters,
 347
 01:25:50,000 --> 01:26:00,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=cluster' | jq -r '.data[0] | to_entries[] | "\(.key): $\(.value.totalCost | . * 100 | round / 100)"']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by cluster to see multi-cluster cost."
 
 348
 01:26:00,000 --> 01:26:10,000
@@ -1610,7 +1614,7 @@ Best practice 3: Set up cost sharing for shared namespaces like kube-system.
 349
 01:26:10,000 --> 01:26:20,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s -X POST 'http://localhost:9090/config/costShares' -H 'Content-Type: application/json' -d '{"sharedNamespaces":["kube-system","monitoring","cert-manager"]}']
-▶ Pronounced as: "Kubectl, exec... curl... X POST..."
+▶ Pronounced as: "Now configuring cost shares for shared namespaces."
 
 350
 01:26:20,000 --> 01:26:30,000
@@ -1619,7 +1623,7 @@ Best practice 4: Set up backup and restore for Kubecost data.
 351
 01:26:30,000 --> 01:26:40,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/backup' --output /tmp/kubecost-backup.json]
-▶ Pronounced as: "Kubectl, exec... curl... backup..."
+▶ Pronounced as: "Now creating a backup of Kubecost data."
 
 352
 01:26:40,000 --> 01:26:50,000
@@ -1628,7 +1632,7 @@ Best practice 5: Monitor Kubecost itself. Kubecost should be monitored like any 
 353
 01:26:50,000 --> 01:27:00,000
 [Types: kubectl get pods -n kubecost -w]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, kubecost..."
+▶ Pronounced as: "Now watching Kubecost pods for health."
 
 354
 01:27:00,000 --> 01:27:10,000
@@ -1637,7 +1641,7 @@ Best practice 6: Keep Kubecost updated. New versions include bug fixes and perfo
 355
 01:27:10,000 --> 01:27:20,000
 [Types: helm repo update && helm upgrade kubecost kubecost/cost-analyzer --namespace kubecost]
-▶ Pronounced as: "Helm, repo, update..."
+▶ Pronounced as: "Now updating Helm repo and upgrading Kubecost."
 
 356
 01:27:20,000 --> 01:27:30,000
@@ -1650,8 +1654,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: Series 3 Q&A — Common Questions Answered
-**Timestamp:** 90:00 – 95:00
+**SEGMENT 18: Series 3 Q&A — Common Questions Answered**
+*Timestamp: 90:00 – 95:00*
 
 ```
 358
@@ -1749,8 +1753,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: Series 3 Knowledge Check — Part 1
-**Timestamp:** 95:00 – 100:00
+**SEGMENT 19: Series 3 Knowledge Check — Part 1**
+*Timestamp: 95:00 – 100:00*
 
 ```
 381
@@ -1836,8 +1840,8 @@ See you in Segment 20.
 
 ---
 
-### SEGMENT 20: Series 3 Knowledge Check — Part 2
-**Timestamp:** 100:00 – 105:00
+**SEGMENT 20: Series 3 Knowledge Check — Part 2**
+*Timestamp: 100:00 – 105:00*
 
 ```
 401
@@ -1927,8 +1931,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Cost by Deployment & Service — Advanced Attribution
-**Timestamp:** 105:00 – 110:00
+**SEGMENT 21: Cost by Deployment & Service — Advanced Attribution**
+*Timestamp: 105:00 – 110:00*
 
 ```
 422
@@ -1942,7 +1946,7 @@ Cost by namespace tells you which namespace is expensive. Cost by deployment tel
 424
 01:45:20,000 --> 01:45:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=deployment&accumulate=true' | jq -r '.data[0] | to_entries[] | select(.value.totalCost > 0) | "\(.key)\t\(.value.totalCost | . * 100 | round / 100)"' | sort -t$'\t' -k2 -rn | head -20 | awk 'BEGIN{print "DEPLOYMENT\t\t\tCOST/MONTH"} {printf "%-35s\t$%s\n", $1, $2}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by deployment to see the top 20 most expensive deployments."
 
 425
 01:45:30,000 --> 01:45:40,000
@@ -1959,7 +1963,7 @@ Now let's look at cost by service. This is cost attributed by the service label.
 428
 01:46:00,000 --> 01:46:10,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=service&accumulate=true' | jq -r '.data[0] | to_entries[] | select(.value.totalCost > 0) | "\(.key)\t\(.value.totalCost | . * 100 | round / 100)"' | sort -t$'\t' -k2 -rn | head -20 | awk 'BEGIN{print "SERVICE\t\t\tCOST/MONTH"} {printf "%-35s\t$%s\n", $1, $2}']
-▶ Pronounced as: "Kubectl, exec... curl... jq..."
+▶ Pronounced as: "Now aggregating by service label."
 
 429
 01:46:10,000 --> 01:46:20,000
@@ -1978,7 +1982,7 @@ This is chargeback-ready data for service owners. Each team sees their cost.
 [Types: echo "" >> ~/finops-baseline.txt]
 [Types: echo "--- COST BY DEPLOYMENT ---" >> ~/finops-baseline.txt]
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=30d&aggregate=deployment&accumulate=true' | jq -r '.data[0] | to_entries[] | select(.value.totalCost > 0) | "\(.key): $\(.value.totalCost | . * 100 | round / 100)"' | head -5 >> ~/finops-baseline.txt]
-▶ Pronounced as: "Echo... kubectl exec... curl... jq..."
+▶ Pronounced as: "Now appending cost by deployment to the baseline document."
 
 433
 01:46:50,000 --> 01:47:00,000
@@ -1995,8 +1999,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Advanced HPA Configuration
-**Timestamp:** 110:00 – 115:00
+**SEGMENT 22: Advanced HPA Configuration**
+*Timestamp: 110:00 – 115:00*
 
 ```
 436
@@ -2010,7 +2014,7 @@ HPA can use custom metrics, not just CPU. You can scale based on request rate, q
 438
 01:50:20,000 --> 01:50:30,000
 [Types: kubectl get hpa --all-namespaces -o yaml]
-▶ Pronounced as: "Kubectl, get, hpa, dash, dash, all, dash, namespaces, dash, o, yaml"
+▶ Pronounced as: "Now kubectl get hpa across all namespaces in YAML format to see full configuration."
 
 439
 01:50:30,000 --> 01:50:40,000
@@ -2039,7 +2043,7 @@ Set scaleDown.stabilizationWindowSeconds to three hundred seconds. This prevents
 445
 01:51:30,000 --> 01:51:40,000
 [Types: kubectl patch hpa llm-ingest-hpa --namespace financial-rag --type=merge -p '{"spec":{"minReplicas":2,"maxReplicas":10,"targetCPUUtilizationPercentage":70,"behavior":{"scaleDown":{"stabilizationWindowSeconds":300}}}}']
-▶ Pronounced as: "Kubectl, patch, hpa..."
+▶ Pronounced as: "Now patching the HPA with optimized values for minReplicas, maxReplicas, target utilization, and stabilization window."
 
 446
 01:51:40,000 --> 01:51:50,000
@@ -2048,7 +2052,7 @@ This configures the HPA for cost optimization. It scales based on CPU utilizatio
 447
 01:51:50,000 --> 01:52:00,000
 [Types: kubectl get hpa llm-ingest-hpa -n financial-rag]
-▶ Pronounced as: "Kubectl, get, hpa..."
+▶ Pronounced as: "Now verifying the HPA configuration."
 
 448
 01:52:00,000 --> 01:52:10,000
@@ -2061,7 +2065,7 @@ Now let's verify HPA is working correctly.
 450
 01:52:20,000 --> 01:52:30,000
 [Types: kubectl get hpa llm-ingest-hpa -n financial-rag -w]
-▶ Pronounced as: "Kubectl, get, hpa... dash, w"
+▶ Pronounced as: "Now watching the HPA in action."
 
 451
 01:52:30,000 --> 01:52:40,000
@@ -2074,7 +2078,7 @@ If the HPA is not scaling, check that the metrics server is running.
 453
 01:52:50,000 --> 01:53:00,000
 [Types: kubectl get deployment metrics-server -n kube-system]
-▶ Pronounced as: "Kubectl, get, deployment, metrics, dash, server..."
+▶ Pronounced as: "Now checking the metrics-server deployment."
 
 454
 01:53:00,000 --> 01:53:10,000
@@ -2087,8 +2091,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 3 Q&A — Part 2
-**Timestamp:** 115:00 – 120:00
+**SEGMENT 23: Series 3 Q&A — Part 2**
+*Timestamp: 115:00 – 120:00*
 
 ```
 456
@@ -2170,8 +2174,8 @@ See you in Segment 24.
 
 ---
 
-### SEGMENT 24: Series 3 Conclusion & Next Steps
-**Timestamp:** 120:00 – 125:00
+**SEGMENT 24: Series 3 Conclusion & Next Steps**
+*Timestamp: 120:00 – 125:00*
 
 ```
 475

@@ -1,11 +1,14 @@
-# SERIES 4: Karpenter — Continuous Cost-Aware Autoscaling
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your **complete Series 4 SRT** with all `Type:` lines and their corresponding `Pronounced at:` lines edited to **type-along, precedential** style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: Why the Cluster Autoscaler Is Costing You Money
-**Timestamp:** 00:00 – 05:00
+**SERIES 4: Karpenter — Continuous Cost-Aware Autoscaling**
+**Complete 24-Segment SRT — 2 Hours**
+
+---
+
+**SEGMENT 1: Why the Cluster Autoscaler Is Costing You Money**
+*Timestamp: 00:00 – 05:00*
 
 ```
 1
@@ -107,7 +110,7 @@ Now let me show you how to deploy Karpenter on your own cluster. Before we start
 25
 00:04:00,000 --> 00:04:10,000
 [Types: kubectl get nodes]
-▶ Pronounced as: "Kubectl, get, nodes"
+▶ Pronounced as: "Now kubectl get nodes to verify our cluster is running."
 
 26
 00:04:10,000 --> 00:04:20,000
@@ -116,7 +119,7 @@ You should see three or more nodes with status Ready. Karpenter requires Kuberne
 27
 00:04:20,000 --> 00:04:30,000
 [Types: kubectl version --short | grep Server]
-▶ Pronounced as: "Kubectl, version, dash, dash, short, pipe, grep, Server"
+▶ Pronounced as: "Now kubectl version --short to check the server version."
 
 28
 00:04:30,000 --> 00:04:40,000
@@ -125,7 +128,7 @@ You should see Server Version v1.24 or higher. If you are on an older version, u
 29
 00:04:40,000 --> 00:04:50,000
 [Types: echo "Account: $ACCOUNT_ID  Region: $REGION"]
-▶ Pronounced as: "Echo, Account, colon, dollar, ACCOUNT, underscore, ID, Region, colon, dollar, REGION"
+▶ Pronounced as: "Now echoing our account ID and region to verify variables."
 
 30
 00:04:50,000 --> 00:05:00,000
@@ -134,8 +137,8 @@ Now, look at that output. You should see your account ID and region. This confir
 
 ---
 
-### SEGMENT 2: Removing Cluster Autoscaler & Setting Up IAM
-**Timestamp:** 05:00 – 10:00
+**SEGMENT 2: Removing Cluster Autoscaler & Setting Up IAM**
+*Timestamp: 05:00 – 10:00*
 
 ```
 31
@@ -145,7 +148,7 @@ Now let's remove the Cluster Autoscaler. You cannot run Karpenter and the Cluste
 32
 00:05:10,000 --> 00:05:20,000
 [Types: kubectl get deployment cluster-autoscaler -n kube-system 2>/dev/null && echo "Cluster Autoscaler found — must remove before installing Karpenter" || echo "No Cluster Autoscaler found — safe to proceed"]
-▶ Pronounced as: "Kubectl, get, deployment, cluster, dash, autoscaler, dash, n, kube, dash, system..."
+▶ Pronounced as: "Now checking if Cluster Autoscaler is present with kubectl get deployment."
 
 33
 00:05:20,000 --> 00:05:30,000
@@ -154,22 +157,22 @@ If you see "Cluster Autoscaler found", you must remove it. If you see "No Cluste
 34
 00:05:30,000 --> 00:05:40,000
 [Types: kubectl delete deployment cluster-autoscaler -n kube-system]
-▶ Pronounced as: "Kubectl, delete, deployment, cluster, dash, autoscaler, dash, n, kube, dash, system"
+▶ Pronounced as: "Now kubectl delete deployment cluster-autoscaler in kube-system."
 
 35
 00:05:40,000 --> 00:05:50,000
 [Types: kubectl delete clusterrolebinding cluster-autoscaler]
-▶ Pronounced as: "Kubectl, delete, clusterrolebinding, cluster, dash, autoscaler"
+▶ Pronounced as: "Now kubectl delete clusterrolebinding cluster-autoscaler."
 
 36
 00:05:50,000 --> 00:06:00,000
 [Types: kubectl delete clusterrole cluster-autoscaler]
-▶ Pronounced as: "Kubectl, delete, clusterrole, cluster, dash, autoscaler"
+▶ Pronounced as: "Now kubectl delete clusterrole cluster-autoscaler."
 
 37
 00:06:00,000 --> 00:06:10,000
 [Types: kubectl delete serviceaccount cluster-autoscaler -n kube-system]
-▶ Pronounced as: "Kubectl, delete, serviceaccount, cluster, dash, autoscaler, dash, n, kube, dash, system"
+▶ Pronounced as: "Now kubectl delete serviceaccount cluster-autoscaler in kube-system."
 
 38
 00:06:10,000 --> 00:06:20,000
@@ -178,7 +181,7 @@ Now let's verify the Cluster Autoscaler is removed.
 39
 00:06:20,000 --> 00:06:30,000
 [Types: kubectl get deployment cluster-autoscaler -n kube-system 2>/dev/null || echo "Cluster Autoscaler removed successfully"]
-▶ Pronounced as: "Kubectl, get, deployment, cluster, dash, autoscaler..."
+▶ Pronounced as: "Now verifying Cluster Autoscaler removal with kubectl get deployment."
 
 40
 00:06:30,000 --> 00:06:40,000
@@ -195,17 +198,18 @@ They continuously fight to add and remove the same nodes. Now let's set up the I
 43
 00:07:00,000 --> 00:07:10,000
 [Types: OIDC_ISSUER=$(aws eks describe-cluster --name $CLUSTER_NAME --query "cluster.identity.oidc.issuer" --output text)]
-▶ Pronounced as: "O-I-D-C, underscore, ISSUER, equals..."
+▶ Pronounced as: "Now capturing the OIDC issuer from our EKS cluster with AWS EKS describe-cluster."
 
 44
 00:07:10,000 --> 00:07:20,000
 [Types: OIDC_ID=$(echo $OIDC_ISSUER | sed 's|https://oidc.eks.us-east-1.amazonaws.com/id/||')]
-▶ Pronounced as: "O-I-D-C, underscore, ID, equals, echo, dollar, OIDC, underscore, ISSUER..."
+▶ Pronounced as: "Now extracting the OIDC ID from the issuer URL using sed."
 
 45
 00:07:20,000 --> 00:07:30,000
 [Types: echo "OIDC Issuer: $OIDC_ISSUER"]
 [Types: echo "OIDC ID: $OIDC_ID"]
+▶ Pronounced as: "Now echoing the OIDC issuer and ID to verify."
 
 46
 00:07:30,000 --> 00:07:40,000
@@ -362,7 +366,7 @@ Now let's create the IAM policy. This policy defines what EC2 actions Karpenter 
   ]
 }
 EOF]
-▶ Pronounced as: "Cat, greater-than, karpenter-controller-policy, dot, json, space, less-than, less-than, EOF..."
+▶ Pronounced as: "Now creating the IAM policy file with cat to karpenter-controller-policy.json."
 
 49
 00:08:00,000 --> 00:08:10,000
@@ -371,11 +375,12 @@ This is a comprehensive least-privilege policy. It allows Karpenter to launch an
 50
 00:08:10,000 --> 00:08:20,000
 [Types: POLICY_ARN=$(aws iam create-policy --policy-name "KarpenterControllerPolicy-$CLUSTER_NAME" --policy-document file://karpenter-controller-policy.json --query 'Policy.Arn' --output text)]
-▶ Pronounced as: "POLICY, underscore, ARN, equals..."
+▶ Pronounced as: "Now creating the IAM policy with AWS IAM create-policy and capturing the ARN."
 
 51
 00:08:20,000 --> 00:08:30,000
 [Types: echo "Policy ARN: $POLICY_ARN"]
+▶ Pronounced as: "Now echoing the policy ARN to verify."
 
 52
 00:08:30,000 --> 00:08:40,000
@@ -407,21 +412,22 @@ Now let's create the IAM role with IRSA trust policy. This allows the Karpenter 
   ]
 }
 EOF]
-▶ Pronounced as: "Cat, greater-than, karpenter-trust-policy, dot, json..."
+▶ Pronounced as: "Now creating the trust policy file with cat to karpenter-trust-policy.json."
 
 55
 00:09:00,000 --> 00:09:10,000
 [Types: KARPENTER_ROLE_ARN=$(aws iam create-role --role-name "KarpenterControllerRole-$CLUSTER_NAME" --assume-role-policy-document file://karpenter-trust-policy.json --query 'Role.Arn' --output text)]
-▶ Pronounced as: "KARPENTER, underscore, ROLE, underscore, ARN, equals..."
+▶ Pronounced as: "Now creating the IAM role with AWS IAM create-role and capturing the ARN."
 
 56
 00:09:10,000 --> 00:09:20,000
 [Types: aws iam attach-role-policy --role-name "KarpenterControllerRole-$CLUSTER_NAME" --policy-arn $POLICY_ARN]
-▶ Pronounced as: "AWS, I-A-M, attach, role, policy..."
+▶ Pronounced as: "Now attaching the policy to the role with AWS IAM attach-role-policy."
 
 57
 00:09:20,000 --> 00:09:30,000
 [Types: echo "Karpenter IAM Role: $KARPENTER_ROLE_ARN"]
+▶ Pronounced as: "Now echoing the Karpenter role ARN to verify."
 
 58
 00:09:30,000 --> 00:09:40,000
@@ -447,18 +453,19 @@ Now let's create the node IAM role. This is the role that the EC2 instances will
   ]
 }
 EOF]
+▶ Pronounced as: "Now creating the node trust policy file with cat to node-trust-policy.json."
 ```
 
 ---
 
-### SEGMENT 3: SQS Queue, Subnet Tags, & Installing Karpenter
-**Timestamp:** 10:00 – 15:00
+**SEGMENT 3: SQS Queue, Subnet Tags, & Installing Karpenter**
+*Timestamp: 10:00 – 15:00*
 
 ```
 61
 00:10:00,000 --> 00:10:10,000
 [Types: aws iam create-role --role-name "KarpenterNodeRole-$CLUSTER_NAME" --assume-role-policy-document file://node-trust-policy.json]
-▶ Pronounced as: "AWS, I-A-M, create, role..."
+▶ Pronounced as: "Now creating the node IAM role with AWS IAM create-role."
 
 62
 00:10:10,000 --> 00:10:20,000
@@ -467,7 +474,7 @@ Now let's attach the required managed policies for EKS nodes.
 63
 00:10:20,000 --> 00:10:30,000
 [Types: for policy in AmazonEKSWorkerNodePolicy AmazonEKS_CNI_Policy AmazonEC2ContainerRegistryReadOnly AmazonSSMManagedInstanceCore; do aws iam attach-role-policy --role-name "KarpenterNodeRole-$CLUSTER_NAME" --policy-arn "arn:aws:iam::aws:policy/$policy"; echo "Attached: $policy"; done]
-▶ Pronounced as: "For, policy, in... do... AWS, I-A-M, attach, role, policy..."
+▶ Pronounced as: "Now looping through the four required policies and attaching each one."
 
 64
 00:10:30,000 --> 00:10:40,000
@@ -476,16 +483,17 @@ Now, look at that output. You should see four policies attached. These are the s
 65
 00:10:40,000 --> 00:10:50,000
 [Types: aws iam create-instance-profile --instance-profile-name "KarpenterNodeInstanceProfile-$CLUSTER_NAME"]
-▶ Pronounced as: "AWS, I-A-M, create, instance, profile..."
+▶ Pronounced as: "Now creating the instance profile with AWS IAM create-instance-profile."
 
 66
 00:10:50,000 --> 00:11:00,000
 [Types: aws iam add-role-to-instance-profile --instance-profile-name "KarpenterNodeInstanceProfile-$CLUSTER_NAME" --role-name "KarpenterNodeRole-$CLUSTER_NAME"]
-▶ Pronounced as: "AWS, I-A-M, add, role, to, instance, profile..."
+▶ Pronounced as: "Now adding the role to the instance profile."
 
 67
 00:11:00,000 --> 00:11:10,000
 [Types: echo "Node instance profile created"]
+▶ Pronounced as: "Now echoing confirmation."
 
 68
 00:11:10,000 --> 00:11:20,000
@@ -498,17 +506,18 @@ Now let's create the SQS queue for Spot interruption handling. Karpenter needs t
 70
 00:11:30,000 --> 00:11:40,000
 [Types: QUEUE_URL=$(aws sqs create-queue --queue-name $CLUSTER_NAME --attributes '{"MessageRetentionPeriod": "300"}' --query 'QueueUrl' --output text)]
-▶ Pronounced as: "QUEUE, underscore, URL, equals..."
+▶ Pronounced as: "Now creating the SQS queue with AWS SQS create-queue and capturing the URL."
 
 71
 00:11:40,000 --> 00:11:50,000
 [Types: QUEUE_ARN=$(aws sqs get-queue-attributes --queue-url $QUEUE_URL --attribute-names QueueArn --query 'Attributes.QueueArn' --output text)]
-▶ Pronounced as: "QUEUE, underscore, ARN, equals..."
+▶ Pronounced as: "Now getting the queue ARN with AWS SQS get-queue-attributes."
 
 72
 00:11:50,000 --> 00:12:00,000
 [Types: echo "Queue URL: $QUEUE_URL"]
 [Types: echo "Queue ARN: $QUEUE_ARN"]
+▶ Pronounced as: "Now echoing the queue URL and ARN to verify."
 
 73
 00:12:00,000 --> 00:12:10,000
@@ -517,7 +526,7 @@ Now, look at that output. We have created the SQS queue and captured its ARN.
 74
 00:12:10,000 --> 00:12:20,000
 [Types: aws sqs set-queue-attributes --queue-url $QUEUE_URL --attributes "{\"Policy\":\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":[\\\"events.amazonaws.com\\\",\\\"sqs.amazonaws.com\\\"]},\\\"Action\\\":\\\"sqs:SendMessage\\\",\\\"Resource\\\":\\\"$QUEUE_ARN\\\"}]}\"}"]
-▶ Pronounced as: "AWS, S-Q-S, set, queue, attributes..."
+▶ Pronounced as: "Now setting the queue policy to allow EventBridge to send messages."
 
 75
 00:12:20,000 --> 00:12:30,000
@@ -526,7 +535,7 @@ Now let's create the EventBridge rules for Spot interruption and instance events
 76
 00:12:30,000 --> 00:12:40,000
 [Types: for rule_name in "KarpenterInterruptionQueueRule-SpotInterruption" "KarpenterInterruptionQueueRule-ScheduledChange" "KarpenterInterruptionQueueRule-StateChange"; do case $rule_name in *SpotInterruption*) pattern='{"source":["aws.ec2"],"detail-type":["EC2 Spot Instance Interruption Warning"]}' ;; *ScheduledChange*) pattern='{"source":["aws.health"],"detail-type":["AWS Health Event"]}' ;; *StateChange*) pattern='{"source":["aws.ec2"],"detail-type":["EC2 Instance State-change Notification"]}' ;; esac; RULE_ARN=$(aws events put-rule --name $rule_name --event-pattern "$pattern" --query 'RuleArn' --output text); aws events put-targets --rule $rule_name --targets "Id=1,Arn=$QUEUE_ARN"; echo "Created EventBridge rule: $rule_name"; done]
-▶ Pronounced as: "For, rule, underscore, name, in..."
+▶ Pronounced as: "Now looping through three EventBridge rules, creating each with the appropriate event pattern and targeting the SQS queue."
 
 77
 00:12:40,000 --> 00:12:50,000
@@ -543,11 +552,12 @@ Now let's tag subnets and security groups. Karpenter discovers subnets and secur
 80
 00:13:10,000 --> 00:13:20,000
 [Types: VPC_ID=$(aws ec2 describe-vpcs --filters "Name=isDefault,Values=false" --query 'Vpcs[0].VpcId' --output text)]
-▶ Pronounced as: "V-P-C, underscore, ID, equals..."
+▶ Pronounced as: "Now capturing the VPC ID with AWS EC2 describe-vpcs."
 
 81
 00:13:20,000 --> 00:13:30,000
 [Types: echo "VPC: $VPC_ID"]
+▶ Pronounced as: "Now echoing the VPC ID to verify."
 
 82
 00:13:30,000 --> 00:13:40,000
@@ -556,7 +566,7 @@ Now, look at that output. We have discovered your VPC ID.
 83
 00:13:40,000 --> 00:13:50,000
 [Types: aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[].SubnetId' --output text | tr '\t' '\n' | while read subnet_id; do aws ec2 create-tags --resources $subnet_id --tags "Key=karpenter.sh/discovery,Value=$CLUSTER_NAME"; echo "Tagged subnet: $subnet_id"; done]
-▶ Pronounced as: "AWS, E-C-two, describe, subnets..."
+▶ Pronounced as: "Now listing all subnets in the VPC and tagging each with the karpenter.sh/discovery tag."
 
 84
 00:13:50,000 --> 00:14:00,000
@@ -565,16 +575,17 @@ Now, look at that output. All private subnets are tagged. Karpenter can now disc
 85
 00:14:00,000 --> 00:14:10,000
 [Types: NODE_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:aws:eks:cluster-name,Values=$CLUSTER_NAME" --query 'SecurityGroups[0].GroupId' --output text)]
-▶ Pronounced as: "NODE, underscore, S-G, equals..."
+▶ Pronounced as: "Now capturing the node security group ID."
 
 86
 00:14:10,000 --> 00:14:20,000
 [Types: aws ec2 create-tags --resources $NODE_SG --tags "Key=karpenter.sh/discovery,Value=$CLUSTER_NAME"]
-▶ Pronounced as: "AWS, E-C-two, create, tags..."
+▶ Pronounced as: "Now tagging the security group with karpenter.sh/discovery."
 
 87
 00:14:20,000 --> 00:14:30,000
 [Types: echo "Tagged security group: $NODE_SG"]
+▶ Pronounced as: "Now echoing confirmation."
 
 88
 00:14:30,000 --> 00:14:40,000
@@ -590,18 +601,19 @@ Now let's install Karpenter via Helm.
 [Types: helm repo add karpenter https://charts.karpenter.sh]
 [Types: helm repo update]
 [Types: helm install karpenter oci://public.ecr.aws/karpenter/karpenter --version "${KARPENTER_VERSION}" --namespace karpenter --create-namespace --set "settings.clusterName=$CLUSTER_NAME" --set "settings.interruptionQueue=$CLUSTER_NAME" --set "serviceAccount.annotations.eks\.amazonaws\.com/role-arn=$KARPENTER_ROLE_ARN" --set controller.resources.requests.cpu=1 --set controller.resources.requests.memory=1Gi --wait]
+▶ Pronounced as: "Now setting the Karpenter version, adding the Helm repo, updating, and installing Karpenter with the cluster name, interruption queue, and IAM role ARN."
 ```
 
 ---
 
-### SEGMENT 4: EC2NodeClass & NodePool Configuration
-**Timestamp:** 15:00 – 20:00
+**SEGMENT 4: EC2NodeClass & NodePool Configuration**
+*Timestamp: 15:00 – 20:00*
 
 ```
 91
 00:15:00,000 --> 00:15:10,000
 [Types: kubectl get pods -n karpenter]
-▶ Pronounced as: "Kubectl, get, pods, dash, n, karpenter"
+▶ Pronounced as: "Now kubectl get pods in the karpenter namespace to verify the controller is running."
 
 92
 00:15:10,000 --> 00:15:20,000
@@ -645,7 +657,7 @@ spec:
         deleteOnTermination: true
   detailedMonitoring: true
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating the EC2NodeClass with kubectl apply. We're defining AL2023 as the AMI family, the node IAM role, subnet and security group selectors using the discovery tag, and gp3 block device mappings with encryption enabled."
 
 95
 00:15:40,000 --> 00:15:50,000
@@ -713,7 +725,7 @@ spec:
     expireAfter: 720h
   weight: 100
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating the application NodePool with kubectl apply. This defines both amd64 and arm64 architectures, multiple instance families, on-demand and spot capacity, and a 30-second consolidation window."
 
 101
 00:16:40,000 --> 00:16:50,000
@@ -774,7 +786,7 @@ spec:
     consolidateAfter: 5m
     expireAfter: 168h
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating the ingestion NodePool for batch workloads. This uses compute-optimized instance families and spot capacity only, with a 5-minute consolidation window."
 
 107
 00:17:40,000 --> 00:17:50,000
@@ -828,7 +840,7 @@ spec:
     expireAfter: 24h
   weight: 10
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating the GPU NodePool with GPU instance families, both spot and on-demand capacity, and a 2-minute consolidation window."
 
 111
 00:18:20,000 --> 00:18:30,000
@@ -846,6 +858,7 @@ Now let's verify all NodePools and the EC2NodeClass are created.
 00:18:50,000 --> 00:19:00,000
 [Types: kubectl get nodepool]
 [Types: kubectl get ec2nodeclass]
+▶ Pronounced as: "Now kubectl get nodepool and kubectl get ec2nodeclass to verify."
 
 115
 00:19:00,000 --> 00:19:10,000
@@ -858,17 +871,17 @@ Now let's add tolerations to your workloads so they schedule on the correct Node
 117
 00:19:20,000 --> 00:19:30,000
 [Types: kubectl patch deployment financial-rag-agent-api -n financial-rag --type='json' -p='[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"dedicated","operator":"Equal","value":"application","effect":"NoSchedule"}]},{"op":"add","path":"/spec/template/spec/nodeSelector","value":{"role":"application"}}]']
-▶ Pronounced as: "Kubectl, patch, deployment, financial-rag-agent-api..."
+▶ Pronounced as: "Now patching the financial-rag-agent-api deployment to add the application toleration and node selector."
 
 118
 00:19:30,000 --> 00:19:40,000
 [Types: kubectl patch deployment llm-ingest -n financial-rag --type='json' -p='[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"dedicated","operator":"Equal","value":"ingestion","effect":"NoSchedule"},{"key":"karpenter.sh/capacity-type","operator":"Equal","value":"spot","effect":"NoSchedule"}]},{"op":"add","path":"/spec/template/spec/nodeSelector","value":{"role":"ingestion"}}]']
-▶ Pronounced as: "Kubectl, patch, deployment, llm-ingest..."
+▶ Pronounced as: "Now patching the llm-ingest deployment for the ingestion NodePool with spot toleration."
 
 119
 00:19:40,000 --> 00:19:50,000
 [Types: kubectl patch deployment risk-model-trainer -n riskoracle --type='json' -p='[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"nvidia.com/gpu","operator":"Equal","value":"true","effect":"NoSchedule"}]},{"op":"add","path":"/spec/template/spec/nodeSelector","value":{"role":"gpu-ml"}}]']
-▶ Pronounced as: "Kubectl, patch, deployment, risk-model-trainer..."
+▶ Pronounced as: "Now patching the risk-model-trainer deployment for the GPU NodePool with the GPU toleration."
 
 120
 00:19:50,000 --> 00:20:00,000
@@ -877,8 +890,8 @@ Now, look at that output. Your workloads now have tolerations to schedule on the
 
 ---
 
-### SEGMENT 5: Spot-Only NodePool, GPU NodePool & Testing Karpenter
-**Timestamp:** 20:00 – 25:00
+**SEGMENT 5: Spot-Only NodePool, GPU NodePool & Testing Karpenter**
+*Timestamp: 20:00 – 25:00*
 
 ```
 121
@@ -888,12 +901,12 @@ Now let's test Karpenter in action. First, test scale-out speed.
 122
 00:20:10,000 --> 00:20:20,000
 [Types: kubectl create deployment burst-test --image=nginx --replicas=20 --namespace=default]
-▶ Pronounced as: "Kubectl, create, deployment, burst, dash, test..."
+▶ Pronounced as: "Now creating a burst test deployment with 20 replicas to trigger Karpenter scaling."
 
 123
 00:20:20,000 --> 00:20:30,000
 [Types: time kubectl wait --for=condition=available deployment/burst-test --timeout=120s]
-▶ Pronounced as: "Time, kubectl, wait..."
+▶ Pronounced as: "Now timing how long it takes for the deployment to become available."
 
 124
 00:20:30,000 --> 00:20:40,000
@@ -902,7 +915,7 @@ Now, look at that output. You should see new nodes appear within thirty to sixty
 125
 00:20:40,000 --> 00:20:50,000
 [Types: kubectl get nodes -w &]
-▶ Pronounced as: "Kubectl, get, nodes, dash, w, ampersand"
+▶ Pronounced as: "Now watching nodes appear in real time with kubectl get nodes -w."
 
 126
 00:20:50,000 --> 00:21:00,000
@@ -911,7 +924,7 @@ Watch nodes appear in real time. You should see new nodes with the karpenter.sh/
 127
 00:21:00,000 --> 00:21:10,000
 [Types: kubectl delete deployment burst-test]
-▶ Pronounced as: "Kubectl, delete, deployment, burst, dash, test"
+▶ Pronounced as: "Now deleting the burst test deployment."
 
 128
 00:21:10,000 --> 00:21:20,000
@@ -920,17 +933,17 @@ Now let's watch consolidation in action. Scale down to create underutilised node
 129
 00:21:20,000 --> 00:21:30,000
 [Types: kubectl scale deployment financial-rag-agent-api --replicas=1 -n financial-rag]
-▶ Pronounced as: "Kubectl, scale, deployment, financial-rag-agent-api..."
+▶ Pronounced as: "Now scaling down the financial-rag-agent-api to trigger consolidation."
 
 130
 00:21:30,000 --> 00:21:40,000
 [Types: kubectl get nodes -w &]
-▶ Pronounced as: "Kubectl, get, nodes, dash, w, ampersand"
+▶ Pronounced as: "Now watching nodes for consolidation activity."
 
 131
 00:21:40,000 --> 00:21:50,000
 [Types: kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --follow --tail=30 | grep -iE "consolidat|disrupt|terminat"]
-▶ Pronounced as: "Kubectl, logs, dash, n, karpenter..."
+▶ Pronounced as: "Now tailing Karpenter logs and grepping for consolidation, disruption, and termination events."
 
 132
 00:21:50,000 --> 00:22:00,000
@@ -955,7 +968,7 @@ Now let's verify Spot node selection. Karpenter should be using Spot instances f
 136
 00:22:30,000 --> 00:22:40,000
 [Types: kubectl get nodes -o custom-columns='NAME:.metadata.name,INSTANCE:.metadata.labels.node\.kubernetes\.io/instance-type,CAPACITY:.metadata.labels.karpenter\.sh/capacity-type,ARCH:.metadata.labels.kubernetes\.io/arch']
-▶ Pronounced as: "Kubectl, get, nodes, dash, o, custom, dash, columns..."
+▶ Pronounced as: "Now listing nodes with instance type, capacity type, and architecture."
 
 137
 00:22:40,000 --> 00:22:50,000
@@ -972,7 +985,7 @@ Now let's analyze Spot prices in real time. This is what Karpenter uses to make 
 140
 00:23:10,000 --> 00:23:20,000
 [Types: for instance_type in m6i.large m6i.xlarge m7g.large m7g.xlarge c6i.large c6i.xlarge; do spot_price=$(aws ec2 describe-spot-price-history --instance-types $instance_type --product-descriptions "Linux/UNIX" --start-time $(date -u +"%Y-%m-%dT%H:%M:%SZ") --query 'SpotPriceHistory[0].SpotPrice' --output text 2>/dev/null || echo "N/A"); od_price=$(aws pricing get-products --service-code AmazonEC2 --filters "Type=TERM_MATCH,Field=instanceType,Value=$instance_type" "Type=TERM_MATCH,Field=operatingSystem,Value=Linux" "Type=TERM_MATCH,Field=tenancy,Value=Shared" "Type=TERM_MATCH,Field=location,Value=US East (N. Virginia)" "Type=TERM_MATCH,Field=preInstalledSw,Value=NA" "Type=TERM_MATCH,Field=capacitystatus,Value=Used" --query 'PriceList[0]' --output text 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); terms=d.get('terms',{}).get('OnDemand',{}); p=list(list(list(terms.values())[0].get('priceDimensions',{}).values())[0].get('pricePerUnit',{}).values())[0]; print(p)" 2>/dev/null || echo "N/A"); if [ "$spot_price" != "N/A" ] && [ "$od_price" != "N/A" ]; then savings=$(echo "scale=0; (1 - $spot_price / $od_price) * 100" | bc 2>/dev/null || echo "?"); echo "$instance_type | OD: \$$od_price/hr | Spot: \$$spot_price/hr | Savings: ${savings}%"; else echo "$instance_type | OD: $od_price/hr | Spot: $spot_price/hr"; fi; done]
-▶ Pronounced as: "For, instance, underscore, type, in... do..."
+▶ Pronounced as: "Now looping through instance types and comparing On-Demand to Spot prices using AWS pricing and Spot price history APIs."
 
 141
 00:23:20,000 --> 00:23:30,000
@@ -1013,7 +1026,7 @@ spec:
       app.kubernetes.io/name: financial-rag-agent
       app.kubernetes.io/component: agent
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating two PodDisruptionBudgets with kubectl apply."
 
 145
 00:24:00,000 --> 00:24:10,000
@@ -1022,7 +1035,7 @@ This creates two PodDisruptionBudgets. The API PDB says never take down more tha
 146
 00:24:10,000 --> 00:24:20,000
 [Types: kubectl get pdb --all-namespaces]
-▶ Pronounced as: "Kubectl, get, pdb, dash, dash, all, dash, namespaces"
+▶ Pronounced as: "Now listing all PDBs to verify they are created."
 
 147
 00:24:20,000 --> 00:24:30,000
@@ -1043,8 +1056,8 @@ Now let's update the baseline document with all our Series 4 findings.
 
 ---
 
-### SEGMENT 6: Disruption Budgets, Baseline Update & Series 5 Preview
-**Timestamp:** 25:00 – 30:00
+**SEGMENT 6: Disruption Budgets, Baseline Update & Series 5 Preview**
+*Timestamp: 25:00 – 30:00*
 
 ```
 151
@@ -1053,35 +1066,42 @@ Now let's update the baseline document with all our Series 4 findings.
 [Types: echo "=== SERIES 4: KARPENTER DEPLOYMENT ===" >> ~/finops-baseline.txt]
 [Types: echo "Date: $(date)" >> ~/finops-baseline.txt]
 [Types: echo "" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the Series 4 header to our baseline document."
 
 152
 00:25:10,000 --> 00:25:20,000
 [Types: echo "--- NODE COUNT ---" >> ~/finops-baseline.txt]
 [Types: kubectl get nodes --no-headers | wc -l >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the node count."
 
 153
 00:25:20,000 --> 00:25:30,000
 [Types: echo "--- INSTANCE TYPE DISTRIBUTION ---" >> ~/finops-baseline.txt]
 [Types: kubectl get nodes -o json | jq -r '.items[] | .metadata.labels["node.kubernetes.io/instance-type"]' | sort | uniq -c | sort -rn >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the instance type distribution."
 
 154
 00:25:30,000 --> 00:25:40,000
 [Types: echo "--- SPOT VS ON-DEMAND SPLIT ---" >> ~/finops-baseline.txt]
 [Types: kubectl get nodes -o json | jq -r '.items[] | .metadata.labels["karpenter.sh/capacity-type"]' | sort | uniq -c >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the Spot vs On-Demand split."
 
 155
 00:25:40,000 --> 00:25:50,000
 [Types: echo "--- CONSOLIDATION EVENTS (LAST 24H) ---" >> ~/finops-baseline.txt]
 [Types: kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --since=24h 2>/dev/null | grep -c "consolidat" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the consolidation event count from the last 24 hours."
 
 156
 00:25:50,000 --> 00:26:00,000
 [Types: echo "--- NODEPOOLS ---" >> ~/finops-baseline.txt]
 [Types: kubectl get nodepool -o custom-columns='NAME:.metadata.name,READY:.status.conditions[-1].type' >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the NodePool status."
 
 157
 00:26:00,000 --> 00:26:10,000
 [Types: cat ~/finops-baseline.txt]
+▶ Pronounced as: "Now viewing the complete baseline document."
 
 158
 00:26:10,000 --> 00:26:20,000
@@ -1118,7 +1138,7 @@ Set minSize zero on your existing node groups after deploying Karpenter. Many te
 166
 00:27:30,000 --> 00:27:40,000
 [Types: aws eks update-nodegroup-config --cluster-name $CLUSTER_NAME --nodegroup-name your-existing-node-group --scaling-config minSize=0,maxSize=1,desiredSize=0]
-▶ Pronounced as: "AWS, E-K-S, update, nodegroup, config..."
+▶ Pronounced as: "Now updating the existing node group to set minSize to 0."
 
 167
 00:27:40,000 --> 00:27:50,000
@@ -1143,7 +1163,7 @@ Lesson four: Graviton ARM instances save twenty percent — but test your contai
 172
 00:28:30,000 --> 00:28:40,000
 [Types: docker buildx build --platform linux/amd64,linux/arm64 -t your-ecr-repo/your-image:latest --push .]
-▶ Pronounced as: "Docker, buildx, build, dash, dash, platform, linux, slash, amd64, comma, linux, slash, arm64..."
+▶ Pronounced as: "Now building a multi-architecture container image with buildx."
 
 173
 00:28:40,000 --> 00:28:50,000
@@ -1164,7 +1184,7 @@ Lesson six: never set CPU limits without understanding the throttling math. With
 177
 00:29:20,000 --> 00:29:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/metrics' | grep throttled | sort -t= -k2 -rn | head -10]
-▶ Pronounced as: "Kubectl, exec, dash, n, kubecost, deploy, slash, kubecost, dash, cost, dash, analyzer..."
+▶ Pronounced as: "Now auditing CPU throttling rates after Karpenter consolidation."
 
 178
 00:29:30,000 --> 00:29:40,000
@@ -1181,8 +1201,8 @@ First: Karpenter running. Check with kubectl get pods -n karpenter. All pods sho
 
 ---
 
-### SEGMENT 7: Understanding the Karpenter Architecture
-**Timestamp:** 30:00 – 35:00
+**SEGMENT 7: Understanding the Karpenter Architecture**
+*Timestamp: 30:00 – 35:00*
 
 ```
 181
@@ -1268,8 +1288,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: Deep Dive — Karpenter vs Cluster Autoscaler
-**Timestamp:** 35:00 – 40:00
+**SEGMENT 8: Deep Dive — Karpenter vs Cluster Autoscaler**
+*Timestamp: 35:00 – 40:00*
 
 ```
 201
@@ -1351,8 +1371,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Advanced NodePool Configuration
-**Timestamp:** 40:00 – 45:00
+**SEGMENT 9: Advanced NodePool Configuration**
+*Timestamp: 40:00 – 45:00*
 
 ```
 220
@@ -1370,7 +1390,7 @@ The first is topology spread constraints. This controls how pods are spread acro
 223
 00:40:30,000 --> 00:40:40,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"topologySpreadConstraints":[{"maxSkew":1,"topologyKey":"topology.kubernetes.io/zone","whenUnsatisfiable":"DoNotSchedule","labelSelector":{"matchLabels":{"role":"application"}}}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now patching the application NodePool to add topology spread constraints for even AZ distribution."
 
 224
 00:40:40,000 --> 00:40:50,000
@@ -1383,7 +1403,7 @@ The second is pod anti-affinity. This prevents pods from scheduling on the same 
 226
 00:41:00,000 --> 00:41:10,000
 [Types: kubectl patch deployment financial-rag-agent-api -n financial-rag --type='json' -p='[{"op":"add","path":"/spec/template/spec/affinity","value":{"podAntiAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":[{"labelSelector":{"matchExpressions":[{"key":"app.kubernetes.io/name","operator":"In","values":["financial-rag-agent"]}]},"topologyKey":"kubernetes.io/hostname"}]}}}]']
-▶ Pronounced as: "Kubectl, patch, deployment..."
+▶ Pronounced as: "Now patching the financial-rag-agent-api with pod anti-affinity to prevent two replicas on the same node."
 
 227
 00:41:10,000 --> 00:41:20,000
@@ -1396,7 +1416,7 @@ The third is node affinity. This allows you to prefer or require specific node a
 229
 00:41:30,000 --> 00:41:40,000
 [Types: kubectl patch deployment risk-model-trainer -n riskoracle --type='json' -p='[{"op":"add","path":"/spec/template/spec/affinity","value":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"weight":80,"preference":{"matchExpressions":[{"key":"node.kubernetes.io/instance-type","operator":"In","values":["g4dn.xlarge","g4dn.2xlarge"]}]}}]}}}]']
-▶ Pronounced as: "Kubectl, patch, deployment..."
+▶ Pronounced as: "Now patching the risk-model-trainer with node affinity to prefer g4dn instance types."
 
 230
 00:41:40,000 --> 00:41:50,000
@@ -1429,7 +1449,7 @@ spec:
           values: ["2xlarge", "4xlarge", "8xlarge"]
   weight: 50
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a high-memory NodePool for memory-intensive workloads with R-family instances."
 
 233
 00:42:10,000 --> 00:42:20,000
@@ -1442,7 +1462,7 @@ The fifth is the consolidation policy. WhenUnderutilized is the default. WhenEmp
 235
 00:42:30,000 --> 00:42:40,000
 [Types: kubectl patch nodepool ingestion --type='merge' -p='{"spec":{"disruption":{"consolidateAfter":"10m"}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, ingestion..."
+▶ Pronounced as: "Now increasing the consolidation delay for ingestion workloads to 10 minutes."
 
 236
 00:42:40,000 --> 00:42:50,000
@@ -1459,7 +1479,7 @@ For GPU workloads, we set it to 168 hours. Seven days. This ensures GPU nodes ar
 239
 00:43:10,000 --> 00:43:20,000
 [Types: kubectl patch nodepool gpu-ml --type='merge' -p='{"spec":{"disruption":{"expireAfter":"168h"}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, gpu-ml..."
+▶ Pronounced as: "Now setting GPU NodePool expiry to 168 hours."
 
 240
 00:43:20,000 --> 00:43:30,000
@@ -1476,8 +1496,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Understanding Consolidation in Depth
-**Timestamp:** 45:00 – 50:00
+**SEGMENT 10: Understanding Consolidation in Depth**
+*Timestamp: 45:00 – 50:00*
 
 ```
 243
@@ -1527,7 +1547,7 @@ Some workloads need a longer consolidation window. Batch jobs need time to compl
 254
 00:46:50,000 --> 00:47:00,000
 [Types: kubectl get events --all-namespaces --field-selector reason=Consolidation --sort-by='.metadata.creationTimestamp' | tail -10]
-▶ Pronounced as: "Kubectl, get, events..."
+▶ Pronounced as: "Now listing consolidation events with kubectl get events."
 
 255
 00:47:00,000 --> 00:47:10,000
@@ -1536,7 +1556,7 @@ This shows you consolidation events in your cluster. You can see when nodes were
 256
 00:47:10,000 --> 00:47:20,000
 [Types: kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --since=1h | grep -i consolidate | wc -l]
-▶ Pronounced as: "Kubectl, logs, dash, n, karpenter..."
+▶ Pronounced as: "Now counting consolidation events in the last hour."
 
 257
 00:47:20,000 --> 00:47:30,000
@@ -1569,8 +1589,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Optimizing Instance Selection for Cost
-**Timestamp:** 50:00 – 55:00
+**SEGMENT 11: Optimizing Instance Selection for Cost**
+*Timestamp: 50:00 – 55:00*
 
 ```
 264
@@ -1600,7 +1620,7 @@ The second optimization is architecture selection. Include arm64. Graviton insta
 270
 00:51:00,000 --> 00:51:10,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now enabling arm64 architecture in the application NodePool."
 
 271
 00:51:10,000 --> 00:51:20,000
@@ -1613,7 +1633,7 @@ The third optimization is Spot preference. Spot instances are sixty to eighty pe
 273
 00:51:30,000 --> 00:51:40,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"karpenter.sh/capacity-type","operator":"In","values":["spot","on-demand"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now enabling both spot and on-demand capacity types."
 
 274
 00:51:40,000 --> 00:51:50,000
@@ -1626,7 +1646,7 @@ The fourth optimization is instance size. Exclude very small instances. They are
 276
 00:52:00,000 --> 00:52:10,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"karpenter.k8s.aws/instance-size","operator":"NotIn","values":["nano","micro","small","medium"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now excluding tiny instance sizes from the application NodePool."
 
 277
 00:52:10,000 --> 00:52:20,000
@@ -1643,7 +1663,7 @@ Karpenter does not have a built-in preference for newer generations. But you can
 280
 00:52:40,000 --> 00:52:50,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"karpenter.k8s.aws/instance-family","operator":"In","values":["m7g","m6g","m6i","m5"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now reordering instance families to prefer newer generations."
 
 281
 00:52:50,000 --> 00:53:00,000
@@ -1657,6 +1677,7 @@ The sixth optimization is to use the weight field. You can prefer some NodePools
 00:53:10,000 --> 00:53:20,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"weight":100}}']
 [Types: kubectl patch nodepool ingestion --type='merge' -p='{"spec":{"weight":50}}']
+▶ Pronounced as: "Now setting weights to prefer the application NodePool."
 
 284
 00:53:20,000 --> 00:53:30,000
@@ -1677,8 +1698,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Deep Dive — Spot Instance Handling
-**Timestamp:** 55:00 – 60:00
+**SEGMENT 12: Deep Dive — Spot Instance Handling**
+*Timestamp: 55:00 – 60:00*
 
 ```
 288
@@ -1720,7 +1741,7 @@ The EventBridge rule we created sends all Spot interruption events to the SQS qu
 297
 00:56:30,000 --> 00:56:40,000
 [Types: aws sqs receive-message --queue-url $QUEUE_URL --max-number-of-messages 5]
-▶ Pronounced as: "AWS, S-Q-S, receive, message..."
+▶ Pronounced as: "Now checking the SQS queue for any pending interruption messages."
 
 298
 00:56:40,000 --> 00:56:50,000
@@ -1733,7 +1754,7 @@ If you want to test Spot interruption handling, you can simulate an interruption
 300
 00:57:00,000 --> 00:57:10,000
 [Types: aws ec2 modify-instance-placement --instance-id i-xxxxxxxxx --affinity default --tenancy default --host-id null]
-▶ Pronounced as: "AWS, E-C-two, modify, instance, placement..."
+▶ Pronounced as: "Now simulating an instance placement change to test interruption handling."
 
 301
 00:57:10,000 --> 00:57:20,000
@@ -1750,7 +1771,7 @@ You should monitor interruption rates. If you see high interruption rates, your 
 304
 00:57:40,000 --> 00:57:50,000
 [Types: kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --since=7d | grep -c "interruption" || echo "0"]
-▶ Pronounced as: "Kubectl, logs, dash, n, karpenter..."
+▶ Pronounced as: "Now counting interruption events in the last 7 days."
 
 305
 00:57:50,000 --> 00:58:00,000
@@ -1775,8 +1796,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: NodePool Taints & Tolerations — Advanced Patterns
-**Timestamp:** 60:00 – 65:00
+**SEGMENT 13: NodePool Taints & Tolerations — Advanced Patterns**
+*Timestamp: 60:00 – 65:00*
 
 ```
 310
@@ -1811,7 +1832,7 @@ spec:
           effect: NoSchedule
   weight: 100
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a production NodePool with an environment taint."
 
 315
 01:00:50,000 --> 01:01:00,000
@@ -1837,7 +1858,7 @@ spec:
           effect: NoSchedule
   weight: 10
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a GPU training NodePool with the GPU taint."
 
 318
 01:01:20,000 --> 01:01:30,000
@@ -1863,7 +1884,7 @@ spec:
           effect: NoExecute
   weight: 1
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a maintenance NodePool with NoExecute taint."
 
 321
 01:01:50,000 --> 01:02:00,000
@@ -1876,7 +1897,7 @@ Tolerations can be applied to deployments or pods directly. You can also apply t
 323
 01:02:10,000 --> 01:02:20,000
 [Types: kubectl patch deployment my-app -n my-namespace --type='json' -p='[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"environment","operator":"Equal","value":"production","effect":"NoSchedule"}]}]']
-▶ Pronounced as: "Kubectl, patch, deployment..."
+▶ Pronounced as: "Now adding a production toleration to a deployment."
 
 324
 01:02:20,000 --> 01:02:30,000
@@ -1901,8 +1922,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Understanding NodeExpiry & NodeRotation
-**Timestamp:** 65:00 – 70:00
+**SEGMENT 14: Understanding NodeExpiry & NodeRotation**
+*Timestamp: 65:00 – 70:00*
 
 ```
 329
@@ -1952,7 +1973,7 @@ You can adjust the expireAfter setting based on your security requirements. Seve
 340
 01:06:50,000 --> 01:07:00,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"disruption":{"expireAfter":"168h"}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now setting application NodePool expiry to 168 hours for weekly rotation."
 
 341
 01:07:00,000 --> 01:07:10,000
@@ -1969,7 +1990,7 @@ The disruption budget controls how many nodes can be disrupted at once. This pre
 344
 01:07:30,000 --> 01:07:40,000
 [Types: kubectl get disruptionbudgets -A]
-▶ Pronounced as: "Kubectl, get, disruptionbudgets, dash, A"
+▶ Pronounced as: "Now listing disruption budgets to see the configured limits."
 
 345
 01:07:40,000 --> 01:07:50,000
@@ -1990,8 +2011,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: Monitoring Karpenter with CloudWatch
-**Timestamp:** 70:00 – 75:00
+**SEGMENT 15: Monitoring Karpenter with CloudWatch**
+*Timestamp: 70:00 – 75:00*
 
 ```
 349
@@ -2009,7 +2030,7 @@ The key metrics are: nodes_provisioned, nodes_terminated, consolidation_events, 
 352
 01:10:30,000 --> 01:10:40,000
 [Types: aws cloudwatch get-metric-statistics --namespace AWS/Karpenter --metric-name nodes_provisioned --start-time $(date -d '1 hour ago' -u +%Y-%m-%dT%H:%M:%SZ) --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ) --period 300 --statistics Sum --output table]
-▶ Pronounced as: "AWS, CloudWatch, get, metric, statistics..."
+▶ Pronounced as: "Now getting CloudWatch metrics for nodes provisioned in the last hour."
 
 353
 01:10:40,000 --> 01:10:50,000
@@ -2018,7 +2039,7 @@ This shows you how many nodes Karpenter has provisioned in the last hour.
 354
 01:10:50,000 --> 01:11:00,000
 [Types: aws cloudwatch get-metric-statistics --namespace AWS/Karpenter --metric-name consolidation_events --start-time $(date -d '1 hour ago' -u +%Y-%m-%dT%H:%M:%SZ) --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ) --period 300 --statistics Sum --output table]
-▶ Pronounced as: "AWS, CloudWatch, get, metric, statistics..."
+▶ Pronounced as: "Now getting CloudWatch metrics for consolidation events in the last hour."
 
 355
 01:11:00,000 --> 01:11:10,000
@@ -2031,7 +2052,7 @@ You can create CloudWatch dashboards to visualize Karpenter metrics. This helps 
 357
 01:11:20,000 --> 01:11:30,000
 [Types: aws cloudwatch put-dashboard --dashboard-name Karpenter --dashboard-body '{"widgets":[{"type":"metric","properties":{"metrics":[["AWS/Karpenter","nodes_provisioned"],["AWS/Karpenter","nodes_terminated"]],"period":300,"stat":"Sum","region":"us-east-1","title":"Karpenter Metrics"}}]}']
-▶ Pronounced as: "AWS, CloudWatch, put, dashboard..."
+▶ Pronounced as: "Now creating a CloudWatch dashboard for Karpenter metrics."
 
 358
 01:11:30,000 --> 01:11:40,000
@@ -2044,7 +2065,7 @@ You should also set up alarms for critical metrics.
 360
 01:11:50,000 --> 01:12:00,000
 [Types: aws cloudwatch put-metric-alarm --alarm-name Karpenter-NodeCount --alarm-description "Alert if Karpenter provisions too many nodes" --metric-name nodes_provisioned --namespace AWS/Karpenter --statistic Sum --period 300 --evaluation-periods 1 --threshold 10 --comparison-operator GreaterThanThreshold --alarm-actions arn:aws:sns:us-east-1:123456789012:alerts]
-▶ Pronounced as: "AWS, CloudWatch, put, metric, alarm..."
+▶ Pronounced as: "Now creating a CloudWatch alarm for excessive node provisioning."
 
 361
 01:12:00,000 --> 01:12:10,000
@@ -2065,8 +2086,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Troubleshooting Karpenter Issues
-**Timestamp:** 75:00 – 80:00
+**SEGMENT 16: Troubleshooting Karpenter Issues**
+*Timestamp: 75:00 – 80:00*
 
 ```
 365
@@ -2080,7 +2101,7 @@ Issue 1: "Karpenter is not provisioning any nodes." Check the Karpenter pod logs
 367
 01:15:20,000 --> 01:15:30,000
 [Types: kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --tail=50]
-▶ Pronounced as: "Kubectl, logs, dash, n, karpenter..."
+▶ Pronounced as: "Now checking Karpenter pod logs."
 
 368
 01:15:30,000 --> 01:15:40,000
@@ -2089,7 +2110,7 @@ Common cause: IAM role missing permissions. Check the IAM role policies.
 369
 01:15:40,000 --> 01:15:50,000
 [Types: aws iam list-attached-role-policies --role-name KarpenterControllerRole-$CLUSTER_NAME]
-▶ Pronounced as: "AWS, I-A-M, list, attached, role, policies..."
+▶ Pronounced as: "Now listing attached policies on the Karpenter controller role."
 
 370
 01:15:50,000 --> 01:16:00,000
@@ -2102,7 +2123,7 @@ Issue 2: "Karpenter is provisioning nodes but pods are not scheduling." Check th
 372
 01:16:10,000 --> 01:16:20,000
 [Types: kubectl describe nodepool application]
-▶ Pronounced as: "Kubectl, describe, nodepool, application"
+▶ Pronounced as: "Now describing the application NodePool."
 
 373
 01:16:20,000 --> 01:16:30,000
@@ -2115,7 +2136,7 @@ Issue 3: "Karpenter is not consolidating nodes." Check the consolidation policy.
 375
 01:16:40,000 --> 01:16:50,000
 [Types: kubectl get nodepool -o yaml | grep -A10 disruption]
-▶ Pronounced as: "Kubectl, get, nodepool..."
+▶ Pronounced as: "Now checking the disruption configuration."
 
 376
 01:16:50,000 --> 01:17:00,000
@@ -2128,7 +2149,7 @@ Issue 4: "Karpenter is terminating nodes with running pods." Check your PodDisru
 378
 01:17:10,000 --> 01:17:20,000
 [Types: kubectl get pdb --all-namespaces]
-▶ Pronounced as: "Kubectl, get, pdb..."
+▶ Pronounced as: "Now listing PDBs to verify configuration."
 
 379
 01:17:20,000 --> 01:17:30,000
@@ -2141,7 +2162,7 @@ Issue 5: "Karpenter is not using Spot instances." Check the NodePool capacity ty
 381
 01:17:40,000 --> 01:17:50,000
 [Types: kubectl get nodepool -o yaml | grep -A5 capacity-type]
-▶ Pronounced as: "Kubectl, get, nodepool..."
+▶ Pronounced as: "Now checking capacity-type configuration."
 
 382
 01:17:50,000 --> 01:18:00,000
@@ -2154,7 +2175,7 @@ Issue 6: "Karpenter is launching nodes but they are failing to join the cluster.
 384
 01:18:10,000 --> 01:18:20,000
 [Types: kubectl get nodes --show-labels]
-▶ Pronounced as: "Kubectl, get, nodes..."
+▶ Pronounced as: "Now listing nodes with labels to check join status."
 
 385
 01:18:20,000 --> 01:18:30,000
@@ -2175,8 +2196,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: Workshop — Configuring Karpenter for Your Workload
-**Timestamp:** 80:00 – 85:00
+**SEGMENT 17: Workshop — Configuring Karpenter for Your Workload**
+*Timestamp: 80:00 – 85:00*
 
 ```
 389
@@ -2237,7 +2258,7 @@ spec:
     consolidationPolicy: WhenUnderutilized
     expireAfter: 720h
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a custom NodePool for your workload."
 
 398
 01:21:30,000 --> 01:21:40,000
@@ -2246,7 +2267,7 @@ Step 7: Add tolerations to your workload.
 399
 01:21:40,000 --> 01:21:50,000
 [Types: kubectl patch deployment my-app -n my-namespace --type='json' -p='[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"workload","operator":"Equal","value":"my-workload","effect":"NoSchedule"}]},{"op":"add","path":"/spec/template/spec/nodeSelector","value":{"workload":"my-workload"}}]']
-▶ Pronounced as: "Kubectl, patch, deployment..."
+▶ Pronounced as: "Now adding tolerations and nodeSelector to your deployment."
 
 400
 01:21:50,000 --> 01:22:00,000
@@ -2255,12 +2276,12 @@ Step 8: Test the configuration. Scale up the deployment and watch Karpenter laun
 401
 01:22:00,000 --> 01:22:10,000
 [Types: kubectl scale deployment my-app -n my-namespace --replicas=10]
-▶ Pronounced as: "Kubectl, scale, deployment..."
+▶ Pronounced as: "Now scaling up to test."
 
 402
 01:22:10,000 --> 01:22:20,000
 [Types: kubectl get nodes -w]
-▶ Pronounced as: "Kubectl, get, nodes, dash, w"
+▶ Pronounced as: "Now watching nodes appear."
 
 403
 01:22:20,000 --> 01:22:30,000
@@ -2269,7 +2290,7 @@ Step 9: Verify the nodes are using the correct instance families. Check the node
 404
 01:22:30,000 --> 01:22:40,000
 [Types: kubectl get nodes -o custom-columns='NAME:.metadata.name,INSTANCE:.metadata.labels.node\.kubernetes\.io/instance-type,CAPACITY:.metadata.labels.karpenter\.sh/capacity-type']
-▶ Pronounced as: "Kubectl, get, nodes, dash, o, custom, dash, columns..."
+▶ Pronounced as: "Now verifying instance types and capacity types."
 
 405
 01:22:40,000 --> 01:22:50,000
@@ -2290,8 +2311,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: Understanding Pod Topology Spread Constraints
-**Timestamp:** 85:00 – 90:00
+**SEGMENT 18: Understanding Pod Topology Spread Constraints**
+*Timestamp: 85:00 – 90:00*
 
 ```
 409
@@ -2334,7 +2355,7 @@ spec:
         - name: my-app
           image: nginx
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a deployment with topology spread constraints for AZ distribution."
 
 413
 01:25:40,000 --> 01:25:50,000
@@ -2384,7 +2405,7 @@ spec:
         - name: my-app
           image: nginx
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a deployment with hostname topology spread constraints."
 
 419
 01:26:40,000 --> 01:26:50,000
@@ -2413,8 +2434,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: Deep Dive — Karpenter Pricing Optimization
-**Timestamp:** 90:00 – 95:00
+**SEGMENT 19: Deep Dive — Karpenter Pricing Optimization**
+*Timestamp: 90:00 – 95:00*
 
 ```
 425
@@ -2460,7 +2481,7 @@ You can see the price differences yourself. Run the Spot price analysis script w
 435
 01:31:40,000 --> 01:31:50,000
 [Types: for family in m6i m7g c6i c7g; do for size in large xlarge; do price=$(aws ec2 describe-spot-price-history --instance-types ${family}.${size} --start-time $(date -u +"%Y-%m-%dT%H:%M:%SZ") --query 'SpotPriceHistory[0].SpotPrice' --output text 2>/dev/null); echo "$family.$size: \$$price/hr"; done; done]
-▶ Pronounced as: "For, family, in... do..."
+▶ Pronounced as: "Now checking current Spot prices for various instance families."
 
 436
 01:31:50,000 --> 01:32:00,000
@@ -2489,8 +2510,8 @@ See you in Segment 20.
 
 ---
 
-### SEGMENT 20: Integrating Karpenter with Kubecost
-**Timestamp:** 95:00 – 100:00
+**SEGMENT 20: Integrating Karpenter with Kubecost**
+*Timestamp: 95:00 – 100:00*
 
 ```
 442
@@ -2516,7 +2537,7 @@ Kubecost also sees the instance types Karpenter selects. It shows you the Spot v
 447
 01:35:50,000 --> 01:36:00,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/allocation?window=7d&aggregate=cluster&expanded=true' | jq '.data[0].nodes[] | {node: .name, instanceType: .instanceType, capacityType: .capacityType}']
-▶ Pronounced as: "Kubectl, exec, dash, n, kubecost..."
+▶ Pronounced as: "Now querying Kubecost for node instance types and capacity types."
 
 448
 01:36:00,000 --> 01:36:10,000
@@ -2529,7 +2550,7 @@ You can also see the cost savings from Karpenter in Kubecost. Compare the cost b
 450
 01:36:20,000 --> 01:36:30,000
 [Types: kubectl exec -n kubecost deploy/kubecost-cost-analyzer -- curl -s 'http://localhost:9090/model/savings' | jq '.savings.karpenterSavings']
-▶ Pronounced as: "Kubectl, exec, dash, n, kubecost..."
+▶ Pronounced as: "Now querying Kubecost for Karpenter savings."
 
 451
 01:36:30,000 --> 01:36:40,000
@@ -2550,7 +2571,7 @@ You can also set up alerts based on Karpenter metrics. If Karpenter is not using
 455
 01:37:10,000 --> 01:37:20,000
 [Types: aws cloudwatch put-metric-alarm --alarm-name Karpenter-Spot-Usage --alarm-description "Alert if Spot usage drops below 50%" --metric-name spot_usage --namespace AWS/Karpenter --statistic Average --period 3600 --evaluation-periods 3 --threshold 50 --comparison-operator LessThanThreshold --alarm-actions arn:aws:sns:us-east-1:123456789012:alerts]
-▶ Pronounced as: "AWS, CloudWatch, put, metric, alarm..."
+▶ Pronounced as: "Now creating a CloudWatch alarm for Spot usage dropping below 50%."
 
 456
 01:37:20,000 --> 01:37:30,000
@@ -2567,8 +2588,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Disruption Budgets — Advanced Configuration
-**Timestamp:** 100:00 – 105:00
+**SEGMENT 21: Disruption Budgets — Advanced Configuration**
+*Timestamp: 100:00 – 105:00*
 
 ```
 459
@@ -2607,7 +2628,7 @@ spec:
       cron: "0 8 * * 6-7"
       maxNodes: 5
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a scheduled disruption budget with weekday and weekend limits."
 
 465
 01:41:00,000 --> 01:41:10,000
@@ -2634,7 +2655,7 @@ spec:
       namespace: financial-rag
   maxNodes: 0
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a disruption budget that prevents disruption in the financial-rag namespace."
 
 469
 01:41:40,000 --> 01:41:50,000
@@ -2660,7 +2681,7 @@ spec:
     - expire
   maxNodes: 1
 EOF]
-▶ Pronounced as: "Cat, less-than, less-than, EOF, pipe, kubectl, apply, dash, f, dash"
+▶ Pronounced as: "Now creating a disruption budget that only controls expiry, not consolidation."
 
 473
 01:42:20,000 --> 01:42:30,000
@@ -2681,8 +2702,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Karpenter Best Practices for Production
-**Timestamp:** 105:00 – 110:00
+**SEGMENT 22: Karpenter Best Practices for Production**
+*Timestamp: 105:00 – 110:00*
 
 ```
 477
@@ -2696,7 +2717,7 @@ Best practice 1: Always set minSize to 0 on existing node groups. Otherwise, the
 479
 01:45:20,000 --> 01:45:30,000
 [Types: aws eks update-nodegroup-config --cluster-name $CLUSTER_NAME --nodegroup-name your-node-group --scaling-config minSize=0,maxSize=1,desiredSize=0]
-▶ Pronounced as: "AWS, E-K-S, update, nodegroup, config..."
+▶ Pronounced as: "Now updating existing node group scaling config."
 
 480
 01:45:30,000 --> 01:45:40,000
@@ -2705,7 +2726,7 @@ Best practice 2: Use PDBs for all stateful workloads. This prevents data loss du
 481
 01:45:40,000 --> 01:45:50,000
 [Types: kubectl apply -f pdb-statefulset.yaml]
-▶ Pronounced as: "Kubectl, apply, dash, f, pdb-statefulset, dot, yaml"
+▶ Pronounced as: "Now applying a PDB for a stateful workload."
 
 482
 01:45:50,000 --> 01:46:00,000
@@ -2714,7 +2735,7 @@ Best practice 3: Set expireAfter to 720 hours or less. This ensures regular secu
 483
 01:46:00,000 --> 01:46:10,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"disruption":{"expireAfter":"720h"}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now setting expireAfter to 720 hours."
 
 484
 01:46:10,000 --> 01:46:20,000
@@ -2723,7 +2744,7 @@ Best practice 4: Include multiple instance families. This gives Karpenter more p
 485
 01:46:20,000 --> 01:46:30,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"karpenter.k8s.aws/instance-family","operator":"In","values":["m5","m6i","m6g","m7g","c5","c6i","c6g"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now adding multiple instance families."
 
 486
 01:46:30,000 --> 01:46:40,000
@@ -2732,7 +2753,7 @@ Best practice 5: Include arm64 architectures. Graviton instances are 20% cheaper
 487
 01:46:40,000 --> 01:46:50,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now enabling arm64 architecture."
 
 488
 01:46:50,000 --> 01:47:00,000
@@ -2741,7 +2762,7 @@ Best practice 6: Use Spot for non-critical workloads. This saves 60-80% of compu
 489
 01:47:00,000 --> 01:47:10,000
 [Types: kubectl patch nodepool ingestion --type='merge' -p='{"spec":{"template":{"spec":{"requirements":[{"key":"karpenter.sh/capacity-type","operator":"In","values":["spot"]}]}}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, ingestion..."
+▶ Pronounced as: "Now setting ingestion NodePool to spot only."
 
 490
 01:47:10,000 --> 01:47:20,000
@@ -2774,8 +2795,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 4 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+**SEGMENT 23: Series 4 Q&A — Common Questions Answered**
+*Timestamp: 110:00 – 115:00*
 
 ```
 497
@@ -2817,7 +2838,7 @@ Check the NodePool configuration. Ensure capacity-type includes "spot". Check th
 506
 01:51:30,000 --> 01:51:40,000
 [Types: kubectl get nodepool -o yaml | grep -A5 capacity-type]
-▶ Pronounced as: "Kubectl, get, nodepool..."
+▶ Pronounced as: "Now checking capacity-type configuration."
 
 507
 01:51:40,000 --> 01:51:50,000
@@ -2830,7 +2851,7 @@ Scale down a deployment and watch the logs. Karpenter will consolidate within th
 509
 01:52:00,000 --> 01:52:10,000
 [Types: kubectl scale deployment my-app --replicas=1; kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --tail=20]
-▶ Pronounced as: "Kubectl, scale, deployment..."
+▶ Pronounced as: "Now scaling down and watching logs."
 
 510
 01:52:10,000 --> 01:52:20,000
@@ -2843,7 +2864,7 @@ Adjust the consolidation window. Increase consolidateAfter to a higher value. Th
 512
 01:52:30,000 --> 01:52:40,000
 [Types: kubectl patch nodepool application --type='merge' -p='{"spec":{"disruption":{"consolidateAfter":"5m"}}}']
-▶ Pronounced as: "Kubectl, patch, nodepool, application..."
+▶ Pronounced as: "Now increasing consolidation delay to 5 minutes."
 
 513
 01:52:40,000 --> 01:52:50,000
@@ -2884,7 +2905,7 @@ Start with the Karpenter logs. They contain detailed information about what Karp
 522
 01:54:10,000 --> 01:54:20,000
 [Types: kubectl logs -n karpenter -l app.kubernetes.io/name=karpenter --tail=100]
-▶ Pronounced as: "Kubectl, logs, dash, n, karpenter..."
+▶ Pronounced as: "Now checking Karpenter logs."
 
 523
 01:54:20,000 --> 01:54:30,000
@@ -2905,8 +2926,8 @@ In the next segment, we do a knowledge check and look ahead to Series 5.
 
 ---
 
-### SEGMENT 24: Series 4 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+**SEGMENT 24: Series 4 Knowledge Check & Next Steps**
+*Timestamp: 115:00 – 120:00*
 
 ```
 527

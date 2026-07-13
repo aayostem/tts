@@ -1,11 +1,14 @@
-# Series 2: The Cloud Cost Audit — Find & Eliminate Hidden Waste
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your **complete Series 2 SRT** with all `Pronounced at:` lines edited to **type-along, precedential** style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: The $12,544 Story & What You'll Find Today
-**Timestamp:** 00:00 – 05:00
+**Series 2: The Cloud Cost Audit — Find & Eliminate Hidden Waste**
+**Complete 24-Segment SRT — 2 Hours**
+
+---
+
+**SEGMENT 1: The $12,544 Story & What You'll Find Today**
+*Timestamp: 00:00 – 05:00*
 
 ```
 1
@@ -106,6 +109,7 @@ Start with environment verification. Every series in this course starts with thi
 [Types: export REGION=us-east-1]
 [Types: export START=$(date -d '30 days ago' +%Y-%m-%d)]
 [Types: export END=$(date +%Y-%m-%d)]
+▶ Pronounced as: "Now I'm setting our environment variables. Export ACCOUNT_ID from STS, export REGION as us-east-1, export START as 30 days ago, and export END as today."
 
 25
 00:04:00,000 --> 00:04:10,000
@@ -123,6 +127,7 @@ Now confirm Cost Explorer still works. This is your gatekeeper command.
 28
 00:04:30,000 --> 00:04:40,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage. We're pulling our total monthly spend using the START and END variables, with MONTHLY granularity and BlendedCost metric."
 
 29
 00:04:40,000 --> 00:04:50,000
@@ -135,8 +140,8 @@ Now let's run our first audit query. This is your opening slide. Every engagemen
 
 ---
 
-### SEGMENT 2: Audit Step 1 — Total Spend & Daily Trends
-**Timestamp:** 05:00 – 10:00
+**SEGMENT 2: Audit Step 1 — Total Spend & Daily Trends**
+*Timestamp: 05:00 – 10:00*
 
 ```
 31
@@ -146,6 +151,7 @@ The first question is always: where is the money going?
 32
 00:05:10,000 --> 00:05:20,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --group-by Type=DIMENSION,Key=SERVICE --query 'ResultsByTime[0].Groups[?Metrics.BlendedCost.Amount > `10`].[Keys[0],Metrics.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage grouped by SERVICE. We're filtering to only show services with cost greater than 10 dollars."
 
 33
 00:05:20,000 --> 00:05:30,000
@@ -185,11 +191,13 @@ Now let's save this to your baseline document. Every time we find waste, we docu
 [Types: echo "=== SERIES 2: WASTE AUDIT ===" >> ~/finops-baseline.txt]
 [Types: echo "Date: $(date)" >> ~/finops-baseline.txt]
 [Types: echo "" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now I'm appending the Series 2 waste audit header to our baseline document."
 
 42
 00:06:50,000 --> 00:07:00,000
 [Types: echo "=== SPEND BY SERVICE ===" >> ~/finops-baseline.txt]
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --group-by Type=DIMENSION,Key=SERVICE --query 'ResultsByTime[0].Groups[?Metrics.BlendedCost.Amount > `10`].[Keys[0],Metrics.BlendedCost.Amount]' --output table >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending the spend by service results to the baseline document."
 
 43
 00:07:00,000 --> 00:07:10,000
@@ -198,6 +206,7 @@ Now let's look at daily cost trends. Monthly totals hide the story. Daily trends
 44
 00:07:10,000 --> 00:07:20,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity DAILY --metrics BlendedCost --query 'ResultsByTime[].[TimePeriod.Start,Total.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage with DAILY granularity. We're pulling each day's total cost."
 
 45
 00:07:20,000 --> 00:07:30,000
@@ -246,6 +255,7 @@ Now let's look at cost by region. This is where you find stray resources — ins
 56
 00:09:10,000 --> 00:09:20,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --group-by Type=DIMENSION,Key=REGION --query 'ResultsByTime[0].Groups[].[Keys[0],Metrics.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage grouped by REGION instead of SERVICE."
 
 57
 00:09:20,000 --> 00:09:30,000
@@ -266,8 +276,8 @@ That load test ended eighteen months ago. They were still paying for it. Every s
 
 ---
 
-### SEGMENT 3: Audit Step 2 — gp2 to gp3 Migration
-**Timestamp:** 10:00 – 15:00
+**SEGMENT 3: Audit Step 2 — gp2 to gp3 Migration**
+*Timestamp: 10:00 – 15:00*
 
 ```
 61
@@ -277,6 +287,7 @@ Let me show you how to find stray resources. This scans every non-primary region
 62
 00:10:10,000 --> 00:10:20,000
 [Types: for region in us-west-1 us-west-2 eu-west-1 eu-central-1 ap-southeast-1 ap-northeast-1; do count=$(aws ec2 describe-instances --region $region --query 'length(Reservations[].Instances[])' --output text 2>/dev/null || echo 0); if [ "$count" -gt "0" ]; then echo "⚠️  $count instance(s) found in $region"; aws ec2 describe-instances --region $region --query 'Reservations[].Instances[].[InstanceId,InstanceType,State.Name,Tags[?Key==`Name`].Value|[0]]' --output table; fi; done]
+▶ Pronounced as: "Now a region scan loop. We're iterating through all non-primary regions, counting EC2 instances, and showing details for any that exist."
 
 63
 00:10:20,000 --> 00:10:30,000
@@ -314,10 +325,12 @@ It alerts you when something unexpected happens — before you see it on the bil
 00:11:40,000 --> 00:11:50,000
 [Types: MONITOR_ARN=$(aws ce create-anomaly-monitor --anomaly-monitor '{"MonitorName":"finops-monitor","MonitorType":"DIMENSIONAL","MonitorDimension":"SERVICE"}' --query 'MonitorArn' --output text)]
 [Types: echo "Monitor ARN: $MONITOR_ARN"]
+▶ Pronounced as: "Now creating an anomaly monitor. AWS C-E create-anomaly-monitor with dimension SERVICE. Capturing the ARN."
 
 72
 00:11:50,000 --> 00:12:00,000
 [Types: aws ce create-anomaly-subscription --anomaly-subscription "{\"SubscriptionName\":\"finops-alerts\",\"MonitorArnList\":[\"$MONITOR_ARN\"],\"Subscribers\":[{\"Address\":\"YOUR_EMAIL@company.com\",\"Type\":\"EMAIL\"}],\"Threshold\":50,\"Frequency\":\"DAILY\"}"]
+▶ Pronounced as: "Now creating an anomaly subscription with daily frequency and a 50 dollar threshold."
 
 73
 00:12:00,000 --> 00:12:10,000
@@ -334,6 +347,7 @@ Now let's check for existing anomalies from the last seven days.
 76
 00:12:30,000 --> 00:12:40,000
 [Types: aws ce get-anomalies --date-interval Start=$(date -d '7 days ago' +%Y-%m-%d),End=$END --query 'Anomalies[].[AnomalyId,RootCauses[0].Service,Impact.TotalImpact]' --output table]
+▶ Pronounced as: "Now AWS C-E get-anomalies for the last 7 days. Showing anomaly ID, service, and total impact."
 
 77
 00:12:40,000 --> 00:12:50,000
@@ -358,6 +372,7 @@ There is no reason to use gp2 in 2026. None. Find all your gp2 volumes:
 82
 00:13:30,000 --> 00:13:40,000
 [Types: aws ec2 describe-volumes --filters Name=volume-type,Values=gp2 --query 'Volumes[].[VolumeId,Size,State,Tags[?Key==`Name`].Value|[0]]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-volumes filtered by volume-type gp2. Showing ID, size, state, and name tag."
 
 83
 00:13:40,000 --> 00:13:50,000
@@ -369,6 +384,7 @@ Calculate your savings:
 [Types: MONTHLY_SAVINGS=$(echo "scale=2; $TOTAL_GP2_GB * 0.02" | bc)]
 [Types: echo "Total gp2 storage: ${TOTAL_GP2_GB} GB"]
 [Types: echo "Monthly savings from migration: \$${MONTHLY_SAVINGS}"]
+▶ Pronounced as: "Now calculating total gp2 storage and monthly savings at 2 cents per GB."
 
 85
 00:14:00,000 --> 00:14:10,000
@@ -378,6 +394,7 @@ Migrate a single volume first to verify the process:
 00:14:10,000 --> 00:14:20,000
 [Types: VOLUME_ID="vol-xxxxxxxxxxxxxxxxx"]
 [Types: aws ec2 modify-volume --volume-id $VOLUME_ID --volume-type gp3 --iops 3000 --throughput 125]
+▶ Pronounced as: "Now testing on a single volume. Set VOLUME_ID, then modify-volume to gp3 with 3000 IOPS and 125 throughput."
 
 87
 00:14:20,000 --> 00:14:30,000
@@ -386,6 +403,7 @@ Monitor the migration:
 88
 00:14:30,000 --> 00:14:40,000
 [Types: aws ec2 describe-volumes-modifications --volume-ids $VOLUME_ID --query 'VolumesModifications[].[VolumeId,ModificationState,TargetVolumeType,Progress]' --output table]
+▶ Pronounced as: "Now checking the migration status with describe-volumes-modifications."
 
 89
 00:14:40,000 --> 00:14:50,000
@@ -398,13 +416,14 @@ Once you are comfortable, migrate all gp2 volumes at once.
 
 ---
 
-### SEGMENT 4: Audit Step 3 — Elastic IPs & Stopped Instances
-**Timestamp:** 15:00 – 20:00
+**SEGMENT 4: Audit Step 3 — Elastic IPs & Stopped Instances**
+*Timestamp: 15:00 – 20:00*
 
 ```
 91
 00:15:00,000 --> 00:15:10,000
 [Types: aws ec2 describe-volumes --filters Name=volume-type,Values=gp2 --query 'Volumes[].VolumeId' --output text | tr '\t' '\n' | while read vol_id; do echo "Migrating $vol_id to gp3..."; aws ec2 modify-volume --volume-id $vol_id --volume-type gp3 --iops 3000 --throughput 125 --output text; done]
+▶ Pronounced as: "Now bulk migrating all gp2 volumes. We list all volume IDs, loop through each, and modify to gp3."
 
 92
 00:15:10,000 --> 00:15:20,000
@@ -417,6 +436,7 @@ Now let's find unattached Elastic IPs. Each one is costing you three dollars six
 94
 00:15:30,000 --> 00:15:40,000
 [Types: aws ec2 describe-addresses --query 'Addresses[?!AssociationId].[AllocationId,PublicIp,Domain,Tags[?Key==`Name`].Value|[0]]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-addresses. Filtering for addresses without an AssociationId, showing allocation ID, public IP, domain, and name tag."
 
 95
 00:15:40,000 --> 00:15:50,000
@@ -427,6 +447,7 @@ Calculate the waste:
 [Types: EIP_COUNT=$(aws ec2 describe-addresses --query 'length(Addresses[?!AssociationId])' --output text)]
 [Types: echo "Unattached EIPs: $EIP_COUNT"]
 [Types: echo "Monthly waste: \$$(echo "scale=2; $EIP_COUNT * 3.65" | bc)"]
+▶ Pronounced as: "Now counting unattached EIPs and calculating monthly waste at 3.65 dollars each."
 
 97
 00:16:00,000 --> 00:16:10,000
@@ -435,6 +456,7 @@ Before releasing — check CloudTrail to see who created each EIP and when. Some
 98
 00:16:10,000 --> 00:16:20,000
 [Types: aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=AllocateAddress --query 'Events[].[EventTime,Username,Resources[0].ResourceName]' --output table]
+▶ Pronounced as: "Now checking CloudTrail for EIP creation events."
 
 99
 00:16:20,000 --> 00:16:30,000
@@ -443,6 +465,7 @@ Release the ones that are genuinely unused:
 100
 00:16:30,000 --> 00:16:40,000
 [Types: aws ec2 describe-addresses --query 'Addresses[?!AssociationId].AllocationId' --output text | tr '\t' '\n' | while read alloc_id; do echo "Releasing EIP: $alloc_id"; aws ec2 release-address --allocation-id $alloc_id; done]
+▶ Pronounced as: "Now releasing all unattached EIPs. List allocation IDs and release each one."
 
 101
 00:16:40,000 --> 00:16:50,000
@@ -455,6 +478,7 @@ A stopped instance with a five hundred gigabyte gp3 volume costs forty dollars a
 103
 00:17:00,000 --> 00:17:10,000
 [Types: aws ec2 describe-instances --filters Name=instance-state-name,Values=stopped --query 'Reservations[].Instances[].[InstanceId,InstanceType,StateTransitionReason,Tags[?Key==`Name`].Value|[0],Tags[?Key==`Owner`].Value|[0]]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-instances filtered by stopped state. Showing ID, type, transition reason, name and owner tags."
 
 104
 00:17:10,000 --> 00:17:20,000
@@ -467,6 +491,7 @@ Stopped more than thirty days — snapshot volumes, then terminate.
 106
 00:17:30,000 --> 00:17:40,000
 [Types: aws ec2 describe-instances --filters Name=instance-state-name,Values=stopped --query 'Reservations[].Instances[].InstanceId' --output text | tr '\t' '\n' | while read instance_id; do echo "Processing stopped instance: $instance_id"; VOLUME_IDS=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[0].Instances[0].BlockDeviceMappings[].Ebs.VolumeId' --output text 2>/dev/null); for vol_id in $VOLUME_IDS; do echo "  Snapshotting $vol_id..."; aws ec2 create-snapshot --volume-id $vol_id --description "Pre-termination backup of $instance_id on $(date +%Y-%m-%d)" --tag-specifications "ResourceType=snapshot,Tags=[{Key=Source,Value=$instance_id},{Key=Date,Value=$(date +%Y-%m-%d)}]" --output text; done; echo "  Terminating instance: $instance_id"; aws ec2 terminate-instances --instance-ids $instance_id --output text; done]
+▶ Pronounced as: "Now processing stopped instances. For each instance, snapshot all volumes, then terminate."
 
 107
 00:17:40,000 --> 00:17:50,000
@@ -483,6 +508,7 @@ Now let's handle unattached EBS volumes. We will snapshot them first, then delet
 110
 00:18:10,000 --> 00:18:20,000
 [Types: aws ec2 describe-volumes --filters Name=status,Values=available --query 'Volumes[].VolumeId' --output text | tr '\t' '\n' | while read vol_id; do snap_id=$(aws ec2 create-snapshot --volume-id $vol_id --description "Unattached volume cleanup $(date +%Y-%m-%d)" --query 'SnapshotId' --output text); echo "Volume $vol_id → Snapshot $snap_id created"; aws ec2 delete-volume --volume-id $vol_id; echo "Volume $vol_id deleted"; done]
+▶ Pronounced as: "Now handling unattached EBS volumes. For each available volume, create a snapshot, then delete the volume."
 
 111
 00:18:20,000 --> 00:18:30,000
@@ -499,6 +525,7 @@ Now let's handle old EBS snapshots. Delete snapshots older than ninety days that
 114
 00:18:50,000 --> 00:19:00,000
 [Types: aws ec2 describe-snapshots --owner-ids $ACCOUNT_ID --query "Snapshots[?StartTime<='$(date -d '90 days ago' +%Y-%m-%dT%H:%M:%S)'].SnapshotId" --output text | tr '\t' '\n' | while read snap_id; do AMI_REF=$(aws ec2 describe-images --filters "Name=block-device-mapping.snapshot-id,Values=$snap_id" --query 'Images[].ImageId' --output text 2>/dev/null); if [ -z "$AMI_REF" ]; then echo "Deleting snapshot: $snap_id"; aws ec2 delete-snapshot --snapshot-id $snap_id; else echo "Keeping snapshot: $snap_id (referenced by AMI $AMI_REF)"; fi; done]
+▶ Pronounced as: "Now cleaning old snapshots. For each snapshot older than 90 days, check if it's referenced by an AMI. If not, delete it."
 
 115
 00:19:00,000 --> 00:19:10,000
@@ -511,6 +538,7 @@ Now let's handle idle load balancers. Remove load balancers with no healthy targ
 117
 00:19:20,000 --> 00:19:30,000
 [Types: aws elbv2 describe-load-balancers --query 'LoadBalancers[].LoadBalancerArn' --output text 2>/dev/null | tr '\t' '\n' | while read lb_arn; do lb_name=$(aws elbv2 describe-load-balancers --load-balancer-arns $lb_arn --query 'LoadBalancers[0].LoadBalancerName' --output text 2>/dev/null); healthy=$(aws elbv2 describe-target-groups --load-balancer-arn $lb_arn --query 'TargetGroups[].TargetGroupArn' --output text 2>/dev/null | tr '\t' '\n' | while read tg_arn; do aws elbv2 describe-target-health --target-group-arn $tg_arn --query 'length(TargetHealthDescriptions[?TargetHealth.State==`healthy`])' --output text 2>/dev/null; done | awk '{sum+=$1} END {print sum+0}'); if [ "$healthy" = "0" ]; then echo "Removing idle load balancer: $lb_name"; aws elbv2 delete-load-balancer --load-balancer-arn $lb_arn; fi; done]
+▶ Pronounced as: "Now finding idle load balancers. For each load balancer, count healthy targets. If zero, delete the load balancer."
 
 118
 00:19:30,000 --> 00:19:40,000
@@ -527,8 +555,8 @@ NAT Gateway is one of the most consistently underestimated line items in AWS acc
 
 ---
 
-### SEGMENT 5: Audit Step 4 — NAT Gateway: The Silent Killer
-**Timestamp:** 20:00 – 25:00
+**SEGMENT 5: Audit Step 4 — NAT Gateway: The Silent Killer**
+*Timestamp: 20:00 – 25:00*
 
 ```
 121
@@ -558,6 +586,7 @@ Find your NAT Gateway cost:
 127
 00:21:00,000 --> 00:21:10,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --filter '{"Dimensions":{"Key":"USAGE_TYPE","Values":["NatGateway-Bytes"]}}' --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage filtered by NatGateway-Bytes usage type."
 
 128
 00:21:10,000 --> 00:21:20,000
@@ -567,11 +596,13 @@ Create the S3 VPC Endpoint — gateway type, free:
 00:21:20,000 --> 00:21:30,000
 [Types: VPC_ID=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)]
 [Types: RTB_ID=$(aws ec2 describe-route-tables --filters Name=vpc-id,Values=$VPC_ID Name=association.main,Values=true --query 'RouteTables[0].RouteTableId' --output text)]
+▶ Pronounced as: "Now capturing our VPC ID and main route table ID."
 
 130
 00:21:30,000 --> 00:21:40,000
 [Types: aws ec2 create-vpc-endpoint --vpc-id $VPC_ID --service-name com.amazonaws.$REGION.s3 --route-table-ids $RTB_ID]
 [Types: echo "S3 VPC Endpoint created"]
+▶ Pronounced as: "Now creating the S3 gateway VPC endpoint."
 
 131
 00:21:40,000 --> 00:21:50,000
@@ -581,6 +612,7 @@ Create the DynamoDB VPC Endpoint:
 00:21:50,000 --> 00:22:00,000
 [Types: aws ec2 create-vpc-endpoint --vpc-id $VPC_ID --service-name com.amazonaws.$REGION.dynamodb --route-table-ids $RTB_ID]
 [Types: echo "DynamoDB VPC Endpoint created"]
+▶ Pronounced as: "Now creating the DynamoDB gateway VPC endpoint."
 
 133
 00:22:00,000 --> 00:22:10,000
@@ -606,6 +638,7 @@ Now let's handle interface endpoints for other AWS services like ECR, Secrets Ma
 00:22:50,000 --> 00:23:00,000
 [Types: aws ec2 create-vpc-endpoint --vpc-id $VPC_ID --service-name com.amazonaws.$REGION.ecr.api --vpc-endpoint-type Interface --subnet-ids $SUBNET_IDS --security-group-ids $SG_ID --private-dns-enabled]
 [Types: aws ec2 create-vpc-endpoint --vpc-id $VPC_ID --service-name com.amazonaws.$REGION.ecr.dkr --vpc-endpoint-type Interface --subnet-ids $SUBNET_IDS --security-group-ids $SG_ID --private-dns-enabled]
+▶ Pronounced as: "Now creating interface endpoints for ECR API and ECR DKR with private DNS enabled."
 
 139
 00:23:00,000 --> 00:23:10,000
@@ -628,37 +661,44 @@ Now let's run the complete waste summary script. This aggregates all the waste c
 [Types: echo "=============================================" >> ~/finops-waste-summary.txt]
 [Types: echo "  COMPLETE WASTE AUDIT — $(date +%Y-%m-%d)" >> ~/finops-waste-summary.txt]
 [Types: echo "=============================================" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now building the waste summary document with header."
 
 144
 00:23:50,000 --> 00:24:00,000
 [Types: GP2_COUNT=$(aws ec2 describe-volumes --filters Name=volume-type,Values=gp2 --query 'length(Volumes)' --output text)]
 [Types: GP2_GB=$(aws ec2 describe-volumes --filters Name=volume-type,Values=gp2 --query 'sum(Volumes[].Size)' --output text 2>/dev/null || echo 0)]
 [Types: GP2_SAVINGS=$(echo "scale=2; ${GP2_GB:-0} * 0.02" | bc)]
+▶ Pronounced as: "Now calculating gp2 volume count, total GB, and monthly savings."
 
 145
 00:24:00,000 --> 00:24:10,000
 [Types: echo "📦 gp2 Volumes: $GP2_COUNT volumes, ${GP2_GB}GB" >> ~/finops-waste-summary.txt]
 [Types: echo "   → Migrate to gp3: save \$${GP2_SAVINGS}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending gp2 findings to the waste summary."
 
 146
 00:24:10,000 --> 00:24:20,000
 [Types: EIP_COUNT=$(aws ec2 describe-addresses --query 'length(Addresses[?!AssociationId])' --output text 2>/dev/null || echo 0)]
 [Types: EIP_WASTE=$(echo "scale=2; ${EIP_COUNT:-0} * 3.65" | bc)]
+▶ Pronounced as: "Now calculating unattached EIP count and monthly waste."
 
 147
 00:24:20,000 --> 00:24:30,000
 [Types: echo "🌐 Unattached EIPs: $EIP_COUNT" >> ~/finops-waste-summary.txt]
 [Types: echo "   → Release: save \$${EIP_WASTE}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending EIP findings to the waste summary."
 
 148
 00:24:30,000 --> 00:24:40,000
 [Types: STOPPED_COUNT=$(aws ec2 describe-instances --filters Name=instance-state-name,Values=stopped --query 'length(Reservations[].Instances[])' --output text 2>/dev/null || echo 0)]
 [Types: STOPPED_WASTE=$(echo "scale=2; ${STOPPED_COUNT:-0} * 8" | bc)]
+▶ Pronounced as: "Now calculating stopped instance count and estimated monthly waste."
 
 149
 00:24:40,000 --> 00:24:50,000
 [Types: echo "⏹  Stopped Instances: $STOPPED_COUNT" >> ~/finops-waste-summary.txt]
 [Types: echo "   → Terminate unused: save ~\$${STOPPED_WASTE}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending stopped instance findings."
 
 150
 00:24:50,000 --> 00:25:00,000
@@ -666,48 +706,56 @@ Now let's run the complete waste summary script. This aggregates all the waste c
 [Types: UNATTACHED_WASTE=$(echo "scale=2; ${UNATTACHED_GB:-0} * 0.08" | bc)]
 [Types: echo "💾 Unattached EBS Volumes: ${UNATTACHED_GB}GB" >> ~/finops-waste-summary.txt]
 [Types: echo "   → Delete after snapshot: save \$${UNATTACHED_WASTE}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now calculating unattached EBS volume storage and waste."
 ```
 
 ---
 
-### SEGMENT 6: Audit Steps 5–8 — Volumes, Snapshots, Idle Load Balancers & Anomaly Detection
-**Timestamp:** 25:00 – 30:00
+**SEGMENT 6: Audit Steps 5–8 — Volumes, Snapshots, Idle Load Balancers & Anomaly Detection**
+*Timestamp: 25:00 – 30:00*
 
 ```
 151
 00:25:00,000 --> 00:25:10,000
 [Types: NAT_COST=$(aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --filter '{"Dimensions":{"Key":"SERVICE","Values":["Amazon EC2 - NAT Gateway"]}}' --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text 2>/dev/null || echo 0)]
 [Types: NAT_SAVINGS=$(echo "scale=2; ${NAT_COST:-0} * 0.6" | bc)]
+▶ Pronounced as: "Now calculating NAT Gateway cost and estimated 60 percent savings from VPC endpoints."
 
 152
 00:25:10,000 --> 00:25:20,000
 [Types: echo "🌉 NAT Gateway Cost: \$${NAT_COST}/month" >> ~/finops-waste-summary.txt]
 [Types: echo "   → VPC Endpoints: save ~\$${NAT_SAVINGS}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending NAT Gateway findings."
 
 153
 00:25:20,000 --> 00:25:30,000
 [Types: OLD_SNAP_GB=$(aws ec2 describe-snapshots --owner-ids $ACCOUNT_ID --query "Snapshots[?StartTime<='$(date -d '90 days ago' +%Y-%m-%dT%H:%M:%S)'].VolumeSize" --output text 2>/dev/null | tr '\t' '\n' | awk '{sum+=$1} END {print sum}')]
 [Types: SNAP_WASTE=$(echo "scale=2; ${OLD_SNAP_GB:-0} * 0.05" | bc)]
+▶ Pronounced as: "Now calculating old snapshot storage and monthly waste."
 
 154
 00:25:30,000 --> 00:25:40,000
 [Types: echo "📸 Old Snapshots (>90 days): ${OLD_SNAP_GB}GB" >> ~/finops-waste-summary.txt]
 [Types: echo "   → Delete unused: save \$${SNAP_WASTE}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending old snapshot findings."
 
 155
 00:25:40,000 --> 00:25:50,000
 [Types: IDLE_LB_COUNT=$(aws elbv2 describe-load-balancers --query 'LoadBalancers[].LoadBalancerArn' --output text 2>/dev/null | tr '\t' '\n' | while read lb_arn; do healthy=$(aws elbv2 describe-target-groups --load-balancer-arn $lb_arn --query 'TargetGroups[].TargetGroupArn' --output text 2>/dev/null | tr '\t' '\n' | while read tg_arn; do aws elbv2 describe-target-health --target-group-arn $tg_arn --query 'length(TargetHealthDescriptions[?TargetHealth.State==`healthy`])' --output text 2>/dev/null; done | awk '{sum+=$1} END {print sum+0}'); if [ "$healthy" = "0" ]; then echo "1"; fi; done | wc -l)]
 [Types: LB_WASTE=$(echo "scale=2; $IDLE_LB_COUNT * 16" | bc)]
+▶ Pronounced as: "Now counting idle load balancers and calculating monthly waste."
 
 156
 00:25:50,000 --> 00:26:00,000
 [Types: echo "⚖️  Idle Load Balancers: $IDLE_LB_COUNT" >> ~/finops-waste-summary.txt]
 [Types: echo "   → Remove: save ~\$${LB_WASTE}/month" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending idle load balancer findings."
 
 157
 00:26:00,000 --> 00:26:10,000
 [Types: echo "" >> ~/finops-waste-summary.txt]
 [Types: TOTAL_WASTE=$(echo "scale=2; $GP2_SAVINGS + $EIP_WASTE + $STOPPED_WASTE + $UNATTACHED_WASTE + $NAT_SAVINGS + $SNAP_WASTE + $LB_WASTE" | bc)]
+▶ Pronounced as: "Now calculating total identified waste by summing all categories."
 
 158
 00:26:10,000 --> 00:26:20,000
@@ -715,6 +763,7 @@ Now let's run the complete waste summary script. This aggregates all the waste c
 [Types: echo "TOTAL IDENTIFIED WASTE:              \$${TOTAL_WASTE}/month" >> ~/finops-waste-summary.txt]
 [Types: echo "ANNUAL WASTE:                        \$$(echo "scale=2; $TOTAL_WASTE * 12" | bc)/year" >> ~/finops-waste-summary.txt]
 [Types: echo "=============================================" >> ~/finops-waste-summary.txt]
+▶ Pronounced as: "Now appending total waste and annual waste to the summary."
 
 159
 00:26:20,000 --> 00:26:30,000
@@ -745,6 +794,7 @@ Now let's append the waste audit results to your baseline document.
 [Types: echo "Old Snapshots: ${OLD_SNAP_GB}GB → save \$${SNAP_WASTE}/month" >> ~/finops-baseline.txt]
 [Types: echo "Idle Load Balancers: $IDLE_LB_COUNT → save ~\$${LB_WASTE}/month" >> ~/finops-baseline.txt]
 [Types: echo "TOTAL MONTHLY OPPORTUNITY: \$${TOTAL_WASTE}" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now appending all waste audit results to the baseline document."
 
 164
 00:27:10,000 --> 00:27:20,000
@@ -817,8 +867,8 @@ Second: unattached EIPs released. Check with aws ec2 describe-addresses --query 
 
 ---
 
-### SEGMENT 7: Complete Waste Summary & Baseline Update
-**Timestamp:** 30:00 – 35:00
+**SEGMENT 7: Complete Waste Summary & Baseline Update**
+*Timestamp: 30:00 – 35:00*
 
 ```
 181
@@ -904,8 +954,8 @@ See you in Series 3.
 
 ---
 
-### SEGMENT 8: Hard-Won Lessons & Series 3 Preview
-**Timestamp:** 35:00 – 40:00
+**SEGMENT 8: Hard-Won Lessons & Series 3 Preview**
+*Timestamp: 35:00 – 40:00*
 
 ```
 201
@@ -1003,8 +1053,8 @@ See you in Series 3.
 
 ---
 
-### SEGMENT 9: Deep Dive — Understanding EC2 Overprovisioning
-**Timestamp:** 40:00 – 45:00
+**SEGMENT 9: Deep Dive — Understanding EC2 Overprovisioning**
+*Timestamp: 40:00 – 45:00*
 
 ```
 224
@@ -1046,6 +1096,7 @@ If your average CPU utilization is below forty percent, you are overprovisioned.
 233
 00:41:30,000 --> 00:41:40,000
 [Types: aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization --dimensions Name=InstanceId,Value=i-1234567890abcdef0 --start-time $START --end-time $END --period 86400 --statistics Average --query 'Datapoints[].Average' --output table]
+▶ Pronounced as: "Now AWS CloudWatch get-metric-statistics. We're pulling average CPU utilization for a specific instance over 30 days."
 
 234
 00:41:40,000 --> 00:41:50,000
@@ -1062,6 +1113,7 @@ The fix is rightsizing. Choose a smaller instance type that still meets your pea
 237
 00:42:10,000 --> 00:42:20,000
 [Types: aws ec2 describe-instance-types --instance-types t3.medium --query 'InstanceTypes[0].VCpuInfo.DefaultVCpus' --output text]
+▶ Pronounced as: "Now AWS E-C-two describe-instance-types to check vCPU count of a smaller instance."
 
 238
 00:42:20,000 --> 00:42:30,000
@@ -1126,8 +1178,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Deep Dive — S3 Storage Classes & Cost Optimization
-**Timestamp:** 45:00 – 50:00
+**SEGMENT 10: Deep Dive — S3 Storage Classes & Cost Optimization**
+*Timestamp: 45:00 – 50:00*
 
 ```
 253
@@ -1185,6 +1237,7 @@ Lifecycle policies automate this transition. You define the rules. S3 moves the 
 266
 00:47:10,000 --> 00:47:20,000
 [Types: aws s3api put-bucket-lifecycle-configuration --bucket your-bucket --lifecycle-configuration '{"Rules":[{"ID":"transition-to-ia","Status":"Enabled","Prefix":"","Transitions":[{"Days":30,"StorageClass":"STANDARD_IA"},{"Days":90,"StorageClass":"GLACIER_INSTANT_RETRIEVAL"},{"Days":365,"StorageClass":"DEEP_ARCHIVE"}]}]}']
+▶ Pronounced as: "Now AWS S3-API put-bucket-lifecycle-configuration. We're defining transitions to IA at 30 days, Glacier at 90 days, and Deep Archive at 365 days."
 
 267
 00:47:20,000 --> 00:47:30,000
@@ -1198,8 +1251,7 @@ This is how you automate S3 cost optimization. You do it once and it runs foreve
 00:47:40,000 --> 00:47:50,000
 The startup in our story had fifteen terabytes of data in Standard tier. They should have been paying zero point zero zero one dollars per GB. They were paying zero point zero two three dollars per GB.
 
-270
-00:47:50,000 --> 00:48:00,000
+27000:47:50,000 --> 00:48:00,000
 The difference is nine hundred dollars a month. A simple lifecycle policy fixed it.
 
 271
@@ -1221,6 +1273,7 @@ If you have versioning enabled, old versions accumulate. Each version consumes s
 275
 00:48:40,000 --> 00:48:50,000
 [Types: aws s3api put-bucket-lifecycle-configuration --bucket your-bucket --lifecycle-configuration '{"Rules":[{"ID":"delete-old-versions","Status":"Enabled","Prefix":"","NoncurrentVersionExpiration":{"NoncurrentDays":30}}]}']
+▶ Pronounced as: "Now a lifecycle rule to delete non-current versions after 30 days."
 
 276
 00:48:50,000 --> 00:49:00,000
@@ -1237,8 +1290,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Deep Dive — EBS Volume Types & When to Use What
-**Timestamp:** 50:00 – 55:00
+**SEGMENT 11: Deep Dive — EBS Volume Types & When to Use What**
+*Timestamp: 50:00 – 55:00*
 
 ```
 279
@@ -1288,6 +1341,7 @@ The key is to right-size your IOPS. Do not overprovision IOPS you do not need.
 290
 00:51:50,000 --> 00:52:00,000
 [Types: aws ec2 describe-volumes --volume-ids vol-1234567890abcdef0 --query 'Volumes[].Iops' --output text]
+▶ Pronounced as: "Now AWS E-C-two describe-volumes to check the IOPS of a specific volume."
 
 291
 00:52:00,000 --> 00:52:10,000
@@ -1296,6 +1350,7 @@ This shows you the IOPS of a specific volume. Compare it to your actual usage.
 292
 00:52:10,000 --> 00:52:20,000
 [Types: aws cloudwatch get-metric-statistics --namespace AWS/EBS --metric-name VolumeReadOps --dimensions Name=VolumeId,Value=vol-1234567890abcdef0 --start-time $START --end-time $END --period 86400 --statistics Sum --query 'Datapoints[].Sum' --output table]
+▶ Pronounced as: "Now CloudWatch get-metric-statistics for VolumeReadOps to see actual usage."
 
 293
 00:52:20,000 --> 00:52:30,000
@@ -1320,6 +1375,7 @@ Now let's look at volume encryption. All EBS volumes should be encrypted.
 298
 00:53:10,000 --> 00:53:20,000
 [Types: aws ec2 describe-volumes --query 'Volumes[?Encrypted==`false`].[VolumeId,Size,VolumeType]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-volumes filtering for unencrypted volumes."
 
 299
 00:53:20,000 --> 00:53:30,000
@@ -1332,6 +1388,7 @@ But new volumes should always be encrypted. Enable the default encryption settin
 301
 00:53:40,000 --> 00:53:50,000
 [Types: aws ec2 enable-ebs-encryption-by-default]
+▶ Pronounced as: "Now enabling EBS encryption by default for all new volumes."
 
 302
 00:53:50,000 --> 00:54:00,000
@@ -1348,8 +1405,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Cost Anomaly Detection — Advanced Configuration
-**Timestamp:** 55:00 – 60:00
+**SEGMENT 12: Cost Anomaly Detection — Advanced Configuration**
+*Timestamp: 55:00 – 60:00*
 
 ```
 305
@@ -1367,6 +1424,7 @@ AWS Cost Anomaly Detection can monitor specific dimensions. Service, linked acco
 308
 00:55:30,000 --> 00:55:40,000
 [Types: aws ce create-anomaly-monitor --anomaly-monitor '{"MonitorName":"financial-rag-anomaly","MonitorType":"DIMENSIONAL","MonitorDimension":"TAG","MonitorSpecification":{"TagKey":"Team","TagValues":["financial-rag"]}}']
+▶ Pronounced as: "Now creating an anomaly monitor specifically for the financial-rag team tag."
 
 309
 00:55:40,000 --> 00:55:50,000
@@ -1379,7 +1437,7 @@ You can also monitor by linked account. This is useful for multi-account organiz
 311
 00:56:00,000 --> 00:56:10,000
 [Types: aws ce create-anomaly-monitor --anomaly-monitor '{"MonitorName":"linked-account-anomaly","MonitorType":"DIMENSIONAL","MonitorDimension":"LINKED_ACCOUNT"}']
-▶ Pronounced as: "AWS, C-E, create, anomaly, monitor..."
+▶ Pronounced as: "Now creating an anomaly monitor for linked accounts."
 
 312
 00:56:10,000 --> 00:56:20,000
@@ -1392,6 +1450,7 @@ For a ten-thousand-dollar account, a ten percent anomaly is one thousand dollars
 314
 00:56:30,000 --> 00:56:40,000
 [Types: aws ce update-anomaly-monitor --monitor-arn $MONITOR_ARN --monitor-name "finops-monitor" --monitor-specification '{"ThresholdExpression":{"Dimension":{"Key":"SERVICE","Values":["EC2"]}}}']
+▶ Pronounced as: "Now updating the anomaly monitor to add a threshold expression for EC2 service."
 
 315
 00:56:40,000 --> 00:56:50,000
@@ -1400,6 +1459,7 @@ You can also create subscriptions that send alerts to SNS, Slack, or Lambda.
 316
 00:56:50,000 --> 00:57:00,000
 [Types: aws ce create-anomaly-subscription --anomaly-subscription '{"SubscriptionName":"Slack-alerts","MonitorArnList":["$MONITOR_ARN"],"Subscribers":[{"Type":"SNS","Address":"arn:aws:sns:us-east-1:123456789012:anomaly-alerts"}],"Threshold":50,"Frequency":"DAILY"}']
+▶ Pronounced as: "Now creating an anomaly subscription that sends to SNS for Slack integration."
 
 317
 00:57:00,000 --> 00:57:10,000
@@ -1424,6 +1484,7 @@ Now let's look at how to analyze anomaly history.
 322
 00:57:50,000 --> 00:58:00,000
 [Types: aws ce get-anomalies --date-interval Start=$(date -d '30 days ago' +%Y-%m-%d),End=$END --query 'Anomalies[?Impact.TotalImpact > `100`].[AnomalyId,RootCauses[0].Service,Impact.TotalImpact]' --output table]
+▶ Pronounced as: "Now AWS C-E get-anomalies for the last 30 days, filtering for impact over 100 dollars."
 
 323
 00:58:00,000 --> 00:58:10,000
@@ -1444,8 +1505,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: How to Automate the Waste Audit with Scripts
-**Timestamp:** 60:00 – 65:00
+**SEGMENT 13: How to Automate the Waste Audit with Scripts**
+*Timestamp: 60:00 – 65:00*
 
 ```
 327
@@ -1482,6 +1543,7 @@ EIP_COUNT=$(aws ec2 describe-addresses --query 'length(Addresses[?!AssociationId
 echo "Unattached EIPs: $EIP_COUNT"
 # Add more checks as needed
 EOF]
+▶ Pronounced as: "Now creating a reusable audit script. We're writing the script to /usr/local/bin/finops-waste-audit.sh."
 
 332
 01:00:50,000 --> 01:01:00,000
@@ -1491,6 +1553,7 @@ Make it executable and schedule it weekly.
 01:01:00,000 --> 01:01:10,000
 [Types: chmod +x /usr/local/bin/finops-waste-audit.sh]
 [Types: echo "0 9 * * 1 /usr/local/bin/finops-waste-audit.sh >> /var/log/finops-audit.log" | crontab -]
+▶ Pronounced as: "Now making the script executable and scheduling it weekly with cron."
 
 334
 01:01:10,000 --> 01:01:20,000
@@ -1511,6 +1574,7 @@ The audit script should check: gp2 volumes, unattached EIPs, stopped instances, 
 338
 01:01:50,000 --> 01:02:00,000
 [Types: aws ec2 describe-volumes --filters Name=volume-type,Values=gp2 --query 'length(Volumes)' --output text]
+▶ Pronounced as: "AWS E-C-two describe-volumes to count gp2 volumes."
 
 339
 01:02:00,000 --> 01:02:10,000
@@ -1519,6 +1583,7 @@ This command returns the count of gp2 volumes. A number greater than zero means 
 340
 01:02:10,000 --> 01:02:20,000
 [Types: aws ec2 describe-addresses --query 'length(Addresses[?!AssociationId])' --output text]
+▶ Pronounced as: "AWS E-C-two describe-addresses to count unattached EIPs."
 
 341
 01:02:20,000 --> 01:02:30,000
@@ -1551,8 +1616,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Understanding Data Transfer Costs
-**Timestamp:** 65:00 – 70:00
+**SEGMENT 14: Understanding Data Transfer Costs**
+*Timestamp: 65:00 – 70:00*
 
 ```
 348
@@ -1586,6 +1651,7 @@ The key principle: keep data transfers to a minimum. Use the same region. Use th
 355
 01:06:10,000 --> 01:06:20,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --filter '{"Dimensions":{"Key":"USAGE_TYPE","Values":["DataTransfer-Out-Bytes"]}}' --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage filtering for DataTransfer-Out-Bytes usage type."
 
 356
 01:06:20,000 --> 01:06:30,000
@@ -1638,8 +1704,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: The Hidden Cost of Load Balancers
-**Timestamp:** 70:00 – 75:00
+**SEGMENT 15: The Hidden Cost of Load Balancers**
+*Timestamp: 70:00 – 75:00*
 
 ```
 368
@@ -1669,6 +1735,7 @@ Idle load balancers are the worst. They are running. They are billing. They are 
 374
 01:11:00,000 --> 01:11:10,000
 [Types: aws elbv2 describe-load-balancers --query 'LoadBalancers[?Type==`application`].{Name:LoadBalancerName,State:State.Code,Type:Type}' --output table]
+▶ Pronounced as: "Now AWS ELBv2 describe-load-balancers showing only application type with name, state, and type."
 
 375
 01:11:10,000 --> 01:11:20,000
@@ -1677,6 +1744,7 @@ This shows you all Application Load Balancers. Look for the ones with State.Code
 376
 01:11:20,000 --> 01:11:30,000
 [Types: aws elbv2 describe-target-groups --load-balancer-arn arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/your-lb/1234567890 --query 'TargetGroups[].TargetGroupArn' --output text | while read tg_arn; do aws elbv2 describe-target-health --target-group-arn $tg_arn --query 'length(TargetHealthDescriptions[?TargetHealth.State==`healthy`])' --output text; done]
+▶ Pronounced as: "Now checking target health for a specific load balancer."
 
 377
 01:11:30,000 --> 01:11:40,000
@@ -1689,6 +1757,7 @@ You can also look at request count in CloudWatch. If a load balancer has zero re
 379
 01:11:50,000 --> 01:12:00,000
 [Types: aws cloudwatch get-metric-statistics --namespace AWS/ApplicationELB --metric-name RequestCount --dimensions Name=LoadBalancer,Value=app/your-lb/1234567890 --start-time $(date -d '7 days ago' -u +%Y-%m-%dT%H:%M:%SZ) --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ) --period 86400 --statistics Sum --query 'Datapoints[].Sum' --output table]
+▶ Pronounced as: "Now CloudWatch get-metric-statistics for RequestCount over 7 days."
 
 380
 01:12:00,000 --> 01:12:10,000
@@ -1721,8 +1790,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Deep Dive — CloudWatch Logs & Storage Costs
-**Timestamp:** 75:00 – 80:00
+**SEGMENT 16: Deep Dive — CloudWatch Logs & Storage Costs**
+*Timestamp: 75:00 – 80:00*
 
 ```
 387
@@ -1744,6 +1813,7 @@ The standard retention period is indefinite. Logs accumulate forever. And you pa
 391
 01:15:40,000 --> 01:15:50,000
 [Types: aws logs describe-log-groups --query 'logGroups[].{Name:logGroupName,Retention:retentionInDays,StoredBytes:storedBytes}' --output table]
+▶ Pronounced as: "Now AWS Logs describe-log-groups showing name, retention, and stored bytes."
 
 392
 01:15:50,000 --> 01:16:00,000
@@ -1752,6 +1822,7 @@ This shows you all your log groups. Look for groups with retention set to never 
 393
 01:16:00,000 --> 01:16:10,000
 [Types: aws logs put-retention-policy --log-group-name /aws/lambda/your-function --retention-in-days 30]
+▶ Pronounced as: "Now setting a 30-day retention policy for a specific log group."
 
 394
 01:16:10,000 --> 01:16:20,000
@@ -1768,6 +1839,7 @@ Set retention policies for every log group. Thirty days for application logs. Se
 397
 01:16:40,000 --> 01:16:50,000
 [Types: for group in $(aws logs describe-log-groups --query 'logGroups[].logGroupName' --output text); do if [ -z "$(aws logs get-retention-policy --log-group-name $group 2>/dev/null)" ]; then echo "No retention policy for $group"; fi; done]
+▶ Pronounced as: "Now looping through all log groups to find those without retention policies."
 
 398
 01:16:50,000 --> 01:17:00,000
@@ -1780,6 +1852,7 @@ You can also archive logs to S3 for long-term storage. It is cheaper than CloudW
 400
 01:17:10,000 --> 01:17:20,000
 [Types: aws logs create-export-task --task-name "export-logs" --log-group-name /aws/lambda/your-function --from 1640995200000 --to 1640998800000 --destination your-bucket --destination-prefix logs/]
+▶ Pronounced as: "Now creating an export task to move logs from CloudWatch to S3."
 
 401
 01:17:20,000 --> 01:17:30,000
@@ -1804,8 +1877,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: How to Find Orphaned Resources
-**Timestamp:** 80:00 – 85:00
+**SEGMENT 17: How to Find Orphaned Resources**
+*Timestamp: 80:00 – 85:00*
 
 ```
 406
@@ -1827,6 +1900,7 @@ All of these are orphaned resources. They were created for a purpose that no lon
 410
 01:20:40,000 --> 01:20:50,000
 [Types: aws ec2 describe-volumes --filters Name=status,Values=available --query 'Volumes[].[VolumeId,Size,CreateTime]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-volumes filtering for available (unattached) volumes."
 
 411
 01:20:50,000 --> 01:21:00,000
@@ -1835,6 +1909,7 @@ This finds unattached EBS volumes. Look at the CreateTime. If it is older than t
 412
 01:21:00,000 --> 01:21:10,000
 [Types: aws ec2 describe-snapshots --owner-ids $ACCOUNT_ID --query 'Snapshots[?StartTime<='$(date -d '180 days ago' +%Y-%m-%dT%H:%M:%S)'].[SnapshotId,StartTime,VolumeSize]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-snapshots filtering for snapshots older than 180 days."
 
 413
 01:21:10,000 --> 01:21:20,000
@@ -1843,6 +1918,7 @@ This finds snapshots older than one hundred and eighty days. Most are orphans.
 414
 01:21:20,000 --> 01:21:30,000
 [Types: aws ec2 describe-addresses --query 'Addresses[?!AssociationId].[PublicIp,AllocationId,Domain]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-addresses for unattached EIPs."
 
 415
 01:21:30,000 --> 01:21:40,000
@@ -1851,6 +1927,7 @@ This finds unattached Elastic IPs. Each one is three dollars sixty-five a month.
 416
 01:21:40,000 --> 01:21:50,000
 [Types: aws rds describe-db-instances --query 'DBInstances[?DBInstanceStatus==`stopped`].[DBInstanceIdentifier,DBInstanceClass,DBInstanceStatus]' --output table]
+▶ Pronounced as: "Now AWS RDS describe-db-instances filtering for stopped instances."
 
 417
 01:21:50,000 --> 01:22:00,000
@@ -1895,8 +1972,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: Cost Allocation Tags — Advanced Strategies
-**Timestamp:** 85:00 – 90:00
+**SEGMENT 18: Cost Allocation Tags — Advanced Strategies**
+*Timestamp: 85:00 – 90:00*
 
 ```
 427
@@ -1926,6 +2003,7 @@ The key is consistency. Every resource gets the same tags. Every team uses the s
 433
 01:26:00,000 --> 01:26:10,000
 [Types: aws resourcegroupstaggingapi get-resources --tag-filters '[{"Key":"Environment","Values":["prod"]}]' --query 'ResourceTagMappingList[].ResourceARN' --output table]
+▶ Pronounced as: "Now AWS ResourceGroupsTaggingAPI get-resources filtered by Environment=prod."
 
 434
 01:26:10,000 --> 01:26:20,000
@@ -1934,6 +2012,7 @@ This finds all resources with Environment=prod. You can use this to audit your t
 435
 01:26:20,000 --> 01:26:30,000
 [Types: aws resourcegroupstaggingapi get-resources --tag-filters '[{"Key":"Environment","Values":["prod","staging","dev","test"]}]' --query 'ResourceTagMappingList[].ResourceARN' --output table]
+▶ Pronounced as: "Now getting all resources with any allowed Environment value."
 
 436
 01:26:30,000 --> 01:26:40,000
@@ -1958,6 +2037,7 @@ Tag policies in AWS Organizations enforce tagging at the organizational level.
 441
 01:27:20,000 --> 01:27:30,000
 [Types: aws organizations list-policies --filter TAG_POLICY --query 'Policies[].{Name:Name,Content:Content}' --output table]
+▶ Pronounced as: "Now AWS Organizations list-policies for tag policies."
 
 442
 01:27:30,000 --> 01:27:40,000
@@ -1970,6 +2050,7 @@ The most advanced strategy is automated tagging. Use Lambda to tag resources at 
 444
 01:27:50,000 --> 01:28:00,000
 [Types: aws lambda list-functions --query 'Functions[?FunctionName.contains(@, `tag`)].FunctionName' --output table]
+▶ Pronounced as: "Now AWS Lambda list-functions to find functions with 'tag' in the name."
 
 445
 01:28:00,000 --> 01:28:10,000
@@ -1994,8 +2075,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: How to Set Up Daily Cost Monitoring
-**Timestamp:** 90:00 – 95:00
+**SEGMENT 19: How to Set Up Daily Cost Monitoring**
+*Timestamp: 90:00 – 95:00*
 
 ```
 450
@@ -2009,6 +2090,7 @@ Monthly Cost Explorer is not enough. You need daily visibility to catch problems
 452
 01:30:20,000 --> 01:30:30,000
 [Types: aws ce get-cost-and-usage --time-period Start=$(date -d '1 day ago' +%Y-%m-%d),End=$END --granularity DAILY --metrics BlendedCost --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage for yesterday's total cost."
 
 453
 01:30:30,000 --> 01:30:40,000
@@ -2017,6 +2099,7 @@ This shows you yesterday's cost. Compare it to the same day last week. Look for 
 454
 01:30:40,000 --> 01:30:50,000
 [Types: aws ce get-cost-and-usage --time-period Start=$(date -d '7 days ago' +%Y-%m-%d),End=$END --granularity DAILY --metrics BlendedCost --query 'ResultsByTime[].[TimePeriod.Start,Total.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage for the last 7 days."
 
 455
 01:30:50,000 --> 01:31:00,000
@@ -2029,6 +2112,7 @@ You can also look at daily cost by service.
 457
 01:31:10,000 --> 01:31:20,000
 [Types: aws ce get-cost-and-usage --time-period Start=$(date -d '1 day ago' +%Y-%m-%d),End=$END --granularity DAILY --metrics BlendedCost --group-by Type=DIMENSION,Key=SERVICE --query 'ResultsByTime[0].Groups[?Metrics.BlendedCost.Amount > `1`].[Keys[0],Metrics.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage for yesterday's cost by service."
 
 458
 01:31:20,000 --> 01:31:30,000
@@ -2041,6 +2125,7 @@ The best way to monitor daily cost is automation. Use a Lambda function to send 
 460
 01:31:40,000 --> 01:31:50,000
 [Types: aws lambda create-function --function-name daily-cost-report --runtime python3.9 --handler lambda_function.lambda_handler --role arn:aws:iam::123456789012:role/lambda-execution-role --zip-file fileb://lambda.zip]
+▶ Pronounced as: "Now AWS Lambda create-function for a daily cost report Lambda."
 
 461
 01:31:50,000 --> 01:32:00,000
@@ -2049,6 +2134,7 @@ The Lambda function runs daily and sends a report to Slack or email.
 462
 01:32:00,000 --> 01:32:10,000
 [Types: aws events put-rule --name daily-cost-report --schedule-expression 'cron(0 9 * * ? *)']
+▶ Pronounced as: "Now AWS Events put-rule to schedule the Lambda daily at 9 AM."
 
 463
 01:32:10,000 --> 01:32:20,000
@@ -2079,13 +2165,14 @@ But you can set it up now. It takes an hour and saves you from surprises.
 In the next segment, we look at the complete audit checklist.
 
 470
-01:33:20,000 --> 01:33:30,000See you in Segment 20.
+01:33:20,000 --> 01:33:30,000
+See you in Segment 20.
 ```
 
 ---
 
-### SEGMENT 20: The Complete Audit Checklist
-**Timestamp:** 95:00 – 100:00
+**SEGMENT 20: The Complete Audit Checklist**
+*Timestamp: 95:00 – 100:00*
 
 ```
 471
@@ -2187,8 +2274,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Workshop — Running Your Full Audit
-**Timestamp:** 100:00 – 105:00
+**SEGMENT 21: Workshop — Running Your Full Audit**
+*Timestamp: 100:00 – 105:00*
 
 ```
 495
@@ -2210,6 +2297,7 @@ Step 1: Set your environment variables.
 [Types: export START=$(date -d '30 days ago' +%Y-%m-%d)]
 [Types: export END=$(date +%Y-%m-%d)]
 [Types: echo "Account: $ACCOUNT_ID | Start: $START | End: $END"]
+▶ Pronounced as: "Now setting environment variables and verifying them."
 
 499
 01:40:40,000 --> 01:40:50,000
@@ -2218,6 +2306,7 @@ Step 2: Confirm Cost Explorer access.
 500
 01:40:50,000 --> 01:41:00,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --query 'ResultsByTime[0].Total.BlendedCost.Amount' --output text]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage to confirm access."
 
 501
 01:41:00,000 --> 01:41:10,000
@@ -2226,6 +2315,7 @@ Step 3: Run the spend by service query.
 502
 01:41:10,000 --> 01:41:20,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --group-by Type=DIMENSION,Key=SERVICE --query 'ResultsByTime[0].Groups[?Metrics.BlendedCost.Amount > `10`].[Keys[0],Metrics.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage grouped by SERVICE."
 
 503
 01:41:20,000 --> 01:41:30,000
@@ -2234,6 +2324,7 @@ Step 4: Run the daily trends query.
 504
 01:41:30,000 --> 01:41:40,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity DAILY --metrics BlendedCost --query 'ResultsByTime[].[TimePeriod.Start,Total.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage with DAILY granularity."
 
 505
 01:41:40,000 --> 01:41:50,000
@@ -2242,6 +2333,7 @@ Step 5: Run the cost by region query.
 506
 01:41:50,000 --> 01:42:00,000
 [Types: aws ce get-cost-and-usage --time-period Start=$START,End=$END --granularity MONTHLY --metrics BlendedCost --group-by Type=DIMENSION,Key=REGION --query 'ResultsByTime[0].Groups[].[Keys[0],Metrics.BlendedCost.Amount]' --output table]
+▶ Pronounced as: "Now AWS C-E get-cost-and-usage grouped by REGION."
 
 507
 01:42:00,000 --> 01:42:10,000
@@ -2250,6 +2342,7 @@ Step 6: Find gp2 volumes.
 508
 01:42:10,000 --> 01:42:20,000
 [Types: aws ec2 describe-volumes --filters Name=volume-type,Values=gp2 --query 'Volumes[].[VolumeId,Size]' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-volumes filtered by gp2."
 
 509
 01:42:20,000 --> 01:42:30,000
@@ -2258,6 +2351,7 @@ Step 7: Find unattached Elastic IPs.
 510
 01:42:30,000 --> 01:42:40,000
 [Types: aws ec2 describe-addresses --query 'Addresses[?!AssociationId].AllocationId' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-addresses for unattached EIPs."
 
 511
 01:42:40,000 --> 01:42:50,000
@@ -2266,6 +2360,7 @@ Step 8: Find stopped instances.
 512
 01:42:50,000 --> 01:43:00,000
 [Types: aws ec2 describe-instances --filters Name=instance-state-name,Values=stopped --query 'Reservations[].Instances[].InstanceId' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-instances filtered by stopped state."
 
 513
 01:43:00,000 --> 01:43:10,000
@@ -2274,6 +2369,7 @@ Step 9: Find unattached EBS volumes.
 514
 01:43:10,000 --> 01:43:20,000
 [Types: aws ec2 describe-volumes --filters Name=status,Values=available --query 'Volumes[].VolumeId' --output table]
+▶ Pronounced as: "Now AWS E-C-two describe-volumes filtered by available status."
 
 515
 01:43:20,000 --> 01:43:30,000
@@ -2282,6 +2378,7 @@ Step 10: Run the complete waste summary.
 516
 01:43:30,000 --> 01:43:40,000
 [Types: bash ~/finops-waste-summary.sh]
+▶ Pronounced as: "Now running the waste summary script."
 
 517
 01:43:40,000 --> 01:43:50,000
@@ -2302,8 +2399,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Analyzing Your Audit Results — What's Normal vs What's Waste
-**Timestamp:** 105:00 – 110:00
+**SEGMENT 22: Analyzing Your Audit Results — What's Normal vs What's Waste**
+*Timestamp: 105:00 – 110:00*
 
 ```
 521
@@ -2381,8 +2478,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 2 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+**SEGMENT 23: Series 2 Q&A — Common Questions Answered**
+*Timestamp: 110:00 – 115:00*
 
 ```
 539
@@ -2492,8 +2589,8 @@ See you in Segment 24.
 
 ---
 
-### SEGMENT 24: Series 2 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+**SEGMENT 24: Series 2 Knowledge Check & Next Steps**
+*Timestamp: 115:00 – 120:00*
 
 ```
 565
