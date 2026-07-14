@@ -1,11 +1,14 @@
-# Series 10: FinOps Integration into the IDP
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your complete Series 10 SRT with all Type: lines and their corresponding Pronounced at: lines edited to type-along, precedential style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: Closing the Loop
-**Timestamp:** 00:00 – 05:00
+Series 10: FinOps Integration into the IDP
+Complete 24-Segment SRT — 2 Hours
+
+---
+
+SEGMENT 1: Closing the Loop
+Timestamp: 00:00 – 05:00
 
 ```
 1
@@ -80,10 +83,12 @@ Create the FinOps backend plugin:
 00:02:50,000 --> 00:03:00,000
 [Types: cd finops-idp]
 [Types: npx @backstage/cli new --select backend-plugin --option id=finops]
+▶ Pronounced as: "Now creating the FinOps backend plugin with the Backstage CLI."
 
 19
 00:03:00,000 --> 00:03:10,000
 [Types: yarn --cwd plugins/finops-backend add node-fetch @backstage/catalog-client @slack/web-api aws-sdk]
+▶ Pronounced as: "Now installing dependencies for the FinOps backend plugin."
 
 20
 00:03:10,000 --> 00:03:20,000
@@ -117,10 +122,12 @@ Before we write any code, verify that Kubecost is running and accessible:
 00:04:20,000 --> 00:04:30,000
 [Types: kubectl get pods -n kubecost]
 [Types: kubectl port-forward -n kubecost svc/kubecost-cost-analyzer 9090:9090 &]
+▶ Pronounced as: "Now verifying Kubecost is running and port-forwarding for access."
 
 28
 00:04:30,000 --> 00:04:40,000
 [Types: curl -s http://localhost:9090/health | jq .]
+▶ Pronounced as: "Now checking Kubecost health endpoint."
 
 29
 00:04:40,000 --> 00:04:50,000
@@ -137,8 +144,8 @@ See you in Segment 2.
 
 ---
 
-### SEGMENT 2: FinOps Backend Plugin — Cost API & Budget Scheduler
-**Timestamp:** 05:00 – 10:00
+SEGMENT 2: FinOps Backend Plugin — Cost API & Budget Scheduler
+Timestamp: 05:00 – 10:00
 
 ```
 32
@@ -230,6 +237,7 @@ export async function createRouter({
   return router;
 }
 EOF]
+▶ Pronounced as: "Now creating the router.ts file with the cost API endpoint."
 
 36
 00:05:40,000 --> 00:05:50,000
@@ -357,6 +365,7 @@ export async function runBudgetCheck({
   logger.info(`Budget check complete. ${alertCount} alerts sent.`);
 }
 EOF]
+▶ Pronounced as: "Now creating the scheduler.ts file with the budget check logic."
 
 42
 00:06:40,000 --> 00:06:50,000
@@ -411,6 +420,7 @@ export const finopsPlugin = createBackendPlugin({
   },
 });
 EOF]
+▶ Pronounced as: "Now creating the plugin.ts file to register the FinOps plugin."
 
 47
 00:07:30,000 --> 00:07:40,000
@@ -421,6 +431,7 @@ Now register the plugin in the backend:
 [Types: cat >> packages/backend/src/index.ts << 'EOF'
 backend.add(import('@internal/plugin-finops-backend'));
 EOF]
+▶ Pronounced as: "Now registering the FinOps backend plugin in the backend index."
 
 49
 00:07:50,000 --> 00:08:00,000
@@ -435,6 +446,7 @@ kubecost:
 slack:
   token: ${SLACK_TOKEN}
 EOF]
+▶ Pronounced as: "Now adding Kubecost and Slack configuration to app-config.yaml."
 
 51
 00:08:10,000 --> 00:08:20,000
@@ -443,6 +455,7 @@ Test the cost API endpoint:
 52
 00:08:20,000 --> 00:08:30,000
 [Types: curl -s "http://localhost:7007/api/finops/cost?namespace=financial-rag" | jq .]
+▶ Pronounced as: "Now testing the cost API endpoint."
 
 53
 00:08:30,000 --> 00:08:40,000
@@ -459,6 +472,7 @@ Now let's test the budget scheduler manually:
 56
 00:09:00,000 --> 00:09:10,000
 [Types: curl -X POST "http://localhost:7007/api/finops/run-budget-check"]
+▶ Pronounced as: "Now manually triggering the budget scheduler."
 
 57
 00:09:10,000 --> 00:09:20,000
@@ -475,8 +489,8 @@ See you in Segment 3.
 
 ---
 
-### SEGMENT 3: FinOps Frontend Component & Homepage Dashboard
-**Timestamp:** 10:00 – 15:00
+SEGMENT 3: FinOps Frontend Component & Homepage Dashboard
+Timestamp: 10:00 – 15:00
 
 ```
 60
@@ -495,10 +509,12 @@ Create the FinOps plugin frontend:
 00:10:30,000 --> 00:10:40,000
 [Types: cd finops-idp]
 [Types: npx @backstage/cli new --select frontend-plugin --option id=finops]
+▶ Pronounced as: "Now creating the FinOps frontend plugin with the Backstage CLI."
 
 64
 00:10:40,000 --> 00:10:50,000
 [Types: yarn --cwd plugins/finops add @backstage/core-components @backstage/core-plugin-api @backstage/plugin-catalog-react]
+▶ Pronounced as: "Now installing frontend dependencies."
 
 65
 00:10:50,000 --> 00:11:00,000
@@ -636,6 +652,7 @@ export const FinOpsCostCard = () => {
   );
 };
 EOF]
+▶ Pronounced as: "Now creating the FinOpsCostCard component."
 
 67
 00:11:10,000 --> 00:11:20,000
@@ -647,6 +664,7 @@ Now export the component from the plugin:
 export { finopsPlugin, FinopsPage } from './plugin';
 export { FinOpsCostCard } from './components/FinOpsCostCard/FinOpsCostCard';
 EOF]
+▶ Pronounced as: "Now exporting the FinOpsCostCard component."
 
 69
 00:11:30,000 --> 00:11:40,000
@@ -677,6 +695,7 @@ const serviceEntityPage = (
   </EntityLayout>
 );
 EOF]
+▶ Pronounced as: "Now adding the FinOpsCostCard to the catalog entity page."
 
 71
 00:11:50,000 --> 00:12:00,000
@@ -685,6 +704,7 @@ Now let's test the component. Start Backstage:
 72
 00:12:00,000 --> 00:12:10,000
 [Types: yarn dev]
+▶ Pronounced as: "Now starting Backstage with yarn dev."
 
 73
 00:12:10,000 --> 00:12:20,000
@@ -821,6 +841,7 @@ export const FinopsDashboard = () => {
   );
 };
 EOF]
+▶ Pronounced as: "Now creating the FinopsDashboard component."
 
 78
 00:13:00,000 --> 00:13:10,000
@@ -831,6 +852,7 @@ Now add the dashboard to the plugin exports:
 [Types: cat >> plugins/finops/src/index.ts << 'EOF'
 export { FinopsDashboard } from './components/FinopsDashboard/FinopsDashboard';
 EOF]
+▶ Pronounced as: "Now exporting the FinopsDashboard component."
 
 80
 00:13:20,000 --> 00:13:30,000
@@ -844,6 +866,7 @@ import { FinopsDashboard } from '@internal/plugin-finops';
 // In the routes
 <Route path="/finops" element={<FinopsDashboard />} />
 EOF]
+▶ Pronounced as: "Now adding the FinOps dashboard route."
 
 82
 00:13:40,000 --> 00:13:50,000
@@ -864,8 +887,8 @@ See you in Segment 4.
 
 ---
 
-### SEGMENT 4: Chargeback Report & Kubecost Anomaly Webhook
-**Timestamp:** 15:00 – 20:00
+SEGMENT 4: Chargeback Report & Kubecost Anomaly Webhook
+Timestamp: 15:00 – 20:00
 
 ```
 86
@@ -953,6 +976,7 @@ Add the chargeback endpoint to the router:
     }
   });
 EOF]
+▶ Pronounced as: "Now adding the chargeback endpoint to the router."
 
 90
 00:15:40,000 --> 00:15:50,000
@@ -1028,6 +1052,7 @@ Now add the anomaly webhook endpoint. This receives alerts from Kubecost and rou
     res.json({ status: 'alert_sent', service: name, team });
   });
 EOF]
+▶ Pronounced as: "Now adding the anomaly webhook endpoint to the router."
 
 92
 00:16:00,000 --> 00:16:10,000
@@ -1040,6 +1065,7 @@ Now configure Kubecost to send anomaly alerts to Backstage:
     "alertConfigs": "{\"alerts\":[{\"type\":\"anomaly\",\"window\":\"1d\",\"threshold\":0.20,\"slackWebhookUrl\":\"https://backstage.internal/api/finops/webhooks/kubecost\",\"ownerContact\":[\"platform-team@yourcompany.com\"]}]}"
   }
 }']
+▶ Pronounced as: "Now configuring Kubecost to send anomaly alerts to the Backstage webhook."
 
 94
 00:16:20,000 --> 00:16:30,000
@@ -1048,6 +1074,7 @@ Test the webhook manually:
 95
 00:16:30,000 --> 00:16:40,000
 [Types: curl -X POST http://localhost:7007/api/finops/webhooks/kubecost -H "Content-Type: application/json" -d '{"namespace":"financial-rag","costIncrease":340,"impact":340}']
+▶ Pronounced as: "Now testing the anomaly webhook manually."
 
 96
 00:16:40,000 --> 00:16:50,000
@@ -1068,6 +1095,7 @@ Now update the baseline document:
 [Types: echo "Kubecost anomaly webhook: pointing at Backstage FinOps plugin" >> ~/finops-baseline.txt]
 [Types: echo "Result: FinOps visible to every developer as part of daily workflow" >> ~/finops-baseline.txt]
 [Types: echo "" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now updating the baseline document with Series 10 results."
 
 99
 00:17:10,000 --> 00:17:20,000
@@ -1104,8 +1132,8 @@ See you in Segment 5.
 
 ---
 
-### SEGMENT 5: Series 10 Recap & Series 11 Preview
-**Timestamp:** 20:00 – 25:00
+SEGMENT 5: Series 10 Recap & Series 11 Preview
+Timestamp: 20:00 – 25:00
 
 ```
 107
@@ -1155,14 +1183,17 @@ Before Series 11, run these verification checks:
 118
 00:21:50,000 --> 00:22:00,000
 [Types: cat ~/finops-baseline.txt | grep -c "SERIES" | xargs echo "Series completed in baseline:"]
+▶ Pronounced as: "Now checking how many series are recorded in the baseline document."
 
 119
 00:22:00,000 --> 00:22:10,000
 [Types: kubectl get pods -n kubecost | grep -c Running | xargs echo "Kubecost pods running:"]
+▶ Pronounced as: "Now checking Kubecost pod status."
 
 120
 00:22:10,000 --> 00:22:20,000
 [Types: curl -s http://localhost:7007/api/finops/cost?namespace=financial-rag | jq -r '.currentMonth' 2>/dev/null | xargs echo "Current month cost from FinOps API: $" || echo "FinOps API not responding"]
+▶ Pronounced as: "Now checking the FinOps API is responding."
 
 121
 00:22:20,000 --> 00:22:30,000
@@ -1195,8 +1226,8 @@ See you in Series 11.
 
 ---
 
-### SEGMENT 6: Deep Dive: FinOps Plugin Architecture
-**Timestamp:** 25:00 – 30:00
+SEGMENT 6: Deep Dive: FinOps Plugin Architecture
+Timestamp: 25:00 – 30:00
 
 ```
 128
@@ -1278,8 +1309,8 @@ See you in Segment 7.
 
 ---
 
-### SEGMENT 7: FinOps Backend Plugin — Installation & Setup
-**Timestamp:** 30:00 – 35:00
+SEGMENT 7: FinOps Backend Plugin — Installation & Setup
+Timestamp: 30:00 – 35:00
 
 ```
 147
@@ -1294,6 +1325,7 @@ First, create the plugin using the Backstage CLI.
 00:30:20,000 --> 00:30:30,000
 [Types: cd finops-idp]
 [Types: npx @backstage/cli new --select backend-plugin --option id=finops]
+▶ Pronounced as: "Now creating the FinOps backend plugin with the Backstage CLI."
 
 150
 00:30:30,000 --> 00:30:40,000
@@ -1310,6 +1342,7 @@ Now install the dependencies:
 153
 00:31:00,000 --> 00:31:10,000
 [Types: yarn --cwd plugins/finops-backend add node-fetch @backstage/catalog-client @slack/web-api aws-sdk]
+▶ Pronounced as: "Now installing dependencies for the FinOps backend plugin."
 
 154
 00:31:10,000 --> 00:31:20,000
@@ -1360,6 +1393,7 @@ Now register the plugin in the backend index.ts file:
 [Types: cat >> packages/backend/src/index.ts << 'EOF'
 backend.add(import('@internal/plugin-finops-backend'));
 EOF]
+▶ Pronounced as: "Now registering the FinOps backend plugin in the backend index."
 
 166
 00:33:10,000 --> 00:33:20,000
@@ -1374,6 +1408,7 @@ kubecost:
 slack:
   token: ${SLACK_TOKEN}
 EOF]
+▶ Pronounced as: "Now adding Kubecost and Slack configuration to app-config.yaml."
 
 168
 00:33:30,000 --> 00:33:40,000
@@ -1386,6 +1421,7 @@ The Slack token is an environment variable. Set it in your .env file:
 170
 00:33:50,000 --> 00:34:00,000
 [Types: echo "SLACK_TOKEN=xoxb-your-token" >> .env]
+▶ Pronounced as: "Now adding the Slack token to the .env file."
 
 171
 00:34:00,000 --> 00:34:10,000
@@ -1394,6 +1430,7 @@ Now rebuild Backstage:
 172
 00:34:10,000 --> 00:34:20,000
 [Types: yarn build]
+▶ Pronounced as: "Now building Backstage."
 
 173
 00:34:20,000 --> 00:34:30,000
@@ -1402,6 +1439,7 @@ And start Backstage:
 174
 00:34:30,000 --> 00:34:40,000
 [Types: yarn dev]
+▶ Pronounced as: "Now starting Backstage."
 
 175
 00:34:40,000 --> 00:34:50,000
@@ -1410,6 +1448,7 @@ Test the cost API endpoint:
 176
 00:34:50,000 --> 00:35:00,000
 [Types: curl -s "http://localhost:7007/api/finops/cost?namespace=financial-rag" | jq .]
+▶ Pronounced as: "Now testing the cost API endpoint."
 
 177
 00:35:00,000 --> 00:35:10,000
@@ -1430,8 +1469,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: Deep Dive: Cost API — /cost Endpoint
-**Timestamp:** 35:00 – 40:00
+SEGMENT 8: Deep Dive: Cost API — /cost Endpoint
+Timestamp: 35:00 – 40:00
 
 ```
 181
@@ -1503,6 +1542,7 @@ Let's look at the endpoint implementation in detail.
     res.status(500).json({ error: 'Failed to fetch cost data' });
   }
 });]
+▶ Pronounced as: "Now viewing the /cost endpoint implementation."
 
 185
 00:35:40,000 --> 00:35:50,000
@@ -1579,8 +1619,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Deep Dive: Cost API — /rightsizing Endpoint
-**Timestamp:** 40:00 – 45:00
+SEGMENT 9: Deep Dive: Cost API — /rightsizing Endpoint
+Timestamp: 40:00 – 45:00
 
 ```
 203
@@ -1633,6 +1673,7 @@ Let's look at the endpoint implementation.
     res.status(500).json({ error: 'Failed to fetch rightsizing data' });
   }
 });]
+▶ Pronounced as: "Now viewing the /rightsizing endpoint implementation."
 
 207
 00:40:40,000 --> 00:40:50,000
@@ -1703,8 +1744,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Deep Dive: Cost API — /dashboard Endpoint
-**Timestamp:** 45:00 – 50:00
+SEGMENT 10: Deep Dive: Cost API — /dashboard Endpoint
+Timestamp: 45:00 – 50:00
 
 ```
 220
@@ -1785,6 +1826,7 @@ Let's look at the endpoint implementation.
     res.status(500).json({ error: 'Failed to generate dashboard' });
   }
 });]
+▶ Pronounced as: "Now viewing the /dashboard endpoint implementation."
 
 224
 00:45:40,000 --> 00:45:50,000
@@ -1860,8 +1902,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Deep Dive: Cost API — /chargeback Endpoint
-**Timestamp:** 50:00 – 55:00
+SEGMENT 11: Deep Dive: Cost API — /chargeback Endpoint
+Timestamp: 50:00 – 55:00
 
 ```
 238
@@ -1945,6 +1987,7 @@ Let's look at the endpoint implementation.
     res.status(500).json({ error: 'Failed to generate chargeback' });
   }
 });]
+▶ Pronounced as: "Now viewing the /chargeback endpoint implementation."
 
 242
 00:50:40,000 --> 00:50:50,000
@@ -1975,7 +2018,7 @@ A typical CSV output looks like this:
 Team,Service,Monthly Cost ($)
 financial-rag,financial-rag-api,5200.00
 financial-rag,llm-ingest,8900.00
-risktoracle,risk-calc,6000.00
+riskoracle,risk-calc,6000.00
 ...
 
 249
@@ -2005,8 +2048,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Deep Dive: Budget Scheduler — How It Works
-**Timestamp:** 55:00 – 60:00
+SEGMENT 12: Deep Dive: Budget Scheduler — How It Works
+Timestamp: 55:00 – 60:00
 
 ```
 255
@@ -2119,6 +2162,7 @@ Let's look at the scheduler implementation.
 
   logger.info(`Budget check complete. ${alertCount} alerts sent.`);
 }]
+▶ Pronounced as: "Now viewing the budget scheduler implementation."
 
 260
 00:55:50,000 --> 00:56:00,000
@@ -2179,8 +2223,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: Budget Scheduler — Slack Integration
-**Timestamp:** 60:00 – 65:00
+SEGMENT 13: Budget Scheduler — Slack Integration
+Timestamp: 60:00 – 65:00
 
 ```
 274
@@ -2198,6 +2242,7 @@ Let's look at the Slack integration in detail.
 277
 01:00:30,000 --> 01:00:40,000
 [Types: const slack = new WebClient(slackToken);]
+▶ Pronounced as: "Now initializing the Slack WebClient."
 
 278
 01:00:40,000 --> 01:00:50,000
@@ -2207,6 +2252,7 @@ The Slack token is configured in app-config.yaml. It is an environment variable 
 01:00:50,000 --> 01:01:00,000
 [Types: slack:
   token: ${SLACK_TOKEN}]
+▶ Pronounced as: "Now viewing the Slack token configuration."
 
 280
 01:01:00,000 --> 01:01:10,000
@@ -2251,6 +2297,7 @@ The scheduler uses the chat.postMessage method to send messages to channels.
     },
   ],
 });]
+▶ Pronounced as: "Now viewing the Slack message format."
 
 283
 01:01:30,000 --> 01:01:40,000
@@ -2266,7 +2313,7 @@ The actions section includes a button that links directly to the service in Back
 
 286
 01:02:00,000 --> 01:02:10,000
-The channel is named after the team. For example, #financial-rag-alerts or #risktoracle-alerts.
+The channel is named after the team. For example, #financial-rag-alerts or #riskoracle-alerts.
 
 287
 01:02:10,000 --> 01:02:20,000
@@ -2303,8 +2350,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Deep Dive: FinOps Frontend — CostCard Component
-**Timestamp:** 65:00 – 70:00
+SEGMENT 14: Deep Dive: FinOps Frontend — CostCard Component
+Timestamp: 65:00 – 70:00
 
 ```
 295
@@ -2429,6 +2476,7 @@ Let's look at the component implementation.
     </InfoCard>
   );
 };]
+▶ Pronounced as: "Now viewing the FinOpsCostCard component implementation."
 
 299
 01:05:40,000 --> 01:05:50,000
@@ -2489,8 +2537,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: Deep Dive: FinOps Frontend — Dashboard Component
-**Timestamp:** 70:00 – 75:00
+SEGMENT 15: Deep Dive: FinOps Frontend — Dashboard Component
+Timestamp: 70:00 – 75:00
 
 ```
 313
@@ -2602,6 +2650,7 @@ Let's look at the component implementation.
     </Box>
   );
 };]
+▶ Pronounced as: "Now viewing the FinopsDashboard component implementation."
 
 317
 01:10:40,000 --> 01:10:50,000
@@ -2650,8 +2699,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Deep Dive: FinOps Frontend — Chargeback Report Component
-**Timestamp:** 75:00 – 80:00
+SEGMENT 16: Deep Dive: FinOps Frontend — Chargeback Report Component
+Timestamp: 75:00 – 80:00
 
 ```
 328
@@ -2745,6 +2794,7 @@ Let's look at the component implementation.
     </Box>
   );
 };]
+▶ Pronounced as: "Now viewing the ChargebackReport component implementation."
 
 332
 01:15:40,000 --> 01:15:50,000
@@ -2785,8 +2835,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: Homepage Dashboard — Company-Wide Cost View
-**Timestamp:** 80:00 – 85:00
+SEGMENT 17: Homepage Dashboard — Company-Wide Cost View
+Timestamp: 80:00 – 85:00
 
 ```
 341
@@ -2808,6 +2858,7 @@ import { FinopsDashboard } from '@internal/plugin-finops';
 
 // In the routes
 <Route path="/finops" element={<FinopsDashboard />} />]
+▶ Pronounced as: "Now viewing the FinOps dashboard route configuration."
 
 345
 01:20:40,000 --> 01:20:50,000
@@ -2821,6 +2872,7 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 
 // In the sidebar items
 <SidebarItem icon={AttachMoneyIcon} to="/finops" text="FinOps" />]
+▶ Pronounced as: "Now viewing the sidebar integration."
 
 347
 01:21:00,000 --> 01:21:10,000
@@ -2839,6 +2891,7 @@ import { FinopsDashboard } from '@internal/plugin-finops';
 <Grid item xs={12}>
   <FinopsDashboard />
 </Grid>]
+▶ Pronounced as: "Now viewing the homepage widget configuration."
 
 350
 01:21:30,000 --> 01:21:40,000
@@ -2875,8 +2928,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: Chargeback Report — CSV Generation
-**Timestamp:** 85:00 – 90:00
+SEGMENT 18: Chargeback Report — CSV Generation
+Timestamp: 85:00 – 90:00
 
 ```
 358
@@ -2907,6 +2960,7 @@ Let's look at the CSV generation implementation.
   res.setHeader('Content-Disposition', `attachment; filename=chargeback-${month}.csv`);
   return res.send(csv);
 }]
+▶ Pronounced as: "Now viewing the CSV generation implementation."
 
 362
 01:25:40,000 --> 01:25:50,000
@@ -2965,8 +3019,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: Kubecost Anomaly Webhook — Configuration
-**Timestamp:** 90:00 – 95:00
+SEGMENT 19: Kubecost Anomaly Webhook — Configuration
+Timestamp: 90:00 – 95:00
 
 ```
 374
@@ -2992,6 +3046,7 @@ Let's look at the webhook configuration.
     "alertConfigs": "{\"alerts\":[{\"type\":\"anomaly\",\"window\":\"1d\",\"threshold\":0.20,\"slackWebhookUrl\":\"https://backstage.internal/api/finops/webhooks/kubecost\",\"ownerContact\":[\"platform-team@yourcompany.com\"]}]}"
   }
 }']
+▶ Pronounced as: "Now configuring Kubecost anomaly alerts to send to Backstage."
 
 379
 01:30:50,000 --> 01:31:00,000
@@ -3087,6 +3142,7 @@ Let's look at the webhook endpoint implementation.
 
   res.json({ status: 'alert_sent', service: name, team });
 });]
+▶ Pronounced as: "Now viewing the webhook endpoint implementation."
 
 387
 01:32:10,000 --> 01:32:20,000
@@ -3127,8 +3183,8 @@ See you in Segment 20.
 
 ---
 
-### SEGMENT 20: Anomaly Webhook — Routing to Service Owners
-**Timestamp:** 95:00 – 100:00
+SEGMENT 20: Anomaly Webhook — Routing to Service Owners
+Timestamp: 95:00 – 100:00
 
 ```
 396
@@ -3161,6 +3217,7 @@ if (!service) {
 const team = service.metadata.annotations?.['finops/team'] ?? 'unknown';
 const name = service.metadata.name;
 const owner = service.spec?.owner ?? 'unknown';]
+▶ Pronounced as: "Now viewing the routing logic."
 
 400
 01:35:40,000 --> 01:35:50,000
@@ -3181,6 +3238,7 @@ The owner is used for email escalation if Slack is unavailable.
 404
 01:36:20,000 --> 01:36:30,000
 [Types: const slackChannel = `#${team}-alerts`;]
+▶ Pronounced as: "Now viewing the Slack channel derivation."
 
 405
 01:36:30,000 --> 01:36:40,000
@@ -3193,6 +3251,7 @@ If the team is unknown, the alert is sent to a default channel.
 407
 01:36:50,000 --> 01:37:00,000
 [Types: const defaultChannel = '#platform-alerts';]
+▶ Pronounced as: "Now viewing the default channel configuration."
 
 408
 01:37:00,000 --> 01:37:10,000
@@ -3209,6 +3268,7 @@ The routing logic also includes an escalation path.
   const email = service.spec?.owner?.replace('user:', '') + '@company.com';
   await sendEmail(email, `Cost anomaly detected for ${name}`, message);
 }]
+▶ Pronounced as: "Now viewing the email escalation logic."
 
 411
 01:37:30,000 --> 01:37:40,000
@@ -3233,8 +3293,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Workshop: Viewing Cost in the Catalog
-**Timestamp:** 100:00 – 105:00
+SEGMENT 21: Workshop: Viewing Cost in the Catalog
+Timestamp: 100:00 – 105:00
 
 ```
 416
@@ -3252,6 +3312,7 @@ On the overview page, you will see the FinOps cost card.
 419
 01:40:30,000 --> 01:40:40,000
 [Types: open http://localhost:3000/catalog/default/component/financial-rag-agent]
+▶ Pronounced as: "Now opening the financial-rag-agent service in the catalog."
 
 420
 01:40:40,000 --> 01:40:50,000
@@ -3264,6 +3325,7 @@ If the cost card is not visible, check the annotations in catalog-info.yaml.
 422
 01:41:00,000 --> 01:41:10,000
 [Types: cat catalog-info.yaml | grep -E "kubecost.com/namespace|finops/"]
+▶ Pronounced as: "Now checking the annotations in catalog-info.yaml."
 
 423
 01:41:10,000 --> 01:41:20,000
@@ -3288,6 +3350,7 @@ Now navigate to the FinOps dashboard at /finops.
 428
 01:42:00,000 --> 01:42:10,000
 [Types: open http://localhost:3000/finops]
+▶ Pronounced as: "Now opening the FinOps dashboard."
 
 429
 01:42:10,000 --> 01:42:20,000
@@ -3304,6 +3367,7 @@ Now generate a chargeback report for the current month.
 432
 01:42:40,000 --> 01:42:50,000
 [Types: open http://localhost:3000/finops/chargeback]
+▶ Pronounced as: "Now opening the chargeback report."
 
 433
 01:42:50,000 --> 01:43:00,000
@@ -3316,6 +3380,7 @@ Download the CSV and open it in a spreadsheet.
 435
 01:43:10,000 --> 01:43:20,000
 [Types: curl http://localhost:7007/api/finops/chargeback?format=csv -o chargeback.csv]
+▶ Pronounced as: "Now downloading the chargeback report as CSV."
 
 436
 01:43:20,000 --> 01:43:30,000
@@ -3332,8 +3397,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Workshop: Generating a Chargeback Report
-**Timestamp:** 105:00 – 110:00
+SEGMENT 22: Workshop: Generating a Chargeback Report
+Timestamp: 105:00 – 110:00
 
 ```
 439
@@ -3351,6 +3416,7 @@ Generate the report using the API endpoint.
 442
 01:45:30,000 --> 01:45:40,000
 [Types: curl http://localhost:7007/api/finops/chargeback?format=csv -o chargeback-$(date +%Y-%m).csv]
+▶ Pronounced as: "Now generating the chargeback report as CSV."
 
 443
 01:45:40,000 --> 01:45:50,000
@@ -3359,6 +3425,7 @@ Now open the CSV file in a spreadsheet.
 444
 01:45:50,000 --> 01:46:00,000
 [Types: open chargeback-$(date +%Y-%m).csv]
+▶ Pronounced as: "Now opening the CSV file."
 
 445
 01:46:00,000 --> 01:46:10,000
@@ -3379,6 +3446,7 @@ Now generate a report for the previous month.
 449
 01:46:40,000 --> 01:46:50,000
 [Types: curl http://localhost:7007/api/finops/chargeback?format=csv&month=last -o chargeback-last-month.csv]
+▶ Pronounced as: "Now generating the previous month's chargeback report."
 
 450
 01:46:50,000 --> 01:47:00,000
@@ -3397,6 +3465,7 @@ Now automate the report generation using a cron job.
 [Types: crontab -e
 # Add this line to run on the 1st of every month
 0 0 1 * * curl http://localhost:7007/api/finops/chargeback?format=csv -o /finance/chargeback-$(date +\%Y-\%m).csv]
+▶ Pronounced as: "Now adding a cron job to generate the chargeback report monthly."
 
 454
 01:47:30,000 --> 01:47:40,000
@@ -3417,8 +3486,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 10 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+SEGMENT 23: Series 10 Q&A — Common Questions Answered
+Timestamp: 110:00 – 115:00
 
 ```
 458
@@ -3440,6 +3509,7 @@ Also verify that the FinOps backend plugin is running and the /cost endpoint is 
 462
 01:50:40,000 --> 01:50:50,000
 [Types: curl http://localhost:7007/api/finops/cost?namespace=financial-rag]
+▶ Pronounced as: "Now testing the cost API endpoint."
 
 463
 01:50:50,000 --> 01:51:00,000
@@ -3464,6 +3534,7 @@ Check the logs for errors. The scheduler logs every attempt.
 468
 01:51:40,000 --> 01:51:50,000
 [Types: kubectl logs -n backstage deployment/backstage-backend | grep "budget" | tail -20]
+▶ Pronounced as: "Now checking the Backstage logs for budget scheduler errors."
 
 469
 01:51:50,000 --> 01:52:00,000
@@ -3476,6 +3547,7 @@ Query Kubecost directly to verify the data.
 471
 01:52:10,000 --> 01:52:20,000
 [Types: curl http://localhost:9090/model/allocation?window=30d&aggregate=namespace]
+▶ Pronounced as: "Now querying Kubecost directly."
 
 472
 01:52:20,000 --> 01:52:30,000
@@ -3497,6 +3569,7 @@ Add the finops/monthly-budget annotation to catalog-info.yaml.
 01:53:00,000 --> 01:53:10,000
 [Types: annotations:
   finops/monthly-budget: "15000"]
+▶ Pronounced as: "Now viewing the budget annotation format."
 
 477
 01:53:10,000 --> 01:53:20,000
@@ -3525,6 +3598,7 @@ The scheduler runs daily at 9 AM. This is configurable in the scheduler configur
 483
 01:54:10,000 --> 01:54:20,000
 [Types: frequency: { cron: '0 9 * * *' }]
+▶ Pronounced as: "Now viewing the scheduler frequency configuration."
 
 484
 01:54:20,000 --> 01:54:30,000
@@ -3569,8 +3643,8 @@ See you in Segment 24.
 
 ---
 
-### SEGMENT 24: Series 10 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+SEGMENT 24: Series 10 Knowledge Check & Next Steps
+Timestamp: 115:00 – 120:00
 
 ```
 494
@@ -3656,6 +3730,7 @@ Third: Verify the chargeback report generates correctly.
 514
 01:58:20,000 --> 01:58:30,000
 [Types: curl http://localhost:7007/api/finops/chargeback?format=csv | head -10]
+▶ Pronounced as: "Now verifying the chargeback report generation."
 
 515
 01:58:30,000 --> 01:58:40,000
@@ -3664,6 +3739,7 @@ Fourth: Verify the budget scheduler is running by checking the logs.
 516
 01:58:40,000 --> 01:58:50,000
 [Types: kubectl logs -n backstage deployment/backstage-backend | grep "Budget check" | tail -5]
+▶ Pronounced as: "Now checking the budget scheduler logs."
 
 517
 01:58:50,000 --> 01:59:00,000
