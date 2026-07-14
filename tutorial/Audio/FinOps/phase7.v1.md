@@ -1,11 +1,14 @@
-# Series 7: IDP Fundamentals — What Is an Internal Developer Platform
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your complete Series 7 SRT with all Type: lines and their corresponding Pronounced at: lines edited to type-along, precedential style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: Why Every FinOps Win Eventually Reverses
-**Timestamp:** 00:00 – 05:00
+Series 7: IDP Fundamentals — What Is an Internal Developer Platform
+Complete 24-Segment SRT — 2 Hours
+
+---
+
+SEGMENT 1: Why Every FinOps Win Eventually Reverses
+Timestamp: 00:00 – 05:00
 
 ```
 1
@@ -163,8 +166,8 @@ See you in Segment 2.
 
 ---
 
-### SEGMENT 2: Three Failure Modes & Team Topologies
-**Timestamp:** 05:00 – 10:00
+SEGMENT 2: Three Failure Modes & Team Topologies
+Timestamp: 05:00 – 10:00
 
 ```
 39
@@ -294,8 +297,8 @@ See you in Segment 3.
 
 ---
 
-### SEGMENT 3: Golden Paths, Backstage Architecture & Installation
-**Timestamp:** 10:00 – 15:00
+SEGMENT 3: Golden Paths, Backstage Architecture & Installation
+Timestamp: 10:00 – 15:00
 
 ```
 70
@@ -345,7 +348,7 @@ Prerequisites check:
 81
 00:11:50,000 --> 00:12:00,000
 [Types: node --version]
-▶ Pronounced as: "Node, dash, dash, version"
+▶ Pronounced as: "Now checking Node.js version with node --version."
 
 82
 00:12:00,000 --> 00:12:10,000
@@ -354,7 +357,7 @@ You should see v18 or higher. Backstage requires Node.js 18 or 20.
 83
 00:12:10,000 --> 00:12:20,000
 [Types: yarn --version]
-▶ Pronounced as: "Yarn, dash, dash, version"
+▶ Pronounced as: "Now checking Yarn version with yarn --version."
 
 84
 00:12:20,000 --> 00:12:30,000
@@ -367,7 +370,7 @@ Now create the Backstage app:
 86
 00:12:40,000 --> 00:12:50,000
 [Types: npx @backstage/create-app@latest]
-▶ Pronounced as: "N-P-X, at, backstage, slash, create, app, at, latest"
+▶ Pronounced as: "Now creating the Backstage app with npx @backstage/create-app@latest."
 
 87
 00:12:50,000 --> 00:13:00,000
@@ -376,11 +379,12 @@ When prompted: enter finops-idp as the app name. Select PostgreSQL as the databa
 88
 00:13:00,000 --> 00:13:10,000
 [Types: cd finops-idp]
+▶ Pronounced as: "Now changing into the finops-idp directory."
 
 89
 00:13:10,000 --> 00:13:20,000
 [Types: yarn dev]
-▶ Pronounced as: "Yarn, dev"
+▶ Pronounced as: "Now starting Backstage in development mode with yarn dev."
 
 90
 00:13:20,000 --> 00:13:30,000
@@ -433,8 +437,8 @@ See you in Segment 4.
 
 ---
 
-### SEGMENT 4: The Software Catalog — Registering Services
-**Timestamp:** 15:00 – 20:00
+SEGMENT 4: The Software Catalog — Registering Services
+Timestamp: 15:00 – 20:00
 
 ```
 102
@@ -492,6 +496,7 @@ spec:
   providesApis:
     - financial-rag-api
 EOF]
+▶ Pronounced as: "Now creating the catalog-info.yaml file for financial-rag-agent with cat and heredoc."
 
 103
 00:15:50,000 --> 00:16:00,000
@@ -540,6 +545,7 @@ catalog:
           frequency: {minutes: 30}
           timeout: {minutes: 3}
 EOF]
+▶ Pronounced as: "Now appending GitHub catalog discovery configuration to app-config.yaml."
 
 112
 00:17:20,000 --> 00:17:30,000
@@ -588,6 +594,7 @@ spec:
   providesApis:
     - riskoracle-api
 EOF]
+▶ Pronounced as: "Now creating the catalog entity for riskoracle."
 
 116
 00:18:00,000 --> 00:18:10,000
@@ -611,6 +618,7 @@ spec:
     - engineer-2
     - engineer-3
 EOF]
+▶ Pronounced as: "Now creating the team-financial-rag Group entity."
 
 118
 00:18:20,000 --> 00:18:30,000
@@ -630,6 +638,7 @@ spec:
     - engineer-5
     - engineer-6
 EOF]
+▶ Pronounced as: "Now creating the team-riskoracle Group entity."
 
 119
 00:18:30,000 --> 00:18:40,000
@@ -638,6 +647,7 @@ Now commit all these files to their respective repositories. The GitHub catalog 
 120
 00:18:40,000 --> 00:18:50,000
 [Types: git add catalog-info.yaml && git commit -m "Add Backstage catalog definition" && git push]
+▶ Pronounced as: "Now committing and pushing the catalog file."
 
 121
 00:18:50,000 --> 00:19:00,000
@@ -662,8 +672,8 @@ See you in Segment 5.
 
 ---
 
-### SEGMENT 5: Series 7 Recap & Series 8 Preview
-**Timestamp:** 20:00 – 25:00
+SEGMENT 5: Series 7 Recap & Series 8 Preview
+Timestamp: 20:00 – 25:00
 
 ```
 126
@@ -785,8 +795,8 @@ Series 8 is the scaffolder. See you there.
 
 ---
 
-### SEGMENT 6: Deep Dive — The Platform Engineering Maturity Model
-**Timestamp:** 25:00 – 30:00
+SEGMENT 6: Deep Dive — The Platform Engineering Maturity Model
+Timestamp: 25:00 – 30:00
 
 ```
 155
@@ -896,8 +906,8 @@ See you in Segment 7.
 
 ---
 
-### SEGMENT 7: Deep Dive — Stream-Aligned Teams vs Platform Teams
-**Timestamp:** 30:00 – 35:00
+SEGMENT 7: Deep Dive — Stream-Aligned Teams vs Platform Teams
+Timestamp: 30:00 – 35:00
 
 ```
 181
@@ -987,8 +997,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: Enabling Teams & Complicated-Subsystem Teams
-**Timestamp:** 35:00 – 40:00
+SEGMENT 8: Enabling Teams & Complicated-Subsystem Teams
+Timestamp: 35:00 – 40:00
 
 ```
 202
@@ -1094,8 +1104,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Deep Dive — Golden Paths — Definition & Design Principles
-**Timestamp:** 40:00 – 45:00
+SEGMENT 9: Deep Dive — Golden Paths — Definition & Design Principles
+Timestamp: 40:00 – 45:00
 
 ```
 227
@@ -1221,8 +1231,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Golden Paths — What Falls Inside vs Outside
-**Timestamp:** 45:00 – 50:00
+SEGMENT 10: Golden Paths — What Falls Inside vs Outside
+Timestamp: 45:00 – 50:00
 
 ```
 257
@@ -1324,8 +1334,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Backstage Architecture — Frontend, Backend & Plugins
-**Timestamp:** 50:00 – 55:00
+SEGMENT 11: Backstage Architecture — Frontend, Backend & Plugins
+Timestamp: 50:00 – 55:00
 
 ```
 281
@@ -1431,8 +1441,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Backstage Installation — Detailed Walkthrough
-**Timestamp:** 55:00 – 60:00
+SEGMENT 12: Backstage Installation — Detailed Walkthrough
+Timestamp: 55:00 – 60:00
 
 ```
 306
@@ -1446,17 +1456,17 @@ Prerequisites: Node.js 18 or higher. Yarn 1.22 or higher. PostgreSQL 12 or highe
 308
 00:55:20,000 --> 00:55:30,000
 [Types: node --version]
-▶ Pronounced as: "Node, dash, dash, version"
+▶ Pronounced as: "Now checking Node.js version."
 
 309
 00:55:30,000 --> 00:55:40,000
 [Types: yarn --version]
-▶ Pronounced as: "Yarn, dash, dash, version"
+▶ Pronounced as: "Now checking Yarn version."
 
 310
 00:55:40,000 --> 00:55:50,000
 [Types: psql --version]
-▶ Pronounced as: "Psql, dash, dash, version"
+▶ Pronounced as: "Now checking PostgreSQL version."
 
 311
 00:55:50,000 --> 00:56:00,000
@@ -1465,7 +1475,7 @@ Create the Backstage app:
 312
 00:56:00,000 --> 00:56:10,000
 [Types: npx @backstage/create-app@latest]
-▶ Pronounced as: "N-P-X, at, backstage, slash, create, app, at, latest"
+▶ Pronounced as: "Now creating the Backstage app with npx."
 
 313
 00:56:10,000 --> 00:56:20,000
@@ -1478,11 +1488,12 @@ The CLI will scaffold the entire application. This takes a few minutes. The scaf
 315
 00:56:30,000 --> 00:56:40,000
 [Types: cd finops-idp]
+▶ Pronounced as: "Now changing into the finops-idp directory."
 
 316
 00:56:40,000 --> 00:56:50,000
 [Types: yarn install]
-▶ Pronounced as: "Yarn, install"
+▶ Pronounced as: "Now installing dependencies with yarn install."
 
 317
 00:56:50,000 --> 00:57:00,000
@@ -1495,6 +1506,7 @@ Now configure the environment variables. Backstage uses environment variables fo
 319
 00:57:10,000 --> 00:57:20,000
 [Types: cp .env.example .env]
+▶ Pronounced as: "Now copying the environment example file."
 
 320
 00:57:20,000 --> 00:57:30,000
@@ -1515,7 +1527,7 @@ Now start Backstage in development mode:
 324
 00:58:00,000 --> 00:58:10,000
 [Types: yarn dev]
-▶ Pronounced as: "Yarn, dev"
+▶ Pronounced as: "Now starting Backstage with yarn dev."
 
 325
 00:58:10,000 --> 00:58:20,000
@@ -1544,7 +1556,7 @@ The logs are in the terminal where you ran yarn dev. They show the backend logs.
 331
 00:59:10,000 --> 00:59:20,000
 [Types: yarn dev --check]
-▶ Pronounced as: "Yarn, dev, dash, dash, check"
+▶ Pronounced as: "Now running yarn dev --check to validate the configuration."
 
 332
 00:59:20,000 --> 00:59:30,000
@@ -1569,8 +1581,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: Backstage Configuration — app-config.yaml Deep Dive
-**Timestamp:** 60:00 – 65:00
+SEGMENT 13: Backstage Configuration — app-config.yaml Deep Dive
+Timestamp: 60:00 – 65:00
 
 ```
 337
@@ -1588,6 +1600,7 @@ The app section configures the frontend. The baseUrl is the URL where the fronte
 340
 01:00:30,000 --> 01:00:40,000
 [Types: cat app-config.yaml | head -20]
+▶ Pronounced as: "Now viewing the first 20 lines of app-config.yaml."
 
 341
 01:00:40,000 --> 01:00:50,000
@@ -1600,6 +1613,7 @@ The database section configures the database. The client is PostgreSQL. The conn
 343
 01:01:00,000 --> 01:01:10,000
 [Types: cat app-config.yaml | grep -A5 "database:"]
+▶ Pronounced as: "Now viewing the database configuration section."
 
 344
 01:01:10,000 --> 01:01:20,000
@@ -1608,6 +1622,7 @@ The integrations section configures external integrations. GitHub, GitLab, and o
 345
 01:01:20,000 --> 01:01:30,000
 [Types: cat app-config.yaml | grep -A10 "integrations:"]
+▶ Pronounced as: "Now viewing the integrations section."
 
 346
 01:01:30,000 --> 01:01:40,000
@@ -1616,6 +1631,7 @@ The auth section configures authentication. The providers section configures the
 347
 01:01:40,000 --> 01:01:50,000
 [Types: cat app-config.yaml | grep -A15 "auth:"]
+▶ Pronounced as: "Now viewing the authentication configuration."
 
 348
 01:01:50,000 --> 01:02:00,000
@@ -1624,6 +1640,7 @@ The catalog section configures the catalog. The import section configures how ca
 349
 01:02:00,000 --> 01:02:10,000
 [Types: cat app-config.yaml | grep -A20 "catalog:"]
+▶ Pronounced as: "Now viewing the catalog configuration."
 
 350
 01:02:10,000 --> 01:02:20,000
@@ -1636,6 +1653,7 @@ The scaffolder section configures the scaffolder. The gitAuthor section configur
 352
 01:02:30,000 --> 01:02:40,000
 [Types: cat app-config.yaml | grep -A5 "scaffolder:"]
+▶ Pronounced as: "Now viewing the scaffolder configuration."
 
 353
 01:02:40,000 --> 01:02:50,000
@@ -1644,6 +1662,7 @@ The kubernetes section configures the Kubernetes plugin. The cluster locator met
 354
 01:02:50,000 --> 01:03:00,000
 [Types: cat app-config.yaml | grep -A10 "kubernetes:"]
+▶ Pronounced as: "Now viewing the Kubernetes plugin configuration."
 
 355
 01:03:00,000 --> 01:03:10,000
@@ -1676,7 +1695,7 @@ The app-config.yaml file is read at startup. Changes require a restart of the Ba
 362
 01:04:10,000 --> 01:04:20,000
 [Types: yarn dev --config app-config.yaml]
-▶ Pronounced as: "Yarn, dev, dash, dash, config, app, dash, config, dot, yaml"
+▶ Pronounced as: "Now starting Backstage with a specific config file."
 
 363
 01:04:20,000 --> 01:04:30,000
@@ -1697,8 +1716,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Deep Dive — Catalog Entity Types — Component, API, Resource
-**Timestamp:** 65:00 – 70:00
+SEGMENT 14: Deep Dive — Catalog Entity Types — Component, API, Resource
+Timestamp: 65:00 – 70:00
 
 ```
 367
@@ -1743,6 +1762,7 @@ spec:
   owner: group:team-financial-rag
   system: financial-intelligence
 EOF]
+▶ Pronounced as: "Now creating the PostgreSQL Resource entity."
 
 374
 01:06:10,000 --> 01:06:20,000
@@ -1785,6 +1805,7 @@ spec:
             "200":
               description: RAG answer with source citations
 EOF]
+▶ Pronounced as: "Now creating the API entity for the financial-rag-api."
 
 376
 01:06:30,000 --> 01:06:40,000
@@ -1821,8 +1842,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: Deep Dive — Catalog Entity Types — System, Domain, Group, User
-**Timestamp:** 70:00 – 75:00
+SEGMENT 15: Deep Dive — Catalog Entity Types — System, Domain, Group, User
+Timestamp: 70:00 – 75:00
 
 ```
 384
@@ -1850,6 +1871,7 @@ spec:
   owner: group:team-financial-rag
   domain: fintech
 EOF]
+▶ Pronounced as: "Now creating the System entity for financial-intelligence."
 
 388
 01:10:40,000 --> 01:10:50,000
@@ -1871,6 +1893,7 @@ metadata:
 spec:
   owner: group:engineering-leadership
 EOF]
+▶ Pronounced as: "Now creating the Domain entity for fintech."
 
 391
 01:11:10,000 --> 01:11:20,000
@@ -1893,6 +1916,7 @@ spec:
     - platform-engineer-1
     - platform-engineer-2
 EOF]
+▶ Pronounced as: "Now creating the Group entity for the platform team."
 
 393
 01:11:30,000 --> 01:11:40,000
@@ -1915,6 +1939,7 @@ spec:
     - group:team-financial-rag
     - group:team-platform
 EOF]
+▶ Pronounced as: "Now creating the User entity."
 
 395
 01:11:50,000 --> 01:12:00,000
@@ -1955,8 +1980,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Writing catalog-info.yaml for financial-rag-agent
-**Timestamp:** 75:00 – 80:00
+SEGMENT 16: Writing catalog-info.yaml for financial-rag-agent
+Timestamp: 75:00 – 80:00
 
 ```
 404
@@ -2023,6 +2048,7 @@ spec:
   providesApis:
     - financial-rag-query-api
 EOF]
+▶ Pronounced as: "Now creating the catalog-info.yaml for financial-rag-agent."
 
 407
 01:15:30,000 --> 01:15:40,000
@@ -2085,6 +2111,7 @@ Now let's commit this file:
 [Types: git add catalog-info.yaml]
 [Types: git commit -m "Add Backstage catalog definition for financial-rag-agent"]
 [Types: git push]
+▶ Pronounced as: "Now committing and pushing the catalog file."
 
 422
 01:18:00,000 --> 01:18:10,000
@@ -2105,8 +2132,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: Writing catalog-info.yaml for riskoracle
-**Timestamp:** 80:00 – 85:00
+SEGMENT 17: Writing catalog-info.yaml for riskoracle
+Timestamp: 80:00 – 85:00
 
 ```
 426
@@ -2174,6 +2201,7 @@ spec:
   providesApis:
     - riskoracle-api
 EOF]
+▶ Pronounced as: "Now creating the catalog-info.yaml for riskoracle."
 
 430
 01:20:40,000 --> 01:20:50,000
@@ -2213,6 +2241,7 @@ spec:
   owner: group:team-riskoracle
   system: financial-intelligence
 EOF]
+▶ Pronounced as: "Now creating the PostgreSQL Resource for riskoracle."
 
 436
 01:21:40,000 --> 01:21:50,000
@@ -2231,6 +2260,7 @@ spec:
   owner: group:team-riskoracle
   system: financial-intelligence
 EOF]
+▶ Pronounced as: "Now creating the Redis Resource for riskoracle."
 
 437
 01:21:50,000 --> 01:22:00,000
@@ -2250,6 +2280,7 @@ spec:
   owner: group:team-riskoracle
   system: financial-intelligence
 EOF]
+▶ Pronounced as: "Now creating the GPU Node Group Resource for riskoracle."
 
 438
 01:22:00,000 --> 01:22:10,000
@@ -2260,6 +2291,7 @@ Now commit all these files to their respective repositories.
 [Types: git add catalog-info.yaml riskoracle-postgres.yaml riskoracle-redis.yaml riskoracle-gpu-nodegroup.yaml]
 [Types: git commit -m "Add Backstage catalog definitions for riskoracle and dependencies"]
 [Types: git push]
+▶ Pronounced as: "Now committing and pushing all catalog definitions."
 
 440
 01:22:20,000 --> 01:22:30,000
@@ -2284,8 +2316,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: GitHub Catalog Discovery Configuration
-**Timestamp:** 85:00 – 90:00
+SEGMENT 18: GitHub Catalog Discovery Configuration
+Timestamp: 85:00 – 90:00
 
 ```
 445
@@ -2315,6 +2347,7 @@ catalog:
           frequency: {minutes: 30}
           timeout: {minutes: 3}
 EOF]
+▶ Pronounced as: "Now adding GitHub catalog discovery configuration to app-config.yaml."
 
 449
 01:25:40,000 --> 01:25:50,000
@@ -2340,6 +2373,7 @@ You can also filter by repository. Add a repositories list to scan only specific
           - riskoracle
           - infrastructure
 EOF]
+▶ Pronounced as: "Now adding repository filters to the catalog discovery."
 
 454
 01:26:30,000 --> 01:26:40,000
@@ -2360,6 +2394,7 @@ The token is configured in app-config.yaml in the integrations section.
 458
 01:27:10,000 --> 01:27:20,000
 [Types: cat app-config.yaml | grep -A5 "integrations:"]
+▶ Pronounced as: "Now viewing the integrations section."
 
 459
 01:27:20,000 --> 01:27:30,000
@@ -2372,7 +2407,7 @@ Now restart Backstage to pick up the new configuration:
 461
 01:27:40,000 --> 01:27:50,000
 [Types: yarn dev]
-▶ Pronounced as: "Yarn, dev"
+▶ Pronounced as: "Now restarting Backstage with yarn dev."
 
 462
 01:27:50,000 --> 01:28:00,000
@@ -2385,6 +2420,7 @@ You can check the logs to see the discovery process:
 464
 01:28:10,000 --> 01:28:20,000
 [Types: cat ~/finops-idp/backstage.log | grep "catalog" | grep "github"]
+▶ Pronounced as: "Now checking the Backstage logs for catalog discovery activity."
 
 465
 01:28:20,000 --> 01:28:30,000
@@ -2405,8 +2441,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: Backstage Authentication — GitHub OAuth Setup
-**Timestamp:** 90:00 – 95:00
+SEGMENT 19: Backstage Authentication — GitHub OAuth Setup
+Timestamp: 90:00 – 95:00
 
 ```
 469
@@ -2447,6 +2483,7 @@ auth:
         clientId: ${GITHUB_CLIENT_ID}
         clientSecret: ${GITHUB_CLIENT_SECRET}
 EOF]
+▶ Pronounced as: "Now adding GitHub OAuth configuration to app-config.yaml."
 
 477
 01:31:20,000 --> 01:31:30,000
@@ -2456,6 +2493,7 @@ Set the environment variables:
 01:31:30,000 --> 01:31:40,000
 [Types: export GITHUB_CLIENT_ID=your-client-id]
 [Types: export GITHUB_CLIENT_SECRET=your-client-secret]
+▶ Pronounced as: "Now setting the GitHub OAuth environment variables."
 
 479
 01:31:40,000 --> 01:31:50,000
@@ -2464,7 +2502,7 @@ Now restart Backstage:
 480
 01:31:50,000 --> 01:32:00,000
 [Types: yarn dev]
-▶ Pronounced as: "Yarn, dev"
+▶ Pronounced as: "Now restarting Backstage."
 
 481
 01:32:00,000 --> 01:32:10,000
@@ -2501,8 +2539,8 @@ See you in Segment 20.
 
 ---
 
-### SEGMENT 20: Backstage Authorization — RBAC Configuration
-**Timestamp:** 95:00 – 100:00
+SEGMENT 20: Backstage Authorization — RBAC Configuration
+Timestamp: 95:00 – 100:00
 
 ```
 489
@@ -2565,6 +2603,7 @@ spec:
         - allOf:
           - subject.group: engineering
 EOF]
+▶ Pronounced as: "Now creating the permissions policy file."
 
 497
 01:36:20,000 --> 01:36:30,000
@@ -2577,6 +2616,7 @@ Apply the policy:
 499
 01:36:40,000 --> 01:36:50,000
 [Types: kubectl apply -f permissions.yaml -n backstage]
+▶ Pronounced as: "Now applying the permissions policy."
 
 500
 01:36:50,000 --> 01:37:00,000
@@ -2609,8 +2649,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Workshop — Registering Your Existing Services
-**Timestamp:** 100:00 – 105:00
+SEGMENT 21: Workshop — Registering Your Existing Services
+Timestamp: 100:00 – 105:00
 
 ```
 507
@@ -2636,6 +2676,7 @@ Step 2: Create the catalog-info.yaml file. Use the financial-rag-agent file as a
 512
 01:40:50,000 --> 01:41:00,000
 [Types: cp financial-rag-agent/catalog-info.yaml your-service/catalog-info.yaml]
+▶ Pronounced as: "Now copying the template catalog file."
 
 513
 01:41:00,000 --> 01:41:10,000
@@ -2650,6 +2691,7 @@ Step 4: Add the file to the repository. Commit and push.
 [Types: git add catalog-info.yaml]
 [Types: git commit -m "Add Backstage catalog definition for your-service"]
 [Types: git push]
+▶ Pronounced as: "Now committing and pushing the catalog file."
 
 516
 01:41:30,000 --> 01:41:40,000
@@ -2658,6 +2700,7 @@ Step 5: Wait for the catalog discovery. It runs every 30 minutes. Or trigger it 
 517
 01:41:40,000 --> 01:41:50,000
 [Types: curl -X POST http://localhost:7007/api/catalog/locations -H "Content-Type: application/json" -d '{"type":"url","target":"https://github.com/your-org/your-service/blob/main/catalog-info.yaml"}']
+▶ Pronounced as: "Now manually triggering catalog discovery."
 
 518
 01:41:50,000 --> 01:42:00,000
@@ -2674,6 +2717,7 @@ If the entity does not appear, check the logs. The logs show any errors in parsi
 521
 01:42:20,000 --> 01:42:30,000
 [Types: cat ~/finops-idp/backstage.log | grep "catalog" | grep "error"]
+▶ Pronounced as: "Now checking the logs for catalog errors."
 
 522
 01:42:30,000 --> 01:42:40,000
@@ -2719,6 +2763,7 @@ spec:
     - resource:financial-rag-postgres
     - resource:financial-rag-s3
 EOF]
+▶ Pronounced as: "Now creating the catalog file for llm-ingest."
 
 527
 01:43:20,000 --> 01:43:30,000
@@ -2739,8 +2784,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Platform Maturity Assessment — Score Your Organization
-**Timestamp:** 105:00 – 110:00
+SEGMENT 22: Platform Maturity Assessment — Score Your Organization
+Timestamp: 105:00 – 110:00
 
 ```
 531
@@ -2800,6 +2845,7 @@ Record your score. This is your baseline. Reassess after completing Series 7 thr
 [Types: echo "Date: $(date)" >> ~/finops-baseline.txt]
 [Types: echo "Score: [your score] / 20" >> ~/finops-baseline.txt]
 [Types: echo "Target: 18+ after Series 10" >> ~/finops-baseline.txt]
+▶ Pronounced as: "Now recording the maturity assessment score in the baseline document."
 
 541
 01:46:40,000 --> 01:46:50,000
@@ -2836,8 +2882,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 7 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+SEGMENT 23: Series 7 Q&A — Common Questions Answered
+Timestamp: 110:00 – 115:00
 
 ```
 549
@@ -2979,8 +3025,8 @@ See you in Segment 24.
 
 ---
 
-### SEGMENT 24: Series 7 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+SEGMENT 24: Series 7 Knowledge Check & Next Steps
+Timestamp: 115:00 – 120:00
 
 ```
 583
