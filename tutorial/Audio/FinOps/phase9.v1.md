@@ -1,11 +1,14 @@
-# Series 9: Golden Paths — Self-Service Operations via IDP
-
-## Complete 24-Segment SRT — 2 Hours
+Here is your complete Series 9 SRT with all Type: lines and their corresponding Pronounced at: lines edited to type-along, precedential style. All headers, timestamps, numbering, narrative, and command blocks remain exactly as you provided.
 
 ---
 
-### SEGMENT 1: The Day-Two Problem
-**Timestamp:** 00:00 – 05:00
+Series 9: Golden Paths — Self-Service Operations via IDP
+Complete 24-Segment SRT — 2 Hours
+
+---
+
+SEGMENT 1: The Day-Two Problem
+Timestamp: 00:00 – 05:00
 
 ```
 1
@@ -87,14 +90,17 @@ Install the Kubernetes plugin:
 20
 00:03:10,000 --> 00:03:20,000
 [Types: cd finops-idp]
+▶ Pronounced as: "Now changing into the finops-idp directory."
 
 21
 00:03:20,000 --> 00:03:30,000
 [Types: yarn --cwd packages/app add @backstage/plugin-kubernetes]
+▶ Pronounced as: "Now installing the Kubernetes frontend plugin."
 
 22
 00:03:30,000 --> 00:03:40,000
 [Types: yarn --cwd packages/backend add @backstage/plugin-kubernetes-backend]
+▶ Pronounced as: "Now installing the Kubernetes backend plugin."
 
 23
 00:03:40,000 --> 00:03:50,000
@@ -105,6 +111,7 @@ Now register the backend module:
 [Types: cat > packages/backend/src/index.ts << 'EOF'
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 EOF]
+▶ Pronounced as: "Now registering the Kubernetes backend module."
 
 25
 00:04:00,000 --> 00:04:10,000
@@ -124,6 +131,7 @@ kubernetes:
           authProvider: aws
           assumeRole: arn:aws:iam::${ACCOUNT_ID}:role/BackstageKubernetesRole
 EOF]
+▶ Pronounced as: "Now adding Kubernetes cluster configuration to app-config.yaml."
 
 27
 00:04:20,000 --> 00:04:30,000
@@ -140,8 +148,8 @@ See you in Segment 2.
 
 ---
 
-### SEGMENT 2: Kubernetes RBAC for Backstage & The Scale Template
-**Timestamp:** 05:00 – 10:00
+SEGMENT 2: Kubernetes RBAC for Backstage & The Scale Template
+Timestamp: 05:00 – 10:00
 
 ```
 30
@@ -195,6 +203,7 @@ subjects:
     name: backstage
     namespace: backstage
 EOF]
+▶ Pronounced as: "Now applying Kubernetes RBAC with kubectl apply."
 
 34
 00:05:40,000 --> 00:05:50,000
@@ -207,6 +216,7 @@ Now let's build the Scale Service template. This is the most used day-two operat
 36
 00:06:00,000 --> 00:06:10,000
 [Types: mkdir -p infrastructure/backstage/templates/operations]
+▶ Pronounced as: "Now creating the operations templates directory."
 
 37
 00:06:10,000 --> 00:06:20,000
@@ -285,6 +295,7 @@ spec:
           Reason: ${{ parameters.reason }}
           Monitor actual cost change in Kubecost within 24 hours.
 EOF]
+▶ Pronounced as: "Now creating the Scale Service template."
 
 38
 00:06:20,000 --> 00:06:30,000
@@ -326,10 +337,12 @@ catalog:
     - type: url
       target: https://github.com/your-org/infrastructure/blob/main/backstage/templates/operations/scale-service.yaml
 EOF]
+▶ Pronounced as: "Now registering the Scale Service template in app-config.yaml."
 
 47
 00:07:50,000 --> 00:08:00,000
 [Types: yarn dev]
+▶ Pronounced as: "Now restarting Backstage with yarn dev."
 
 48
 00:08:00,000 --> 00:08:10,000
@@ -346,6 +359,7 @@ Click Review. You should see the cost impact. Click Create. The deployment shoul
 51
 00:08:30,000 --> 00:08:40,000
 [Types: kubectl get deployment financial-rag-agent -n financial-rag -o json | jq '.spec.replicas']
+▶ Pronounced as: "Now verifying the deployment has scaled."
 
 52
 00:08:40,000 --> 00:08:50,000
@@ -362,8 +376,8 @@ See you in Segment 3.
 
 ---
 
-### SEGMENT 3: Rollback Template, Log Streaming & The Complete Deployment Trace
-**Timestamp:** 10:00 – 15:00
+SEGMENT 3: Rollback Template, Log Streaming & The Complete Deployment Trace
+Timestamp: 10:00 – 15:00
 
 ```
 55
@@ -434,6 +448,7 @@ spec:
           Reason: ${{ parameters.reason }}
           ArgoCD will sync within 30-60 seconds.
 EOF]
+▶ Pronounced as: "Now creating the Rollback Service template."
 
 59
 00:10:40,000 --> 00:10:50,000
@@ -504,6 +519,7 @@ export function createLogStreamRouter(): Router {
   return router;
 }
 EOF]
+▶ Pronounced as: "Now creating the log streaming backend plugin."
 
 65
 00:11:40,000 --> 00:11:50,000
@@ -516,6 +532,7 @@ import { createLogStreamRouter } from './plugins/log-stream';
 const logStreamRouter = createLogStreamRouter();
 backend.use('/api/logs', logStreamRouter);
 EOF]
+▶ Pronounced as: "Now registering the log stream router."
 
 67
 00:12:00,000 --> 00:12:10,000
@@ -556,10 +573,12 @@ Now let's verify the deployment trace worked.
 76
 00:13:30,000 --> 00:13:40,000
 [Types: kubectl get pods -n filing-classifier -o wide]
+▶ Pronounced as: "Now checking pods in the filing-classifier namespace."
 
 77
 00:13:40,000 --> 00:13:50,000
 [Types: kubectl get deployment filing-classifier -n filing-classifier -o json | jq '.spec.replicas, .spec.template.spec.tolerations']
+▶ Pronounced as: "Now checking deployment replicas and tolerations."
 
 78
 00:13:50,000 --> 00:14:00,000
@@ -576,8 +595,8 @@ See you in Segment 4.
 
 ---
 
-### SEGMENT 4: Series 9 Recap & Series 10 Preview
-**Timestamp:** 15:00 – 20:00
+SEGMENT 4: Series 9 Recap & Series 10 Preview
+Timestamp: 15:00 – 20:00
 
 ```
 81
@@ -607,10 +626,12 @@ Before moving to Series 10, verify these things.
 87
 00:16:00,000 --> 00:16:10,000
 [Types: echo "=== SERIES 9 VERIFICATION ==="]
+▶ Pronounced as: "Now starting Series 9 verification."
 
 88
 00:16:10,000 --> 00:16:20,000
 [Types: curl -s http://localhost:7007/api/kubernetes | jq .]
+▶ Pronounced as: "Now checking the Kubernetes API endpoint."
 
 89
 00:16:20,000 --> 00:16:30,000
@@ -619,6 +640,7 @@ Now, look at that output. If the Kubernetes plugin is working, you should see a 
 90
 00:16:30,000 --> 00:16:40,000
 [Types: curl -s "http://localhost:7007/api/catalog/entities?filter=kind=Template" | jq -r '.items[] | select(.metadata.name | contains("scale")) | .metadata.name']
+▶ Pronounced as: "Now checking if the scale template is registered."
 
 91
 00:16:40,000 --> 00:16:50,000
@@ -675,8 +697,8 @@ See you in Segment 5.
 
 ---
 
-### SEGMENT 5: Series 9 Knowledge Check & Next Steps
-**Timestamp:** 20:00 – 25:00
+SEGMENT 5: Series 9 Knowledge Check & Next Steps
+Timestamp: 20:00 – 25:00
 
 ```
 104
@@ -754,8 +776,8 @@ See you in Series 10.
 
 ---
 
-### SEGMENT 6: Deep Dive: Day-Two Operations — What Developers Need
-**Timestamp:** 25:00 – 30:00
+SEGMENT 6: Deep Dive: Day-Two Operations — What Developers Need
+Timestamp: 25:00 – 30:00
 
 ```
 122
@@ -845,8 +867,8 @@ See you in Segment 7.
 
 ---
 
-### SEGMENT 7: Kubernetes Plugin — Installation & Configuration
-**Timestamp:** 30:00 – 35:00
+SEGMENT 7: Kubernetes Plugin — Installation & Configuration
+Timestamp: 30:00 – 35:00
 
 ```
 143
@@ -876,10 +898,12 @@ Install the frontend plugin:
 149
 00:31:00,000 --> 00:31:10,000
 [Types: cd finops-idp]
+▶ Pronounced as: "Now changing into the finops-idp directory."
 
 150
 00:31:10,000 --> 00:31:20,000
 [Types: yarn --cwd packages/app add @backstage/plugin-kubernetes]
+▶ Pronounced as: "Now installing the Kubernetes frontend plugin."
 
 151
 00:31:20,000 --> 00:31:30,000
@@ -888,6 +912,7 @@ Install the backend plugin:
 152
 00:31:30,000 --> 00:31:40,000
 [Types: yarn --cwd packages/backend add @backstage/plugin-kubernetes-backend]
+▶ Pronounced as: "Now installing the Kubernetes backend plugin."
 
 153
 00:31:40,000 --> 00:31:50,000
@@ -898,6 +923,7 @@ Now configure the backend plugin:
 [Types: cat >> packages/backend/src/index.ts << 'EOF'
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 EOF]
+▶ Pronounced as: "Now registering the Kubernetes backend plugin."
 
 155
 00:32:00,000 --> 00:32:10,000
@@ -919,6 +945,7 @@ kubernetes:
           skipTLSVerify: false
           caData: ${K8S_CA_DATA}
 EOF]
+▶ Pronounced as: "Now adding cluster configuration to app-config.yaml."
 
 157
 00:32:20,000 --> 00:32:30,000
@@ -935,6 +962,7 @@ The cluster URL is the EKS endpoint. You can find this in the AWS console or wit
 160
 00:32:50,000 --> 00:33:00,000
 [Types: aws eks describe-cluster --name $CLUSTER_NAME --query 'cluster.endpoint' --output text]
+▶ Pronounced as: "Now getting the EKS cluster endpoint."
 
 161
 00:33:00,000 --> 00:33:10,000
@@ -943,6 +971,7 @@ The CA data is the certificate authority data. This is used to verify the cluste
 162
 00:33:10,000 --> 00:33:20,000
 [Types: aws eks describe-cluster --name $CLUSTER_NAME --query 'cluster.certificateAuthority.data' --output text]
+▶ Pronounced as: "Now getting the cluster CA data."
 
 163
 00:33:20,000 --> 00:33:30,000
@@ -951,6 +980,7 @@ Now restart Backstage:
 164
 00:33:30,000 --> 00:33:40,000
 [Types: yarn dev]
+▶ Pronounced as: "Now restarting Backstage with yarn dev."
 
 165
 00:33:40,000 --> 00:33:50,000
@@ -971,6 +1001,7 @@ You can also check the Backstage logs for errors:
 169
 00:34:20,000 --> 00:34:30,000
 [Types: kubectl logs -n backstage deployment/backstage --tail=50 | grep -i kubernetes]
+▶ Pronounced as: "Now checking Backstage logs for Kubernetes errors."
 
 170
 00:34:30,000 --> 00:34:40,000
@@ -987,8 +1018,8 @@ See you in Segment 8.
 
 ---
 
-### SEGMENT 8: Kubernetes RBAC — Service Account & ClusterRole
-**Timestamp:** 35:00 – 40:00
+SEGMENT 8: Kubernetes RBAC — Service Account & ClusterRole
+Timestamp: 35:00 – 40:00
 
 ```
 173
@@ -1018,6 +1049,7 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/BackstageKubernetesRole
 EOF]
+▶ Pronounced as: "Now creating the Backstage ServiceAccount."
 
 178
 00:35:50,000 --> 00:36:00,000
@@ -1049,6 +1081,7 @@ rules:
     resources: [horizontalpodautoscalers]
     verbs: [get, list, watch]
 EOF]
+▶ Pronounced as: "Now creating the ClusterRole with read permissions."
 
 182
 00:36:30,000 --> 00:36:40,000
@@ -1078,6 +1111,7 @@ subjects:
     name: backstage
     namespace: backstage
 EOF]
+▶ Pronounced as: "Now creating the ClusterRoleBinding."
 
 186
 00:37:10,000 --> 00:37:20,000
@@ -1090,6 +1124,7 @@ The IAM role must also have the correct permissions. Backstage uses the IAM role
 188
 00:37:30,000 --> 00:37:40,000
 [Types: aws iam attach-role-policy --role-name BackstageKubernetesRole --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess]
+▶ Pronounced as: "Now attaching the ReadOnlyAccess policy to the IAM role."
 
 189
 00:37:40,000 --> 00:37:50,000
@@ -1116,14 +1151,17 @@ For production, you should create a custom policy with only the permissions Back
   ]
 }
 EOF]
+▶ Pronounced as: "Now creating a custom IAM policy for EKS access."
 
 192
 00:38:10,000 --> 00:38:20,000
 [Types: aws iam create-policy --policy-name BackstageEKSPolicy --policy-document file:///tmp/backstage-eks-policy.json]
+▶ Pronounced as: "Now creating the IAM policy."
 
 193
 00:38:20,000 --> 00:38:30,000
 [Types: aws iam attach-role-policy --role-name BackstageKubernetesRole --policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/BackstageEKSPolicy]
+▶ Pronounced as: "Now attaching the custom policy to the IAM role."
 
 194
 00:38:30,000 --> 00:38:40,000
@@ -1144,8 +1182,8 @@ See you in Segment 9.
 
 ---
 
-### SEGMENT 9: Deep Dive: The Scale Service Template
-**Timestamp:** 40:00 – 45:00
+SEGMENT 9: Deep Dive: The Scale Service Template
+Timestamp: 40:00 – 45:00
 
 ```
 198
@@ -1167,6 +1205,7 @@ It then calculates the cost impact and applies the scale operation.
 202
 00:40:40,000 --> 00:40:50,000
 [Types: cat infrastructure/backstage/templates/operations/scale-service.yaml]
+▶ Pronounced as: "Now viewing the Scale Service template."
 
 203
 00:40:50,000 --> 00:41:00,000
@@ -1223,6 +1262,7 @@ Now let me show you how to test the template.
 216
 00:43:00,000 --> 00:43:10,000
 [Types: curl -X POST "http://localhost:7007/api/scaffolder/v2/tasks" -H "Content-Type: application/json" -d '{"templateRef":"template:default/scale-service","values":{"service_name":"financial-rag-agent","namespace":"financial-rag","replicas":5,"reason":"Traffic increase during earnings season"}}']
+▶ Pronounced as: "Now triggering the Scale Service template via API."
 
 217
 00:43:10,000 --> 00:43:20,000
@@ -1231,6 +1271,7 @@ Now, look at that output. You should see a task ID. This is the ID of the scale 
 218
 00:43:20,000 --> 00:43:30,000
 [Types: kubectl get deployment financial-rag-agent -n financial-rag -o json | jq '.spec.replicas']
+▶ Pronounced as: "Now verifying the deployment has scaled."
 
 219
 00:43:30,000 --> 00:43:40,000
@@ -1251,8 +1292,8 @@ See you in Segment 10.
 
 ---
 
-### SEGMENT 10: Scale Template — Cost Impact Calculation
-**Timestamp:** 45:00 – 50:00
+SEGMENT 10: Scale Template — Cost Impact Calculation
+Timestamp: 45:00 – 50:00
 
 ```
 223
@@ -1290,6 +1331,7 @@ The cost impact is the difference between the current cost and the new cost.
 231
 00:46:20,000 --> 00:46:30,000
 [Types: cat infrastructure/backstage/templates/operations/scale-service.yaml | grep -A5 "calculate-impact"]
+▶ Pronounced as: "Now viewing the cost impact calculation step."
 
 232
 00:46:30,000 --> 00:46:40,000
@@ -1330,6 +1372,7 @@ The cost impact is also logged. When someone asks why the bill increased, you ca
 241
 00:48:00,000 --> 00:48:10,000
 [Types: curl -s "http://localhost:7007/api/scaffolder/v2/tasks" | jq -r '.tasks[] | select(.status == "completed") | {id: .id, created: .createdAt, template: .templateRef}']
+▶ Pronounced as: "Now viewing completed scaffold tasks."
 
 242
 00:48:10,000 --> 00:48:20,000
@@ -1346,8 +1389,8 @@ See you in Segment 11.
 
 ---
 
-### SEGMENT 11: Deep Dive: The Rollback Service Template
-**Timestamp:** 50:00 – 55:00
+SEGMENT 11: Deep Dive: The Rollback Service Template
+Timestamp: 50:00 – 55:00
 
 ```
 245
@@ -1369,6 +1412,7 @@ The target revision is the Git commit SHA or image tag to roll back to.
 249
 00:50:40,000 --> 00:50:50,000
 [Types: cat infrastructure/backstage/templates/operations/rollback-service.yaml]
+▶ Pronounced as: "Now viewing the Rollback Service template."
 
 250
 00:50:50,000 --> 00:51:00,000
@@ -1397,6 +1441,7 @@ First, get the current revision of a service:
 256
 00:51:50,000 --> 00:52:00,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.sync.revision']
+▶ Pronounced as: "Now getting the current revision of the service."
 
 257
 00:52:00,000 --> 00:52:10,000
@@ -1409,6 +1454,7 @@ To roll back, you need a previous revision. You can find previous revisions in A
 259
 00:52:20,000 --> 00:52:30,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.history[] | {revision: .revision, deployedAt: .deployedAt}' | head -20]
+▶ Pronounced as: "Now getting ArgoCD history for the service."
 
 260
 00:52:30,000 --> 00:52:40,000
@@ -1421,6 +1467,7 @@ Pick a previous revision. Then trigger a rollback:
 262
 00:52:50,000 --> 00:53:00,000
 [Types: curl -X POST "http://localhost:7007/api/scaffolder/v2/tasks" -H "Content-Type: application/json" -d '{"templateRef":"template:default/rollback-service","values":{"service_name":"financial-rag-agent","target_revision":"abc123","reason":"Bad deploy — fixed in next PR"}}']
+▶ Pronounced as: "Now triggering the Rollback Service template via API."
 
 263
 00:53:00,000 --> 00:53:10,000
@@ -1429,6 +1476,7 @@ Now, look at that output. You should see a task ID. This is the ID of the rollba
 264
 00:53:10,000 --> 00:53:20,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.sync.revision']
+▶ Pronounced as: "Now verifying the rollback."
 
 265
 00:53:20,000 --> 00:53:30,000
@@ -1449,8 +1497,8 @@ See you in Segment 12.
 
 ---
 
-### SEGMENT 12: Rollback Template — ArgoCD Integration
-**Timestamp:** 55:00 – 60:00
+SEGMENT 12: Rollback Template — ArgoCD Integration
+Timestamp: 55:00 – 60:00
 
 ```
 269
@@ -1476,6 +1524,7 @@ The argocd:sync action requires ArgoCD to be installed and configured in the clu
 274
 00:55:50,000 --> 00:56:00,000
 [Types: kubectl get pods -n argocd]
+▶ Pronounced as: "Now checking if ArgoCD is running."
 
 275
 00:56:00,000 --> 00:56:10,000
@@ -1488,6 +1537,7 @@ The argocd:sync action also requires an ArgoCD token. This token is used to auth
 277
 00:56:20,000 --> 00:56:30,000
 [Types: kubectl get secret argocd-initial-admin-secret -n argocd -o json | jq -r '.data.password' | base64 -d]
+▶ Pronounced as: "Now getting the ArgoCD admin password."
 
 278
 00:56:30,000 --> 00:56:40,000
@@ -1516,6 +1566,7 @@ The rollback operation is logged in ArgoCD. You can see the sync history in the 
 284
 00:57:30,000 --> 00:57:40,000
 [Types: kubectl port-forward svc/argocd-server -n argocd 8443:443]
+▶ Pronounced as: "Now port-forwarding to the ArgoCD server."
 
 285
 00:57:40,000 --> 00:57:50,000
@@ -1544,8 +1595,8 @@ See you in Segment 13.
 
 ---
 
-### SEGMENT 13: Deep Dive: The Restart Service Template
-**Timestamp:** 60:00 – 65:00
+SEGMENT 13: Deep Dive: The Restart Service Template
+Timestamp: 60:00 – 65:00
 
 ```
 291
@@ -1615,6 +1666,7 @@ spec:
           ✅ **${{ parameters.service_name }}** restarted.
           Reason: ${{ parameters.reason }}
 EOF]
+▶ Pronounced as: "Now creating the Restart Service template."
 
 295
 01:00:40,000 --> 01:00:50,000
@@ -1643,6 +1695,7 @@ Now let me show you how to test the Restart template.
 301
 01:01:50,000 --> 01:02:00,000
 [Types: curl -X POST "http://localhost:7007/api/scaffolder/v2/tasks" -H "Content-Type: application/json" -d '{"templateRef":"template:default/restart-service","values":{"service_name":"financial-rag-agent","namespace":"financial-rag","reason":"Stuck deployment"}}']
+▶ Pronounced as: "Now triggering the Restart Service template via API."
 
 302
 01:02:00,000 --> 01:02:10,000
@@ -1651,6 +1704,7 @@ Now, look at that output. You should see a task ID. This is the ID of the restar
 303
 01:02:10,000 --> 01:02:20,000
 [Types: kubectl get deployment financial-rag-agent -n financial-rag -o json | jq '.spec.template.metadata.annotations["kubectl.kubernetes.io/restartedAt"]']
+▶ Pronounced as: "Now verifying the restart annotation."
 
 304
 01:02:20,000 --> 01:02:30,000
@@ -1663,6 +1717,7 @@ The deployment is restarting. The pods will be recreated with the new timestamp.
 306
 01:02:40,000 --> 01:02:50,000
 [Types: kubectl rollout status deployment/financial-rag-agent -n financial-rag]
+▶ Pronounced as: "Now checking the rollout status."
 
 307
 01:02:50,000 --> 01:03:00,000
@@ -1683,8 +1738,8 @@ See you in Segment 14.
 
 ---
 
-### SEGMENT 14: Deep Dive: The Log Streaming Action
-**Timestamp:** 65:00 – 70:00
+SEGMENT 14: Deep Dive: The Log Streaming Action
+Timestamp: 65:00 – 70:00
 
 ```
 311
@@ -1702,6 +1757,7 @@ The Log Streaming action is a custom backend action. It fetches logs from the Ku
 314
 01:05:30,000 --> 01:05:40,000
 [Types: cat packages/backend/src/plugins/log-stream.ts]
+▶ Pronounced as: "Now viewing the log stream plugin."
 
 315
 01:05:40,000 --> 01:05:50,000
@@ -1726,6 +1782,7 @@ Let me show you how the log streaming works.
 320
 01:06:30,000 --> 01:06:40,000
 [Types: curl -s "http://localhost:7007/api/logs/pod-logs?namespace=financial-rag&pod=financial-rag-agent-abc123&lines=50"]
+▶ Pronounced as: "Now testing the log streaming endpoint."
 
 321
 01:06:40,000 --> 01:06:50,000
@@ -1742,6 +1799,7 @@ The frontend component for log viewing displays the logs in a scrollable contain
 324
 01:07:10,000 --> 01:07:20,000
 [Types: cat packages/app/src/components/LogViewer/LogViewer.tsx]
+▶ Pronounced as: "Now viewing the LogViewer frontend component."
 
 325
 01:07:20,000 --> 01:07:30,000
@@ -1782,8 +1840,8 @@ See you in Segment 15.
 
 ---
 
-### SEGMENT 15: Log Streaming — Frontend Component
-**Timestamp:** 70:00 – 75:00
+SEGMENT 15: Log Streaming — Frontend Component
+Timestamp: 70:00 – 75:00
 
 ```
 334
@@ -1889,6 +1947,7 @@ export const LogViewer: React.FC = () => {
   );
 };
 EOF]
+▶ Pronounced as: "Now creating the LogViewer component."
 
 337
 01:10:30,000 --> 01:10:40,000
@@ -1927,6 +1986,7 @@ const serviceEntityPage = (
   </EntityLayout>
 );
 EOF]
+▶ Pronounced as: "Now adding the LogViewer to the catalog page."
 
 344
 01:11:40,000 --> 01:11:50,000
@@ -1935,6 +1995,7 @@ Now developers can view logs from any service in the catalog. No kubectl access 
 345
 01:11:50,000 --> 01:12:00,000
 [Types: curl -s "http://localhost:7007/api/logs/pods?namespace=financial-rag"]
+▶ Pronounced as: "Now testing the pods endpoint."
 
 346
 01:12:00,000 --> 01:12:10,000
@@ -1955,8 +2016,8 @@ See you in Segment 16.
 
 ---
 
-### SEGMENT 16: Deep Dive: The Pod Status Check Template
-**Timestamp:** 75:00 – 80:00
+SEGMENT 16: Deep Dive: The Pod Status Check Template
+Timestamp: 75:00 – 80:00
 
 ```
 350
@@ -2017,6 +2078,7 @@ spec:
           Pod status for ${{ parameters.service_name }}:
           [Use the Kubernetes tab in the catalog for detailed status]
 EOF]
+▶ Pronounced as: "Now creating the Pod Status template."
 
 354
 01:15:40,000 --> 01:15:50,000
@@ -2041,6 +2103,7 @@ The real value of this template is in the learning process. It shows how to inte
 359
 01:16:30,000 --> 01:16:40,000
 [Types: kubectl get pods -n financial-rag]
+▶ Pronounced as: "Now getting pods in the financial-rag namespace."
 
 360
 01:16:40,000 --> 01:16:50,000
@@ -2065,8 +2128,8 @@ See you in Segment 17.
 
 ---
 
-### SEGMENT 17: ArgoCD Plugin — Installation & Configuration
-**Timestamp:** 80:00 – 85:00
+SEGMENT 17: ArgoCD Plugin — Installation & Configuration
+Timestamp: 80:00 – 85:00
 
 ```
 365
@@ -2084,14 +2147,17 @@ Install the ArgoCD Plugin:
 368
 01:20:30,000 --> 01:20:40,000
 [Types: cd finops-idp]
+▶ Pronounced as: "Now changing into the finops-idp directory."
 
 369
 01:20:40,000 --> 01:20:50,000
 [Types: yarn --cwd packages/app add @roadiehq/backstage-plugin-argo-cd]
+▶ Pronounced as: "Now installing the ArgoCD frontend plugin."
 
 370
 01:20:50,000 --> 01:21:00,000
 [Types: yarn --cwd packages/backend add @roadiehq/backstage-plugin-argo-cd-backend]
+▶ Pronounced as: "Now installing the ArgoCD backend plugin."
 
 371
 01:21:00,000 --> 01:21:10,000
@@ -2108,6 +2174,7 @@ argocd:
           url: https://argocd.yourcompany.com
           token: ${ARGOCD_TOKEN}
 EOF]
+▶ Pronounced as: "Now adding ArgoCD configuration to app-config.yaml."
 
 373
 01:21:20,000 --> 01:21:30,000
@@ -2116,6 +2183,7 @@ The ArgoCD token is required for authentication. You can generate a token from t
 374
 01:21:30,000 --> 01:21:40,000
 [Types: kubectl get secret argocd-initial-admin-secret -n argocd -o json | jq -r '.data.password' | base64 -d]
+▶ Pronounced as: "Now getting the ArgoCD admin password."
 
 375
 01:21:40,000 --> 01:21:50,000
@@ -2137,6 +2205,7 @@ const overviewContent = (
   </Grid>
 );
 EOF]
+▶ Pronounced as: "Now adding the ArgoCD card to the catalog page."
 
 377
 01:22:00,000 --> 01:22:10,000
@@ -2145,6 +2214,7 @@ Now the catalog shows ArgoCD sync status for each service. Developers can see if
 378
 01:22:10,000 --> 01:22:20,000
 [Types: curl -s "http://localhost:7007/api/argocd/applications" | jq '.[] | {name: .metadata.name, syncStatus: .status.sync.status}']
+▶ Pronounced as: "Now testing the ArgoCD API endpoint."
 
 379
 01:22:20,000 --> 01:22:30,000
@@ -2165,8 +2235,8 @@ See you in Segment 18.
 
 ---
 
-### SEGMENT 18: ArgoCD Integration — Sync Status in Catalog
-**Timestamp:** 85:00 – 90:00
+SEGMENT 18: ArgoCD Integration — Sync Status in Catalog
+Timestamp: 85:00 – 90:00
 
 ```
 383
@@ -2188,6 +2258,7 @@ The integration uses the ArgoCD API to fetch the sync status.
 387
 01:25:40,000 --> 01:25:50,000
 [Types: curl -s "http://localhost:7007/api/argocd/applications/financial-rag-agent" | jq '{name: .metadata.name, syncStatus: .status.sync.status, healthStatus: .status.health.status}']
+▶ Pronounced as: "Now getting the sync status for financial-rag-agent."
 
 388
 01:25:50,000 --> 01:26:00,000
@@ -2212,6 +2283,7 @@ The ArgoCD card in the catalog displays this information. It also provides a lin
 393
 01:26:40,000 --> 01:26:50,000
 [Types: kubectl port-forward svc/argocd-server -n argocd 8443:443]
+▶ Pronounced as: "Now port-forwarding to the ArgoCD server."
 
 394
 01:26:50,000 --> 01:27:00,000
@@ -2232,8 +2304,8 @@ See you in Segment 19.
 
 ---
 
-### SEGMENT 19: Complete Deployment Trace — Walkthrough
-**Timestamp:** 90:00 – 95:00
+SEGMENT 19: Complete Deployment Trace — Walkthrough
+Timestamp: 90:00 – 95:00
 
 ```
 398
@@ -2267,6 +2339,7 @@ Step 1: GitHub repository is created. The repository is at https://github.com/yo
 405
 01:31:10,000 --> 01:31:20,000
 [Types: curl -s "https://api.github.com/repos/your-org/filing-classifier" | jq '.name, .description']
+▶ Pronounced as: "Now checking the GitHub repository."
 
 406
 01:31:20,000 --> 01:31:30,000
@@ -2275,6 +2348,7 @@ Step 2: Files are pushed. Dockerfile, Helm chart, CI/CD workflow, catalog-info.y
 407
 01:31:30,000 --> 01:31:40,000
 [Types: curl -s "https://api.github.com/repos/your-org/filing-classifier/contents" | jq '.[].name']
+▶ Pronounced as: "Now listing the repository contents."
 
 408
 01:31:40,000 --> 01:31:50,000
@@ -2283,6 +2357,7 @@ Step 3: S3 bucket is created with lifecycle policy.
 409
 01:31:50,000 --> 01:32:00,000
 [Types: aws s3api get-bucket-lifecycle-configuration --bucket filing-classifier-team-financial-rag-data]
+▶ Pronounced as: "Now checking the S3 bucket lifecycle policy."
 
 410
 01:32:00,000 --> 01:32:10,000
@@ -2291,6 +2366,7 @@ Step 4: ArgoCD application is created and syncing.
 411
 01:32:10,000 --> 01:32:20,000
 [Types: kubectl get application filing-classifier -n argocd -o json | jq '.status.sync.status']
+▶ Pronounced as: "Now checking the ArgoCD sync status."
 
 412
 01:32:20,000 --> 01:32:30,000
@@ -2299,6 +2375,7 @@ Step 5: Service is registered in the catalog.
 413
 01:32:30,000 --> 01:32:40,000
 [Types: curl -s "http://localhost:7007/api/catalog/entities/by-name/component/default/filing-classifier" | jq '.metadata.name']
+▶ Pronounced as: "Now checking the catalog registration."
 
 414
 01:32:40,000 --> 01:32:50,000
@@ -2327,8 +2404,8 @@ See you in Segment 20.
 
 ---
 
-### SEGMENT 20: Developer Experience — From Creation to Production
-**Timestamp:** 95:00 – 100:00
+SEGMENT 20: Developer Experience — From Creation to Production
+Timestamp: 95:00 – 100:00
 
 ```
 420
@@ -2382,6 +2459,7 @@ Now let me show you the developer experience metrics.
 [Types: echo "Tickets for infrastructure: 0"]
 [Types: echo "Kubectl access requests: 0"]
 [Types: echo "Services created via IDP: $(curl -s "http://localhost:7007/api/catalog/entities?filter=kind=Component" | jq '.items | length')"]
+▶ Pronounced as: "Now displaying developer experience metrics."
 
 432
 01:37:00,000 --> 01:37:10,000
@@ -2406,8 +2484,8 @@ See you in Segment 21.
 
 ---
 
-### SEGMENT 21: Workshop: Scaling a Service via IDP
-**Timestamp:** 100:00 – 105:00
+SEGMENT 21: Workshop: Scaling a Service via IDP
+Timestamp: 100:00 – 105:00
 
 ```
 437
@@ -2461,6 +2539,7 @@ Step 10: Verify the scale worked.
 449
 01:42:00,000 --> 01:42:10,000
 [Types: kubectl get deployment financial-rag-agent -n financial-rag -o json | jq '.spec.replicas']
+▶ Pronounced as: "Now verifying the deployment has scaled."
 
 450
 01:42:10,000 --> 01:42:20,000
@@ -2473,6 +2552,7 @@ Step 11: Scale back to 2 replicas. This is the normal state.
 452
 01:42:30,000 --> 01:42:40,000
 [Types: curl -X POST "http://localhost:7007/api/scaffolder/v2/tasks" -H "Content-Type: application/json" -d '{"templateRef":"template:default/scale-service","values":{"service_name":"financial-rag-agent","namespace":"financial-rag","replicas":2,"reason":"Revert after traffic spike"}}']
+▶ Pronounced as: "Now scaling back to 2 replicas via API."
 
 453
 01:42:40,000 --> 01:42:50,000
@@ -2481,6 +2561,7 @@ Now, look at that output. You should see a task ID. This is the ID of the scale 
 454
 01:42:50,000 --> 01:43:00,000
 [Types: kubectl get deployment financial-rag-agent -n financial-rag -o json | jq '.spec.replicas']
+▶ Pronounced as: "Now verifying the deployment has scaled back."
 
 455
 01:43:00,000 --> 01:43:10,000
@@ -2501,8 +2582,8 @@ See you in Segment 22.
 
 ---
 
-### SEGMENT 22: Workshop: Rolling Back a Service via IDP
-**Timestamp:** 105:00 – 110:00
+SEGMENT 22: Workshop: Rolling Back a Service via IDP
+Timestamp: 105:00 – 110:00
 
 ```
 459
@@ -2540,6 +2621,7 @@ Step 6: Get the current revision of the service:
 467
 01:46:20,000 --> 01:46:30,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.sync.revision']
+▶ Pronounced as: "Now getting the current revision of the service."
 
 468
 01:46:30,000 --> 01:46:40,000
@@ -2552,6 +2634,7 @@ Step 7: Get a previous revision from ArgoCD history:
 470
 01:46:50,000 --> 01:47:00,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.history[1].revision']
+▶ Pronounced as: "Now getting a previous revision from ArgoCD history."
 
 471
 01:47:00,000 --> 01:47:10,000
@@ -2580,6 +2663,7 @@ Step 12: Verify the rollback worked.
 477
 01:48:00,000 --> 01:48:10,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.sync.revision']
+▶ Pronounced as: "Now verifying the rollback."
 
 478
 01:48:10,000 --> 01:48:20,000
@@ -2592,6 +2676,7 @@ Step 13: Roll forward to the current revision. This is the normal state.
 480
 01:48:30,000 --> 01:48:40,000
 [Types: curl -X POST "http://localhost:7007/api/scaffolder/v2/tasks" -H "Content-Type: application/json" -d "{\"templateRef\":\"template:default/rollback-service\",\"values\":{\"service_name\":\"financial-rag-agent\",\"target_revision\":\"$(kubectl get application financial-rag-agent -n argocd -o json | jq -r '.status.sync.revision')\",\"reason\":\"Revert rollback\"}}"]
+▶ Pronounced as: "Now rolling forward to the current revision."
 
 481
 01:48:40,000 --> 01:48:50,000
@@ -2600,6 +2685,7 @@ Now, look at that output. You should see a task ID. This is the ID of the rollba
 482
 01:48:50,000 --> 01:49:00,000
 [Types: kubectl get application financial-rag-agent -n argocd -o json | jq '.status.sync.revision']
+▶ Pronounced as: "Now verifying the roll-forward."
 
 483
 01:49:00,000 --> 01:49:10,000
@@ -2620,8 +2706,8 @@ See you in Segment 23.
 
 ---
 
-### SEGMENT 23: Series 9 Q&A — Common Questions Answered
-**Timestamp:** 110:00 – 115:00
+SEGMENT 23: Series 9 Q&A — Common Questions Answered
+Timestamp: 110:00 – 115:00
 
 ```
 487
@@ -2711,8 +2797,8 @@ See you in Segment 24.
 
 ---
 
-### SEGMENT 24: Series 9 Knowledge Check & Next Steps
-**Timestamp:** 115:00 – 120:00
+SEGMENT 24: Series 9 Knowledge Check & Next Steps
+Timestamp: 115:00 – 120:00
 
 ```
 508
