@@ -1,0 +1,5564 @@
+1
+00:00:00,000 --> 00:00:03,500
+LECTURE 1 — FUNDAMENTALS AND THE SYSTEM BOUNDARY
+
+2
+00:00:04,500 --> 00:00:09,716
+Here's the question that decides whether you get into the room at all.
+
+3
+00:00:09,988 --> 00:00:15,605
+A Fortune five hundred procurement team opens your vendor security questionnaire, and before they
+
+4
+00:00:15,877 --> 00:00:21,494
+ask anything about your architecture, before they ask about your team, before they ask
+
+5
+00:00:21,767 --> 00:00:24,976
+a single technical question, they ask one thing.
+
+6
+00:00:25,249 --> 00:00:28,057
+Do you have a SOC two report.
+
+7
+00:00:28,329 --> 00:00:29,934
+Not are you secure.
+
+8
+00:00:30,207 --> 00:00:32,213
+Do you have the report.
+
+9
+00:00:32,485 --> 00:00:38,102
+That one distinction is the entire subject of this course, and once it clicks,
+
+10
+00:00:38,374 --> 00:00:39,979
+everything else gets easier.
+
+11
+00:00:40,252 --> 00:00:43,060
+SOC two is not a security program.
+
+12
+00:00:43,332 --> 00:00:48,949
+It is a reporting standard about a security program, built by the American Institute
+
+13
+00:00:49,222 --> 00:00:50,827
+of Certified Public Accountants.
+
+14
+00:00:51,099 --> 00:00:56,716
+An independent CPA firm examines your controls against five Trust Service Criteria and issues
+
+15
+00:00:56,988 --> 00:00:58,192
+a professional opinion.
+
+16
+00:00:58,464 --> 00:01:04,081
+And here's the part that surprises almost every engineer the first time they hear
+
+17
+00:01:04,354 --> 00:01:05,254
+it.
+
+18
+00:01:05,526 --> 00:01:07,532
+There is no fixed checklist.
+
+19
+00:01:07,804 --> 00:01:13,421
+Unlike ISO twenty seven thousand one, which hands you a fixed control set, or
+
+20
+00:01:13,694 --> 00:01:19,310
+PCI DSS, which hands you fixed requirements, SOC two gives you criteria and something
+
+21
+00:01:19,583 --> 00:01:23,194
+called points of focus, which are illustrative, not mandatory.
+
+22
+00:01:23,466 --> 00:01:25,071
+You design the controls.
+
+23
+00:01:25,343 --> 00:01:30,960
+The auditor's job is to test whether your controls satisfy the criteria, not whether
+
+24
+00:01:31,233 --> 00:01:36,448
+you match some template somebody wrote in an office in Durham, North Carolina.
+
+25
+00:01:36,721 --> 00:01:42,338
+This is why two completely different SOC two reports, from two completely different companies,
+
+26
+00:01:42,610 --> 00:01:46,221
+can both be entirely valid, while looking nothing alike.
+
+27
+00:01:46,493 --> 00:01:52,110
+And here's the second thing that changes how you think about the whole engagement.
+
+28
+00:01:52,382 --> 00:01:56,395
+The report belongs to a person, not just a company.
+
+29
+00:01:56,667 --> 00:02:02,284
+Somebody, usually your CTO, sometimes a named system owner, signs what's called a management
+
+30
+00:02:02,556 --> 00:02:03,456
+assertion.
+
+31
+00:02:03,729 --> 00:02:05,333
+It's a written claim.
+
+32
+00:02:05,606 --> 00:02:11,223
+It says the controls are suitably designed, for a Type One report, or operating
+
+33
+00:02:11,495 --> 00:02:13,902
+effectively, for a Type Two report.
+
+34
+00:02:14,175 --> 00:02:18,588
+The auditor is opining on whether that assertion is fairly stated.
+
+35
+00:02:18,860 --> 00:02:24,076
+They are not auditing your infrastructure directly, in the sense you might imagine.
+
+36
+00:02:24,348 --> 00:02:29,965
+They are testing whether the claim your own leadership made about your own system
+
+37
+00:02:30,238 --> 00:02:31,138
+holds up.
+
+38
+00:02:31,410 --> 00:02:37,027
+Get this backwards, and you will misread every single interaction with your auditor for
+
+39
+00:02:37,299 --> 00:02:39,305
+the rest of the engagement.
+
+40
+00:02:39,578 --> 00:02:45,195
+Let's talk about the five criteria, precisely, because vague explanations are how teams end
+
+41
+00:02:45,467 --> 00:02:47,072
+up over scoping later.
+
+42
+00:02:47,344 --> 00:02:52,961
+Security is the mandatory core, the common criteria, labeled C C one through C
+
+43
+00:02:53,234 --> 00:02:57,647
+C nine, and every SOC two report includes it, no exceptions.
+
+44
+00:02:57,919 --> 00:03:03,536
+Then you have four optional criteria that bolt on depending on what you actually
+
+45
+00:03:03,809 --> 00:03:04,709
+do.
+
+46
+00:03:04,981 --> 00:03:10,598
+Availability, labeled A one, is about whether your system meets its uptime and performance
+
+47
+00:03:10,870 --> 00:03:11,770
+commitments.
+
+48
+00:03:12,043 --> 00:03:17,659
+Processing Integrity, labeled P I one, is about whether your processing is complete, valid,
+
+49
+00:03:17,932 --> 00:03:19,537
+accurate, timely, and authorized.
+
+50
+00:03:19,809 --> 00:03:25,426
+Confidentiality, labeled C one, is about whether information you've designated confidential stays that way,
+
+51
+00:03:25,698 --> 00:03:28,908
+per whatever agreement you made with your customer.
+
+52
+00:03:29,180 --> 00:03:34,797
+And Privacy, labeled P one through P nine, is about whether personal information is
+
+53
+00:03:35,070 --> 00:03:40,687
+collected, used, retained, disclosed, and disposed of in a way that actually matches your
+
+54
+00:03:40,959 --> 00:03:42,163
+stated privacy notice.
+
+55
+00:03:42,435 --> 00:03:48,052
+For our reference system in this course, the Financial RAG Agent, we select all
+
+56
+00:03:48,324 --> 00:03:49,224
+five.
+
+57
+00:03:49,497 --> 00:03:51,503
+Not because more is impressive.
+
+58
+00:03:51,775 --> 00:03:55,787
+Because each one is triggered by something specific and real.
+
+59
+00:03:56,060 --> 00:04:01,676
+We have a ninety nine point nine percent uptime SLA in our enterprise contracts,
+
+60
+00:04:01,949 --> 00:04:03,554
+so Availability is triggered.
+
+61
+00:04:03,826 --> 00:04:09,443
+We process SEC filings and answer financial questions, where accuracy actually matters to someone's
+
+62
+00:04:09,715 --> 00:04:12,524
+investment decision, so Processing Integrity is triggered.
+
+63
+00:04:12,796 --> 00:04:18,413
+Users ask questions that could reveal their own investment strategy, so Confidentiality is triggered.
+
+64
+00:04:18,685 --> 00:04:23,500
+We collect user emails for API key management, so Privacy is triggered.
+
+65
+00:04:23,772 --> 00:04:29,389
+Every criteria you select needs a reason you can say out loud to an
+
+66
+00:04:29,661 --> 00:04:31,266
+auditor in one sentence.
+
+67
+00:04:31,539 --> 00:04:36,353
+If you can't produce that sentence, you probably don't need the criteria.
+
+68
+00:04:36,626 --> 00:04:42,242
+Now, briefly, Type One versus Type Two, because we'll go deep on this in
+
+69
+00:04:42,515 --> 00:04:46,928
+a later lecture, but you need the shape of it now.
+
+70
+00:04:47,201 --> 00:04:49,207
+Type One answers one question.
+
+71
+00:04:49,479 --> 00:04:54,293
+Are your controls suitably designed, as of a single point in time.
+
+72
+00:04:54,566 --> 00:04:57,374
+Type Two answers a completely different question.
+
+73
+00:04:57,647 --> 00:05:03,263
+Have your controls been operating effectively, over an observation period, typically six to twelve
+
+74
+00:05:03,536 --> 00:05:04,436
+months.
+
+75
+00:05:04,708 --> 00:05:07,116
+That's not a difference in thoroughness.
+
+76
+00:05:07,388 --> 00:05:13,005
+It's a different question, full stop, and confusing the two is the single most
+
+77
+00:05:13,277 --> 00:05:16,487
+expensive category of mistake in this entire field.
+
+78
+00:05:16,759 --> 00:05:22,376
+Here's something almost nobody teaches at this stage, and it's exactly the kind of
+
+79
+00:05:22,649 --> 00:05:28,265
+thing that separates a course written about SOC two from one written by someone
+
+80
+00:05:28,538 --> 00:05:34,155
+who has actually sat across the table from a Schellman or an A-LIGN auditor.
+
+81
+00:05:34,427 --> 00:05:36,032
+You depend on AWS.
+
+82
+00:05:36,304 --> 00:05:37,909
+You depend on OpenAI.
+
+83
+00:05:38,182 --> 00:05:39,786
+You depend on Groq.
+
+84
+00:05:40,059 --> 00:05:43,670
+What happens to those dependencies in your system description.
+
+85
+00:05:43,942 --> 00:05:49,559
+There are two paths here, and getting this wrong costs you real time later.
+
+86
+00:05:49,831 --> 00:05:55,448
+The carve out method means you exclude the subservice organization's own controls from your
+
+87
+00:05:55,721 --> 00:06:01,337
+description, and you disclose plainly that certain criteria are met using their controls, which
+
+88
+00:06:01,610 --> 00:06:07,227
+your customer's auditor, or you yourself, considers separately through the subservice organization's own report,
+
+89
+00:06:07,499 --> 00:06:12,313
+or through something called a bridge letter covering any gap in dates.
+
+90
+00:06:12,586 --> 00:06:18,203
+The inclusive method means you fold their controls directly into your own description, and
+
+91
+00:06:18,475 --> 00:06:20,481
+your auditor tests them directly.
+
+92
+00:06:20,754 --> 00:06:22,760
+Nobody does this with AWS.
+
+93
+00:06:23,032 --> 00:06:23,932
+Nobody should.
+
+94
+00:06:24,204 --> 00:06:29,821
+For AWS, you carve out, and you back that up with AWS Artifact access
+
+95
+00:06:30,094 --> 00:06:33,303
+to their own SOC two Type Two report.
+
+96
+00:06:33,576 --> 00:06:39,193
+For OpenAI and for Groq, you also carve out, backed by their own attestations
+
+97
+00:06:39,465 --> 00:06:45,082
+when they have one, and when they don't yet, which is genuinely common with
+
+98
+00:06:45,354 --> 00:06:50,971
+fast moving AI vendors, you back it with a security questionnaire and a signed
+
+99
+00:06:51,244 --> 00:06:54,854
+Data Processing Addendum, which functions as your compensating control.
+
+100
+00:06:55,127 --> 00:07:00,744
+Write this decision down explicitly, in the system boundary document itself, because auditors ask
+
+101
+00:07:01,016 --> 00:07:06,633
+for it in the very first prepared by client request, and having no answer
+
+102
+00:07:06,905 --> 00:07:10,115
+is a rough way to open an engagement.
+
+103
+00:07:10,387 --> 00:07:12,795
+Let's build the actual document now.
+
+104
+00:07:13,067 --> 00:07:15,875
+The system boundary document is exhibit A.
+
+105
+00:07:16,148 --> 00:07:21,765
+It's the first file your auditor opens, and it's the map they use to
+
+106
+00:07:22,037 --> 00:07:25,247
+understand your entire system before fieldwork even starts.
+
+107
+00:07:25,519 --> 00:07:31,136
+It has a system name, a system description, a version, a document date, and
+
+108
+00:07:31,408 --> 00:07:37,025
+a document owner, because version control on your compliance documentation is itself evidence that
+
+109
+00:07:37,298 --> 00:07:40,909
+you're managing your own program, and auditors notice that.
+
+110
+00:07:41,181 --> 00:07:46,798
+It has our subservice organization disclosure, with the carve out method stated explicitly for
+
+111
+00:07:47,070 --> 00:07:51,082
+each vendor and the specific evidence backing that carve out.
+
+112
+00:07:51,355 --> 00:07:56,972
+It has our Trust Service Criteria selection, each one paired with a one sentence
+
+113
+00:07:57,244 --> 00:08:00,855
+rationale tied to a real obligation, not a vibe.
+
+114
+00:08:01,127 --> 00:08:05,540
+And then it has the piece that actually does the work.
+
+115
+00:08:05,813 --> 00:08:11,430
+The trust service criteria mapping, which connects every single criterion to the specific file
+
+116
+00:08:11,702 --> 00:08:14,109
+in our codebase that implements it.
+
+117
+00:08:14,382 --> 00:08:19,999
+Security maps to our API key middleware, implementing control C C six point one,
+
+118
+00:08:20,271 --> 00:08:23,882
+sitting in a specific file in our API layer.
+
+119
+00:08:24,154 --> 00:08:29,771
+It maps to Vault's dynamic database credentials, also under C C six point one,
+
+120
+00:08:30,044 --> 00:08:32,451
+defined in our infrastructure as code.
+
+121
+00:08:32,723 --> 00:08:38,340
+It maps to our Cilium zero trust network policies, same control, different implementation, because
+
+122
+00:08:38,612 --> 00:08:43,828
+multiple controls can and should map to the same criterion from different angles.
+
+123
+00:08:44,100 --> 00:08:49,717
+It maps to R D S encryption at rest under C C six point
+
+124
+00:08:49,990 --> 00:08:55,607
+six, and TLS one point three on our load balancer under C C six
+
+125
+00:08:55,879 --> 00:08:56,779
+point seven.
+
+126
+00:08:57,051 --> 00:08:59,459
+This mapping is the treasure map.
+
+127
+00:08:59,731 --> 00:09:05,348
+The control is the X, the file is the location, the code is what's
+
+128
+00:09:05,620 --> 00:09:06,824
+actually buried there.
+
+129
+00:09:07,096 --> 00:09:11,108
+Validate this file the way you'd validate any infrastructure config.
+
+130
+00:09:11,381 --> 00:09:14,189
+Parse it, don't just eyeball the indentation.
+
+131
+00:09:14,462 --> 00:09:20,078
+Commit it to Git, with a message that says exactly what it is, because
+
+132
+00:09:20,351 --> 00:09:25,165
+your commit history itself becomes part of your change management evidence later.
+
+133
+00:09:25,438 --> 00:09:31,055
+This one document, done properly, with the subservice organization disclosure included from day one,
+
+134
+00:09:31,327 --> 00:09:36,944
+saves you weeks of scrambling later when an auditor asks a question you should
+
+135
+00:09:37,216 --> 00:09:39,222
+have already answered in writing.
+
+136
+00:09:39,495 --> 00:09:45,112
+Coming up next, we tackle scope, and I'm going to show you the single
+
+137
+00:09:45,384 --> 00:09:49,797
+most common mistake that costs teams weeks of wasted evidence collection.
+
+138
+00:09:50,070 --> 00:09:54,884
+Scoping something into your audit that nobody actually asked you to include.
+
+139
+00:09:55,157 --> 00:10:00,773
+Let's make the management assertion concept completely concrete, because it's the piece that unlocks
+
+140
+00:10:01,046 --> 00:10:04,255
+everything else about how these audits actually work.
+
+141
+00:10:04,528 --> 00:10:10,145
+Picture your CTO sitting down and signing a document that says, in plain language,
+
+142
+00:10:10,417 --> 00:10:16,034
+here is our system, here are the controls we have built around it, and
+
+143
+00:10:16,306 --> 00:10:20,720
+here is our claim about how well those controls actually work.
+
+144
+00:10:20,992 --> 00:10:26,609
+That signed claim is the management assertion, and it is the actual subject of
+
+145
+00:10:26,881 --> 00:10:27,781
+the audit.
+
+146
+00:10:28,054 --> 00:10:33,671
+The auditor is not wandering through your Kubernetes cluster forming their own independent opinion
+
+147
+00:10:33,943 --> 00:10:34,843
+from scratch.
+
+148
+00:10:35,115 --> 00:10:40,732
+They are testing a specific claim your own leadership already made, in writing, before
+
+149
+00:10:41,005 --> 00:10:43,011
+the auditor ever showed up.
+
+150
+00:10:43,283 --> 00:10:48,900
+This matters enormously for how you prepare, because it means the system boundary document
+
+151
+00:10:49,172 --> 00:10:54,789
+you're building right now isn't just documentation for your own team's benefit, it's the
+
+152
+00:10:55,062 --> 00:11:00,678
+first draft of exactly what your CTO is going to sign their name to
+
+153
+00:11:00,951 --> 00:11:01,851
+later.
+
+154
+00:11:02,123 --> 00:11:07,740
+Let's also talk about why the Trust Service Criteria approach, without a fixed checklist,
+
+155
+00:11:08,013 --> 00:11:13,629
+is actually the harder path in the short term but the better path in
+
+156
+00:11:13,902 --> 00:11:15,105
+the long term.
+
+157
+00:11:15,378 --> 00:11:20,995
+A fixed checklist framework tells you exactly what sixty four things to implement, and
+
+158
+00:11:21,267 --> 00:11:26,884
+you implement them, and you're done, regardless of whether any of those sixty four
+
+159
+00:11:27,156 --> 00:11:30,767
+things are actually relevant to what your system does.
+
+160
+00:11:31,040 --> 00:11:33,848
+SOC two forces you to think instead.
+
+161
+00:11:34,120 --> 00:11:39,737
+It asks, given what you specifically built, what controls does the risk profile of
+
+162
+00:11:40,010 --> 00:11:42,016
+this specific system actually require.
+
+163
+00:11:42,288 --> 00:11:43,893
+That's harder up front.
+
+164
+00:11:44,165 --> 00:11:49,782
+It's also exactly why a well built SOC two program tends to produce a
+
+165
+00:11:50,055 --> 00:11:55,671
+genuinely more secure system than a checklist compliance exercise, because you were forced to
+
+166
+00:11:55,944 --> 00:12:01,561
+reason about your own actual risk the entire way through, rather than pattern matching
+
+167
+00:12:01,833 --> 00:12:03,839
+against somebody else's generic template.
+
+168
+00:12:04,112 --> 00:12:09,728
+One more thing worth nailing down before we move to scope in the next
+
+169
+00:12:10,001 --> 00:12:10,901
+lecture.
+
+170
+00:12:11,173 --> 00:12:16,790
+Notice that our system boundary document isn't a static artifact you write once and
+
+171
+00:12:17,063 --> 00:12:17,963
+forget.
+
+172
+00:12:18,235 --> 00:12:23,852
+Every time you add a new subservice organization, every time you pick up a
+
+173
+00:12:24,124 --> 00:12:29,741
+new criterion because a new customer contract adds an availability SLA you didn't have
+
+174
+00:12:30,013 --> 00:12:35,630
+before, this document changes, and that change history itself is evidence of an actively
+
+175
+00:12:35,903 --> 00:12:41,520
+managed compliance program rather than a one time box ticking exercise performed the week
+
+176
+00:12:41,792 --> 00:12:42,996
+before an audit.
+
+177
+00:12:43,268 --> 00:12:48,885
+Auditors can tell the difference between a document that's been living and breathing in
+
+178
+00:12:49,157 --> 00:12:54,774
+your Git history for a year versus one that was authored three days before
+
+179
+00:12:55,047 --> 00:12:56,250
+the engagement started.
+
+180
+00:12:56,523 --> 00:13:02,139
+Build the habit of updating it now, and it pays for itself every single
+
+181
+00:13:02,412 --> 00:13:05,622
+audit cycle going forward, not just this one.
+
+182
+00:13:05,894 --> 00:13:11,511
+Let's talk briefly about who actually reads a SOC two report once it exists,
+
+183
+00:13:11,783 --> 00:13:16,196
+because understanding the audience changes how you write the underlying documents.
+
+184
+00:13:16,469 --> 00:13:22,086
+It is almost never read cover to cover by a curious engineer on the
+
+185
+00:13:22,358 --> 00:13:23,258
+customer's side.
+
+186
+00:13:23,531 --> 00:13:29,147
+It is read by a security reviewer on a procurement team, working through a
+
+187
+00:13:29,420 --> 00:13:35,037
+checklist of their own, cross referencing your Trust Service Criteria selection against whatever data
+
+188
+00:13:35,309 --> 00:13:38,117
+sensitivity tier your specific contract falls into.
+
+189
+00:13:38,390 --> 00:13:44,007
+If you're selling into healthcare or financial services specifically, that reviewer is looking for
+
+190
+00:13:44,279 --> 00:13:49,896
+Confidentiality and Processing Integrity in particular, and if those two criteria aren't clearly justified
+
+191
+00:13:50,168 --> 00:13:55,785
+in your system description, expect a follow up question before the deal even reaches
+
+192
+00:13:56,058 --> 00:13:56,958
+legal.
+
+193
+00:13:57,230 --> 00:14:02,847
+Writing your system boundary document with that specific reader in mind, not an abstract
+
+194
+00:14:03,119 --> 00:14:08,736
+auditor, changes what you choose to spell out explicitly versus what you leave implicit.
+
+195
+00:14:09,009 --> 00:14:13,021
+And one final grounding point before we move into scope.
+
+196
+00:14:13,293 --> 00:14:18,910
+Everything in this course maps to a real, running system, not a hypothetical one,
+
+197
+00:14:19,182 --> 00:14:24,799
+which matters because the details you're about to see, real file paths, real Terraform
+
+198
+00:14:25,072 --> 00:14:30,688
+resources, real control identifiers, are the actual difference between a course that teaches you
+
+199
+00:14:30,961 --> 00:14:36,578
+the shape of SOC two and one that hands you something you can literally
+
+200
+00:14:36,850 --> 00:14:40,862
+copy, adapt, and run against your own infrastructure starting today.
+
+201
+00:14:41,135 --> 00:14:46,751
+Keep that distinction in mind as we move faster through the next few lectures,
+
+202
+00:14:47,024 --> 00:14:52,641
+because the goal from here forward is not just understanding the concepts, it's walking
+
+203
+00:14:52,913 --> 00:14:57,728
+away with artifacts you can commit to your own repository this week.
+
+204
+00:14:59,728 --> 00:15:03,228
+LECTURE 2 — SCOPE AND DATA FLOW MAPPING
+
+205
+00:15:04,228 --> 00:15:10,122
+Scope is the decision that either saves you six weeks or costs you six
+
+206
+00:15:10,397 --> 00:15:15,449
+weeks, and there is no partial credit for getting it approximately right.
+
+207
+00:15:15,725 --> 00:15:20,356
+The principle is simple to state and genuinely hard to apply.
+
+208
+00:15:20,631 --> 00:15:23,999
+Include everything required to deliver your service commitments.
+
+209
+00:15:24,274 --> 00:15:27,221
+Exclude everything customers do not depend on.
+
+210
+00:15:27,497 --> 00:15:33,391
+Scope too wide, and you spend a month collecting evidence for systems nobody will
+
+211
+00:15:33,666 --> 00:15:34,929
+ever ask about.
+
+212
+00:15:35,205 --> 00:15:41,099
+Scope too narrow, and the auditor, not you, decides where the line should have
+
+213
+00:15:41,374 --> 00:15:47,268
+been, in the form of a finding, after fieldwork has already started, which is
+
+214
+00:15:47,544 --> 00:15:50,912
+the worst possible time to have that conversation.
+
+215
+00:15:51,187 --> 00:15:55,397
+Here's a pattern I see constantly with early stage companies.
+
+216
+00:15:55,673 --> 00:16:01,567
+A team scopes their entire staging environment into the audit boundary, because, in their
+
+217
+00:16:01,842 --> 00:16:04,368
+words, it's part of our infrastructure.
+
+218
+00:16:04,643 --> 00:16:10,538
+Three weeks later they're producing evidence for a system that has never once touched
+
+219
+00:16:10,813 --> 00:16:16,286
+customer data, and the auditor is asking, quite reasonably, why is this here.
+
+220
+00:16:16,561 --> 00:16:18,245
+The fix isn't cleverness.
+
+221
+00:16:18,521 --> 00:16:24,415
+It's writing the boundary down, explicitly, before fieldwork begins, in a document your auditor
+
+222
+00:16:24,690 --> 00:16:30,584
+reviews on day one, so the conversation about what's in and what's out happens
+
+223
+00:16:30,860 --> 00:16:32,965
+on your terms, not theirs.
+
+224
+00:16:33,240 --> 00:16:37,450
+Let's define the actual boundary for the Financial RAG Agent.
+
+225
+00:16:37,726 --> 00:16:42,778
+In scope, we have the E K S cluster running the application.
+
+226
+00:16:43,053 --> 00:16:46,421
+R D S PostgreSQL with the pgvector extension.
+
+227
+00:16:46,696 --> 00:16:48,381
+ElastiCache Redis for caching.
+
+228
+00:16:48,656 --> 00:16:51,603
+S3 buckets for backups and ingestion artifacts.
+
+229
+00:16:51,878 --> 00:16:54,404
+The E C R container registry.
+
+230
+00:16:54,680 --> 00:16:56,785
+The FastAPI application service itself.
+
+231
+00:16:57,060 --> 00:17:00,007
+The agent workers that process customer queries.
+
+232
+00:17:00,282 --> 00:17:04,072
+The ingestion cron jobs that build our knowledge base.
+
+233
+00:17:04,347 --> 00:17:06,031
+Vault for credential management.
+
+234
+00:17:06,306 --> 00:17:08,411
+Cilium for network policy enforcement.
+
+235
+00:17:08,687 --> 00:17:10,792
+Falco for runtime security monitoring.
+
+236
+00:17:11,067 --> 00:17:12,751
+ArgoCD for GitOps deployment.
+
+237
+00:17:13,026 --> 00:17:17,237
+And our full observability stack, Prometheus, Loki, Tempo, and Grafana.
+
+238
+00:17:17,512 --> 00:17:23,406
+Everything here either touches production customer data directly or supports the production service in
+
+239
+00:17:23,681 --> 00:17:27,891
+a way that would break something if it went down.
+
+240
+00:17:28,167 --> 00:17:29,430
+That's the test.
+
+241
+00:17:29,705 --> 00:17:35,599
+Out of scope, and this is where you need a real justification for each
+
+242
+00:17:35,875 --> 00:17:39,243
+exclusion, not just a wave of the hand.
+
+243
+00:17:39,518 --> 00:17:45,412
+Developer workstations are out, covered by your endpoint policy, and you should reference that
+
+244
+00:17:45,688 --> 00:17:49,477
+policy by name, not just assert it's handled somewhere.
+
+245
+00:17:49,752 --> 00:17:55,646
+Customer on premises environments are out, that's the customer's own responsibility, and it belongs
+
+246
+00:17:55,922 --> 00:17:57,606
+in your responsibility matrix.
+
+247
+00:17:57,881 --> 00:18:03,775
+OpenAI and Groq A P Is are out, covered by the vendor assessment and
+
+248
+00:18:04,050 --> 00:18:08,260
+subservice organization treatment we set up in the previous lecture.
+
+249
+00:18:08,536 --> 00:18:14,430
+The public internet between the customer and our load balancer is out, by definition,
+
+250
+00:18:14,705 --> 00:18:18,494
+because our control boundary literally starts at TLS termination.
+
+251
+00:18:18,770 --> 00:18:24,664
+And staging and development clusters are out, but only if you can actually prove
+
+252
+00:18:24,939 --> 00:18:27,465
+no customer data ever flows there.
+
+253
+00:18:27,741 --> 00:18:33,635
+If your ingestion pipeline has ever restored a production snapshot into staging for debugging,
+
+254
+00:18:33,910 --> 00:18:39,804
+that's now a data flow you have to document and defend, or a practice
+
+255
+00:18:40,080 --> 00:18:44,711
+you need to fix before you can honestly make this claim.
+
+256
+00:18:44,986 --> 00:18:50,880
+Now here's a concept that most SOC two explainers skip entirely, and it matters
+
+257
+00:18:51,156 --> 00:18:54,524
+more than half the things they do cover.
+
+258
+00:18:54,799 --> 00:18:57,325
+Complementary User Entity Controls, or CUECs.
+
+259
+00:18:57,600 --> 00:19:03,495
+Some of your controls only actually work if your customer does something on their
+
+260
+00:19:03,770 --> 00:19:04,670
+side too.
+
+261
+00:19:04,945 --> 00:19:10,839
+If a customer manages their own API key rotation internally, or is responsible for
+
+262
+00:19:11,115 --> 00:19:17,009
+restricting who on their team can call your API, that's a CUEC, a control
+
+263
+00:19:17,284 --> 00:19:23,178
+your report explicitly states the customer must implement for the overall objective to actually
+
+264
+00:19:23,454 --> 00:19:24,354
+hold.
+
+265
+00:19:24,629 --> 00:19:30,523
+Miss this distinction, and your Type Two report ends up claiming a control works
+
+266
+00:19:30,798 --> 00:19:36,693
+when it secretly depends on a customer behavior you can't observe and definitely can't
+
+267
+00:19:36,968 --> 00:19:37,868
+enforce.
+
+268
+00:19:38,143 --> 00:19:41,090
+A good auditor will ask you directly.
+
+269
+00:19:41,366 --> 00:19:47,260
+What do you expect the user entity to do, that you're not doing yourself.
+
+270
+00:19:47,535 --> 00:19:53,429
+Have that answer ready, in writing, in your trust boundary document, before they ask.
+
+271
+00:19:53,705 --> 00:19:56,652
+Let's build the trust boundary document itself.
+
+272
+00:19:56,927 --> 00:20:02,821
+We're drawing this as an actual architecture diagram, because auditors genuinely prefer something they
+
+273
+00:20:03,097 --> 00:20:08,991
+can diff in Git over a Visio export that lives on someone's desktop and
+
+274
+00:20:09,266 --> 00:20:10,529
+never gets updated.
+
+275
+00:20:10,804 --> 00:20:15,857
+Internet flows into our A L B over TLS one point three.
+
+276
+00:20:16,132 --> 00:20:22,026
+The A L B talks to our E K S cluster over Cilium's mutual
+
+277
+00:20:22,301 --> 00:20:23,201
+TLS.
+
+278
+00:20:23,477 --> 00:20:29,371
+Inside the cluster, our FastAPI service is customer facing, our agent workers process the
+
+279
+00:20:29,646 --> 00:20:35,540
+actual queries, our ingestion cron jobs build the knowledge base, our observability stack watches
+
+280
+00:20:35,816 --> 00:20:40,868
+everything, Vault manages every secret, and ArgoCD deploys every change from Git.
+
+281
+00:20:41,143 --> 00:20:47,037
+From there, TLS and mutual TLS carry traffic to R D S PostgreSQL as
+
+282
+00:20:47,313 --> 00:20:53,207
+our primary store, to ElastiCache Redis as our cache, and to S3 for backups
+
+283
+00:20:53,482 --> 00:20:54,382
+and artifacts.
+
+284
+00:20:54,658 --> 00:20:58,026
+And then, separately, our out of scope boundary.
+
+285
+00:20:58,301 --> 00:21:04,195
+OpenAI's A P I, covered by their own SOC two Type Two and our
+
+286
+00:21:04,470 --> 00:21:06,154
+executed Data Processing Addendum.
+
+287
+00:21:06,430 --> 00:21:12,324
+Groq's A P I, covered by their security questionnaire and D P A while
+
+288
+00:21:12,599 --> 00:21:15,125
+we wait on their own attestation.
+
+289
+00:21:15,401 --> 00:21:20,874
+SEC EDGAR, a public data source where no customer data is ever shared.
+
+290
+00:21:21,149 --> 00:21:27,043
+And AWS global infrastructure, covered by the AWS Shared Responsibility Model and their own
+
+291
+00:21:27,319 --> 00:21:30,687
+SOC two Type Two, accessible through AWS Artifact.
+
+292
+00:21:30,962 --> 00:21:36,856
+The single most valuable table in this entire lecture is the control at boundary
+
+293
+00:21:37,132 --> 00:21:39,658
+table, so let's build it properly.
+
+294
+00:21:39,933 --> 00:21:45,827
+Internet to A L B, inbound, TLS one point three only, evidenced by our
+
+295
+00:21:46,102 --> 00:21:49,050
+ingress annotations and a live openssl verification.
+
+296
+00:21:49,325 --> 00:21:55,219
+A L B to E K S pods, inbound, A P I key validation,
+
+297
+00:21:55,494 --> 00:21:57,599
+evidenced by our middleware logs.
+
+298
+00:21:57,875 --> 00:22:03,769
+Pod to pod, internal, Cilium mutual TLS plus network policy, evidenced by a live
+
+299
+00:22:04,044 --> 00:22:04,944
+policy query.
+
+300
+00:22:05,220 --> 00:22:11,114
+Pod to R D S, internal, TLS verify full plus Vault's dynamic credentials, evidenced
+
+301
+00:22:11,389 --> 00:22:13,494
+by PostgreSQL's own SSL status.
+
+302
+00:22:13,769 --> 00:22:19,664
+Pod to Redis, internal, TLS plus a Redis auth token, evidenced by a TLS
+
+303
+00:22:19,939 --> 00:22:21,623
+enabled redis client check.
+
+304
+00:22:21,898 --> 00:22:27,792
+Pod to S3, internal, I A M roles for service accounts plus a VPC
+
+305
+00:22:28,068 --> 00:22:32,699
+endpoint, evidenced by I A M policy and S3 access logs.
+
+306
+00:22:32,974 --> 00:22:38,868
+And pod to OpenAI, outbound, TLS one point three plus our D P A
+
+307
+00:22:39,144 --> 00:22:45,038
+and a zero retention configuration, evidenced by our A P I client's own connection
+
+308
+00:22:45,313 --> 00:22:46,213
+settings.
+
+309
+00:22:46,489 --> 00:22:52,383
+Now let's map the actual data flows, because this is where auditors find the
+
+310
+00:22:52,658 --> 00:22:54,342
+surprises nobody planned for.
+
+311
+00:22:54,617 --> 00:23:00,512
+If you don't know exactly where a piece of data goes, you cannot possibly
+
+312
+00:23:00,787 --> 00:23:04,576
+protect it, and vague answers here generate real findings.
+
+313
+00:23:04,851 --> 00:23:10,746
+Flow D F dash zero zero one is SEC filing ingestion, moving from SEC
+
+314
+00:23:11,021 --> 00:23:15,231
+EDGAR into our S3 raw bucket and then into pgvector.
+
+315
+00:23:15,506 --> 00:23:21,400
+It's classified public, because SEC filings are public documents, but it still needs real
+
+316
+00:23:21,676 --> 00:23:25,886
+integrity controls, because the risk here is accuracy, not secrecy.
+
+317
+00:23:26,161 --> 00:23:32,055
+We protect it with TLS for the download, SHA two fifty six checksum validation,
+
+318
+00:23:32,331 --> 00:23:36,120
+and idempotent processing with a file hash based deduplication.
+
+319
+00:23:36,395 --> 00:23:42,289
+Flow D F dash zero zero two is user query processing, moving from a
+
+320
+00:23:42,565 --> 00:23:48,459
+customer's A P I client through FastAPI, through pgvector, out to OpenAI, and back
+
+321
+00:23:48,734 --> 00:23:49,997
+to the customer.
+
+322
+00:23:50,272 --> 00:23:56,167
+This one is classified confidential, because a user's financial question can genuinely reveal their
+
+323
+00:23:56,442 --> 00:23:57,705
+own investment strategy.
+
+324
+00:23:57,980 --> 00:24:03,874
+We protect it with end to end TLS one point three, A P I
+
+325
+00:24:04,150 --> 00:24:09,623
+key authentication, field level encryption for anything we store, and full audit logging.
+
+326
+00:24:09,898 --> 00:24:15,792
+Flow D F dash zero zero three is analysis history storage, moving from our
+
+327
+00:24:16,068 --> 00:24:20,278
+agent workers into a dedicated table in R D S.
+
+328
+00:24:20,553 --> 00:24:26,447
+Also confidential, and it's our most heavily controlled flow, because it's effectively our audit
+
+329
+00:24:26,723 --> 00:24:27,623
+trail.
+
+330
+00:24:27,898 --> 00:24:33,792
+R D S encryption at rest, an append only table where triggers physically block
+
+331
+00:24:34,068 --> 00:24:39,962
+update and delete statements, and a hash chain across records so any tampering becomes
+
+332
+00:24:40,237 --> 00:24:41,137
+immediately detectable.
+
+333
+00:24:41,412 --> 00:24:47,307
+And flow D F dash zero zero four is database credential issuance itself, moving
+
+334
+00:24:47,582 --> 00:24:53,055
+from Vault's database secrets engine into our application pods through a sidecar agent.
+
+335
+00:24:53,330 --> 00:24:59,224
+This one is classified restricted, our highest tier, because credential compromise here has no
+
+336
+00:24:59,500 --> 00:25:00,400
+graceful degradation.
+
+337
+00:25:00,675 --> 00:25:06,569
+Credentials with a one hour time to live, injected only into in memory temp
+
+338
+00:25:06,845 --> 00:25:12,739
+file systems, never written to disk, and expiring automatically whether or not anyone remembers
+
+339
+00:25:13,014 --> 00:25:14,277
+to revoke them.
+
+340
+00:25:14,553 --> 00:25:15,816
+Classification isn't decoration.
+
+341
+00:25:16,091 --> 00:25:21,985
+Restricted, confidential, internal, public, in that order, each with real consequences for how much
+
+342
+00:25:22,260 --> 00:25:24,786
+control effort you're required to justify.
+
+343
+00:25:25,062 --> 00:25:30,956
+Get the classification right, and the rest of your control selection in the next
+
+344
+00:25:31,231 --> 00:25:32,915
+lecture becomes almost mechanical.
+
+345
+00:25:33,191 --> 00:25:39,085
+Commit both files, the trust boundary document and the data flow mapping, together, because
+
+346
+00:25:39,360 --> 00:25:45,254
+they tell one coherent story about where your fence line sits and what crosses
+
+347
+00:25:45,530 --> 00:25:46,430
+it.
+
+348
+00:25:46,705 --> 00:25:52,599
+Next lecture, we take everything we've drawn here and turn it into an actual
+
+349
+00:25:52,874 --> 00:25:58,769
+control catalog, nineteen specific controls, each one tied to a specific line of code.
+
+350
+00:25:59,044 --> 00:26:04,938
+Let's spend a moment on why data classification, specifically the four tiers we're using
+
+351
+00:26:05,213 --> 00:26:11,108
+here, restricted, confidential, internal, and public, actually changes your engineering decisions in ways that
+
+352
+00:26:11,383 --> 00:26:13,067
+matter beyond just labeling.
+
+353
+00:26:13,342 --> 00:26:19,236
+When you classify something restricted, like a database credential, you're making a statement that
+
+354
+00:26:19,512 --> 00:26:25,406
+this data has essentially zero tolerance for exposure, which is exactly why our Vault
+
+355
+00:26:25,681 --> 00:26:31,575
+issued credentials never touch disk at all, they exist purely in memory and expire
+
+356
+00:26:31,851 --> 00:26:32,751
+automatically.
+
+357
+00:26:33,026 --> 00:26:38,920
+When you classify something confidential, like a user's query history, you're saying exposure would
+
+358
+00:26:39,196 --> 00:26:45,090
+cause real harm to a specific person, which justifies field level encryption plus an
+
+359
+00:26:45,365 --> 00:26:46,628
+audit trail specifically.
+
+360
+00:26:46,903 --> 00:26:52,798
+Public data, like an SEC filing anyone can download themselves from EDGAR, doesn't need
+
+361
+00:26:53,073 --> 00:26:58,967
+secrecy controls at all, but it absolutely still needs integrity controls, because the actual
+
+362
+00:26:59,242 --> 00:27:05,137
+risk with public data usually isn't somebody stealing it, it's somebody being served a
+
+363
+00:27:05,412 --> 00:27:08,780
+corrupted or tampered version of it without realizing.
+
+364
+00:27:09,055 --> 00:27:14,949
+Here's a genuinely practical exercise worth doing with your own system before you move
+
+365
+00:27:15,225 --> 00:27:16,125
+forward.
+
+366
+00:27:16,400 --> 00:27:22,294
+Take every single data element that flows through your architecture and force yourself to
+
+367
+00:27:22,570 --> 00:27:28,464
+write down its classification, explicitly, in one sentence, the same way we did for
+
+368
+00:27:28,739 --> 00:27:30,002
+our four flows.
+
+369
+00:27:30,277 --> 00:27:36,172
+Most teams discover, doing this exercise for the first time, that they have data
+
+370
+00:27:36,447 --> 00:27:42,341
+flowing through their system that nobody had ever actually classified at all, it just
+
+371
+00:27:42,616 --> 00:27:48,511
+existed in some ambiguous state where everyone assumed somebody else had thought about it.
+
+372
+00:27:48,786 --> 00:27:54,680
+That ambiguity is exactly where audit findings come from, and exactly where real security
+
+373
+00:27:54,955 --> 00:28:00,850
+incidents come from too, because unclassified data tends to get handled with whatever level
+
+374
+00:28:01,125 --> 00:28:07,019
+of care happens to be convenient in the moment, rather than the level of
+
+375
+00:28:07,294 --> 00:28:08,978
+care it actually requires.
+
+376
+00:28:09,254 --> 00:28:15,148
+And one more layer worth adding to your trust boundary thinking, specifically for anyone
+
+377
+00:28:15,423 --> 00:28:18,791
+building on Kubernetes the way we are here.
+
+378
+00:28:19,067 --> 00:28:24,540
+Namespace boundaries are not automatically security boundaries unless you explicitly make them one.
+
+379
+00:28:24,815 --> 00:28:30,709
+Two workloads sitting in the same namespace, by default, can often reach each other
+
+380
+00:28:30,985 --> 00:28:36,879
+over the network with zero restriction at all, regardless of how carefully you've drawn
+
+381
+00:28:37,154 --> 00:28:39,259
+your architecture diagram on paper.
+
+382
+00:28:39,535 --> 00:28:45,429
+This is exactly why Cilium's network policies aren't a nice to have sitting on
+
+383
+00:28:45,704 --> 00:28:51,598
+top of our trust boundary diagram, they're the actual mechanism that makes the diagram
+
+384
+00:28:51,874 --> 00:28:54,400
+true in practice rather than aspirational.
+
+385
+00:28:54,675 --> 00:29:00,569
+Draw the fence on paper first, always, but then go verify, with a live
+
+386
+00:29:00,844 --> 00:29:06,739
+policy query, that the fence you drew is the fence that Kubernetes is actually
+
+387
+00:29:07,014 --> 00:29:08,277
+enforcing at runtime.
+
+388
+00:29:08,552 --> 00:29:14,446
+Here's a scoping question worth asking about every single component before you finalize your
+
+389
+00:29:14,722 --> 00:29:17,669
+boundary, and it's simpler than it sounds.
+
+390
+00:29:17,944 --> 00:29:23,417
+If this component disappeared tonight, would a customer notice within your SLA window.
+
+391
+00:29:23,693 --> 00:29:29,587
+If yes, it's in scope, full stop, regardless of how you've historically labeled it
+
+392
+00:29:29,862 --> 00:29:32,388
+internally as production or non production.
+
+393
+00:29:32,664 --> 00:29:38,558
+If no, and it genuinely never touches customer data even indirectly, it's a candidate
+
+394
+00:29:38,833 --> 00:29:44,727
+for exclusion, but only once you've actually verified the no touches customer data claim
+
+395
+00:29:45,002 --> 00:29:46,687
+rather than assumed it.
+
+396
+00:29:46,962 --> 00:29:52,856
+This single question, applied consistently across your entire architecture inventory, resolves the vast majority
+
+397
+00:29:53,131 --> 00:29:59,026
+of scoping ambiguity faster than any amount of theoretical discussion about what counts as
+
+398
+00:29:59,301 --> 00:30:00,201
+infrastructure.
+
+399
+00:30:00,476 --> 00:30:06,370
+Let's also address a specific edge case teams run into constantly with modern data
+
+400
+00:30:06,646 --> 00:30:07,909
+platforms like ours.
+
+401
+00:30:08,184 --> 00:30:14,078
+Your observability stack, Prometheus, Loki, Tempo, Grafana, technically doesn't process customer requests directly, so
+
+402
+00:30:14,354 --> 00:30:18,143
+it's tempting to wave it out of scope entirely.
+
+403
+00:30:18,418 --> 00:30:19,318
+Don't.
+
+404
+00:30:19,593 --> 00:30:25,487
+It absolutely belongs in scope, because it's exactly the system that produces your availability
+
+405
+00:30:25,763 --> 00:30:31,657
+and monitoring evidence, and an auditor testing your C C seven controls needs to
+
+406
+00:30:31,932 --> 00:30:37,405
+trust that the monitoring system itself is reliable and hasn't been tampered with.
+
+407
+00:30:37,681 --> 00:30:43,575
+A monitoring stack that's out of scope but is simultaneously the source of your
+
+408
+00:30:43,850 --> 00:30:49,744
+evidence for in scope controls creates a genuine logical gap in your own argument,
+
+409
+00:30:50,020 --> 00:30:55,914
+and a sharp auditor will find that gap in about thirty seconds of reading
+
+410
+00:30:56,189 --> 00:30:57,452
+your boundary document.
+
+411
+00:30:59,452 --> 00:31:02,952
+LECTURE 3 — CONTROL SELECTION
+
+412
+00:31:03,952 --> 00:31:11,515
+Control selection is where most engineers make the same instinctive mistake, and I want
+
+413
+00:31:11,807 --> 00:31:16,669
+to name it directly before we go any further.
+
+414
+00:31:16,961 --> 00:31:21,282
+The instinct is, we need all of them.
+
+415
+00:31:21,574 --> 00:31:23,195
+It feels safe.
+
+416
+00:31:23,487 --> 00:31:25,107
+It feels thorough.
+
+417
+00:31:25,399 --> 00:31:29,721
+It is completely wrong, and here's exactly why.
+
+418
+00:31:30,012 --> 00:31:37,575
+Every control you claim is something you now have to prove, forever, with evidence,
+
+419
+00:31:37,867 --> 00:31:43,269
+in every single future audit cycle, not just this one.
+
+420
+00:31:43,561 --> 00:31:51,124
+A control you don't actually need is pure maintenance burden with zero security benefit.
+
+421
+00:31:51,416 --> 00:31:58,979
+The real discipline, the thing that separates senior engineering from checkbox compliance, is this.
+
+422
+00:31:59,271 --> 00:32:06,834
+For every control you add, you name the specific criterion and the specific data
+
+423
+00:32:07,125 --> 00:32:09,286
+flow that requires it.
+
+424
+00:32:09,578 --> 00:32:13,359
+If you can't name both, cut it.
+
+425
+00:32:13,651 --> 00:32:21,214
+Let's talk about the control hierarchy precisely, because vague category names cause real confusion
+
+426
+00:32:21,506 --> 00:32:22,406
+later.
+
+427
+00:32:22,698 --> 00:32:30,261
+C C six is logical and physical access controls, and for a technical SaaS
+
+428
+00:32:30,552 --> 00:32:38,115
+company, it's genuinely the largest category, covering how you control who can get into
+
+429
+00:32:38,407 --> 00:32:41,108
+your system and your data.
+
+430
+00:32:41,400 --> 00:32:48,963
+C C seven is system operations, monitoring, incident detection, backup, and disaster recovery, the
+
+431
+00:32:49,255 --> 00:32:54,117
+controls that prove you're actually watching your own system.
+
+432
+00:32:54,408 --> 00:33:01,971
+C C eight is change management, how you ensure changes are authorized, tested, and
+
+433
+00:33:02,263 --> 00:33:08,746
+tracked, where GitOps plus branch protection does most of the heavy lifting.
+
+434
+00:33:09,037 --> 00:33:16,600
+And C C nine is risk mitigation, vendor risk management and business continuity, where
+
+435
+00:33:16,892 --> 00:33:19,593
+your vendor assessment program lives.
+
+436
+00:33:19,885 --> 00:33:27,448
+Now, here's a problem that almost every course on this topic completely ignores, and
+
+437
+00:33:27,740 --> 00:33:34,763
+it's one of the most common findings I see for early stage companies.
+
+438
+00:33:35,054 --> 00:33:36,675
+Segregation of duties.
+
+439
+00:33:36,967 --> 00:33:44,530
+C C eight point one, change management, typically wants a pattern where the person
+
+440
+00:33:44,821 --> 00:33:52,384
+who wrote the code, the person who approves it, and the person who deploys
+
+441
+00:33:52,676 --> 00:33:55,377
+it, are three different humans.
+
+442
+00:33:55,669 --> 00:34:03,232
+For a three to five person engineering team, this is genuinely hard, because those
+
+443
+00:34:03,524 --> 00:34:11,087
+roles keep collapsing onto the same two or three people no matter how you
+
+444
+00:34:11,379 --> 00:34:13,539
+organize the org chart.
+
+445
+00:34:13,831 --> 00:34:21,394
+And pretending this problem away doesn't work, because auditors literally check git blame against
+
+446
+00:34:21,686 --> 00:34:23,847
+your list of approvers.
+
+447
+00:34:24,138 --> 00:34:27,380
+There are two honest paths here.
+
+448
+00:34:27,672 --> 00:34:35,235
+One, you accept a documented compensating control, something like every production deploy becomes automatically
+
+449
+00:34:35,526 --> 00:34:43,089
+visible in a dedicated Slack channel, with a mandatory cooling period before certain higher
+
+450
+00:34:43,381 --> 00:34:50,944
+risk change types go live, giving you a detective control where you're missing a
+
+451
+00:34:51,236 --> 00:34:52,316
+preventive one.
+
+452
+00:34:52,608 --> 00:35:00,171
+Or two, you bring in a fractional or contractor reviewer specifically for security touching
+
+453
+00:35:00,463 --> 00:35:08,026
+changes, which, by the way, is a completely legitimate service a consultancy can sell,
+
+454
+00:35:08,317 --> 00:35:12,639
+not just a compliance footnote to apologize for.
+
+455
+00:35:12,931 --> 00:35:20,494
+Let's build the actual catalog, nineteen controls, each one code linked, each one with
+
+456
+00:35:20,786 --> 00:35:25,107
+a named owner and an automated evidence source.
+
+457
+00:35:25,399 --> 00:35:29,721
+Under C C six, logical and physical access.
+
+458
+00:35:30,013 --> 00:35:37,576
+C C six point one, logical access security software, implemented as A P I
+
+459
+00:35:37,867 --> 00:35:45,430
+key middleware plus Vault's role based access control plus Kubernetes R B A C,
+
+460
+00:35:45,722 --> 00:35:51,124
+evidenced daily by querying our cluster's roles and role bindings.
+
+461
+00:35:51,416 --> 00:35:58,979
+C C six point two, authenticating entities before issuing credentials, implemented as A P
+
+462
+00:35:59,271 --> 00:36:06,834
+I key provisioning that requires explicit admin approval, evidenced monthly by an A P
+
+463
+00:36:07,125 --> 00:36:08,746
+I key audit.
+
+464
+00:36:09,038 --> 00:36:16,601
+C C six point three, removing access on termination, implemented as an A P
+
+465
+00:36:16,893 --> 00:36:24,456
+I key revocation endpoint with immediate effect, no grace period, no delay, evidenced quarterly
+
+466
+00:36:24,747 --> 00:36:27,448
+by a full access review.
+
+467
+00:36:27,740 --> 00:36:35,303
+C C six point six, encryption of data at rest, implemented across four layers,
+
+468
+00:36:35,595 --> 00:36:43,158
+R D S with a customer managed K M S key, S3 with server
+
+469
+00:36:43,450 --> 00:36:51,013
+side encryption, E B S volume encryption, and field level encryption for personally identifiable
+
+470
+00:36:51,304 --> 00:36:58,867
+information inside the database itself, evidenced daily by querying R D S for its
+
+471
+00:36:59,159 --> 00:37:00,240
+encryption status.
+
+472
+00:37:00,531 --> 00:37:08,094
+C C six point seven, encryption of data in transit, implemented as TLS one
+
+473
+00:37:08,386 --> 00:37:15,949
+point three on our load balancer, mutual TLS between pods through Cilium, and TLS
+
+474
+00:37:16,241 --> 00:37:23,804
+to both R D S and Redis, evidenced daily by a live openssl handshake
+
+475
+00:37:24,096 --> 00:37:24,996
+test.
+
+476
+00:37:25,287 --> 00:37:32,850
+And C C six point eight, controls that prevent or detect unauthorized software, implemented
+
+477
+00:37:33,142 --> 00:37:40,705
+as Falco runtime security, Trivy container scanning in our C I pipeline, and cryptographic
+
+478
+00:37:40,997 --> 00:37:46,399
+image signing, evidenced daily by scanning our Falco alert logs.
+
+479
+00:37:46,691 --> 00:37:49,932
+Under C C seven, system operations.
+
+480
+00:37:50,224 --> 00:37:57,787
+C C seven point one, availability and performance, implemented as Prometheus S L O
+
+481
+00:37:58,078 --> 00:38:05,641
+tracking, PagerDuty on call escalation, horizontal pod autoscaling, and Karpenter node provisioning, evidenced daily
+
+482
+00:38:05,933 --> 00:38:09,715
+through our Grafana S L O dashboard.
+
+483
+00:38:10,006 --> 00:38:17,569
+C C seven point two, monitoring of security events, implemented as Falco alerts routed
+
+484
+00:38:17,861 --> 00:38:25,424
+through Falcosidekick into PagerDuty, Prometheus AlertManager for metric based alerts, and AWS GuardDuty for
+
+485
+00:38:25,716 --> 00:38:27,337
+cloud level monitoring.
+
+486
+00:38:27,628 --> 00:38:35,191
+C C seven point four, backup and recovery, implemented as daily Velero backups, thirty
+
+487
+00:38:35,483 --> 00:38:43,046
+day R D S snapshot retention, and quarterly restore tests that actually verify we
+
+488
+00:38:43,338 --> 00:38:48,740
+can recover, not just that a backup file exists somewhere.
+
+489
+00:38:49,032 --> 00:38:56,595
+And C C seven point five, responding to identified security incidents, implemented as version
+
+490
+00:38:56,886 --> 00:39:04,449
+controlled incident runbooks, PagerDuty escalation, and a mandatory post incident review after every single
+
+491
+00:39:04,741 --> 00:39:05,641
+event.
+
+492
+00:39:05,933 --> 00:39:09,174
+Under C C eight, change management.
+
+493
+00:39:09,466 --> 00:39:17,029
+C C eight point one, implemented as GitHub branch protection requiring two reviewers, ArgoCD
+
+494
+00:39:17,321 --> 00:39:24,884
+managing all cluster state from Git, and canary deployments to limit blast radius, with
+
+495
+00:39:25,176 --> 00:39:32,738
+our segregation of duties compensating control documented explicitly for the periods where team size
+
+496
+00:39:33,030 --> 00:39:36,272
+makes the ideal pattern genuinely impossible.
+
+497
+00:39:36,563 --> 00:39:39,805
+Under C C nine, risk mitigation.
+
+498
+00:39:40,096 --> 00:39:47,659
+C C nine point two, vendor risk management, implemented as annual vendor assessments, review
+
+499
+00:39:47,951 --> 00:39:55,514
+of subservice organization SOC two reports, executed Data Processing Addendums, and our carve out
+
+500
+00:39:55,806 --> 00:39:57,967
+documentation from Lecture One.
+
+501
+00:39:58,258 --> 00:40:03,661
+And then our four optional criteria layer directly on top.
+
+502
+00:40:03,952 --> 00:40:11,515
+A one point one, availability commitments communicated, our ninety nine point nine percent S
+
+503
+00:40:11,807 --> 00:40:16,669
+L A documented and visible on a live dashboard.
+
+504
+00:40:16,961 --> 00:40:23,983
+A one point two, environmental protections, multi A Z deployment and automatic failover.
+
+505
+00:40:24,275 --> 00:40:31,838
+P I one point one, processing integrity, our SHA two fifty six deduplication and
+
+506
+00:40:32,130 --> 00:40:35,371
+A C I D compliant transactions.
+
+507
+00:40:35,663 --> 00:40:43,226
+C one point one and C one point two, confidentiality during collection and during
+
+508
+00:40:43,518 --> 00:40:47,839
+disposal, field encryption and a documented purge process.
+
+509
+00:40:48,131 --> 00:40:55,694
+P one point one and P four point two, privacy notice communication and retention
+
+510
+00:40:55,986 --> 00:41:03,549
+and disposal policy, our thirty day query retention and a user facing deletion endpoint.
+
+511
+00:41:03,841 --> 00:41:11,404
+Notice something important here, because it's the actual design insight, not just a catalog
+
+512
+00:41:11,695 --> 00:41:12,595
+fact.
+
+513
+00:41:12,887 --> 00:41:20,450
+Our field encryption module satisfies both C C six point six and C one
+
+514
+00:41:20,742 --> 00:41:22,363
+point one simultaneously.
+
+515
+00:41:22,654 --> 00:41:28,057
+That's not a coincidence, and it's not just efficient bookkeeping.
+
+516
+00:41:28,348 --> 00:41:31,049
+It's the real design goal.
+
+517
+00:41:31,341 --> 00:41:38,904
+A control implemented well in code usually satisfies more than one criterion at once,
+
+518
+00:41:39,196 --> 00:41:46,759
+which is exactly why designing for compliance from day one is dramatically cheaper than
+
+519
+00:41:47,051 --> 00:41:54,614
+retrofitting it eighteen months later, after you've already signed your first enterprise contract and
+
+520
+00:41:54,905 --> 00:41:59,227
+the customer's legal team is asking pointed questions.
+
+521
+00:41:59,519 --> 00:42:07,082
+Nineteen controls, every single one linked to a real file, a real owner, and
+
+522
+00:42:07,374 --> 00:42:10,075
+a real automated evidence source.
+
+523
+00:42:10,366 --> 00:42:11,987
+Commit this file.
+
+524
+00:42:12,279 --> 00:42:19,842
+Next lecture, we take this catalog and we automate the proof, because a control
+
+525
+00:42:20,134 --> 00:42:27,697
+without contemporaneous evidence is just a claim, and claims are exactly what get challenged
+
+526
+00:42:27,988 --> 00:42:29,069
+in fieldwork.
+
+527
+00:42:29,360 --> 00:42:36,923
+Let's go a layer deeper on why control mapping to code, specifically, rather than
+
+528
+00:42:37,215 --> 00:42:44,778
+control mapping to a policy document, is the actual differentiator between a compliance program
+
+529
+00:42:45,070 --> 00:42:52,633
+that survives a Type Two audit and one that quietly falls apart the first
+
+530
+00:42:52,925 --> 00:42:57,246
+time an auditor asks a follow up question.
+
+531
+00:42:57,538 --> 00:43:04,561
+A policy document that says we encrypt data at rest is a claim.
+
+532
+00:43:04,853 --> 00:43:12,416
+A Terraform resource block that provisions a KMS key and attaches it to your
+
+533
+00:43:12,707 --> 00:43:20,270
+RDS instance is proof, because it either exists in your infrastructure or it doesn't,
+
+534
+00:43:20,562 --> 00:43:28,125
+and there's no interpretation gap between what the document says and what's actually running
+
+535
+00:43:28,417 --> 00:43:29,497
+in production.
+
+536
+00:43:29,789 --> 00:43:37,352
+Every single control in our catalog is deliberately anchored to a specific file, a
+
+537
+00:43:37,644 --> 00:43:45,207
+specific class, a specific method, precisely so that the gap between claim and reality
+
+538
+00:43:45,499 --> 00:43:50,901
+can never quietly widen without somebody noticing in code review.
+
+539
+00:43:51,192 --> 00:43:58,755
+Let's also talk honestly about control fatigue, because it's a real failure mode for
+
+540
+00:43:59,047 --> 00:44:03,909
+growing teams that nobody warns you about early enough.
+
+541
+00:44:04,201 --> 00:44:11,764
+As your system grows, the number of controls you're formally tracking grows too, and
+
+542
+00:44:12,056 --> 00:44:19,619
+at some point, without deliberate maintenance, your control catalog starts drifting away from what
+
+543
+00:44:19,910 --> 00:44:22,071
+your system actually does.
+
+544
+00:44:22,363 --> 00:44:29,926
+A control might reference a file that got refactored eighteen months ago and moved
+
+545
+00:44:30,218 --> 00:44:31,838
+somewhere else entirely.
+
+546
+00:44:32,130 --> 00:44:36,452
+The owner listed might have left the company.
+
+547
+00:44:36,744 --> 00:44:42,686
+The automated evidence command might reference a tool you've since replaced.
+
+548
+00:44:42,978 --> 00:44:50,541
+This is exactly why the owner field on every control isn't bureaucratic overhead, it's
+
+549
+00:44:50,832 --> 00:44:58,395
+a living pointer to a specific human whose job includes noticing when their control's
+
+550
+00:44:58,687 --> 00:45:06,250
+implementation has drifted, and updating the catalog before an auditor discovers the drift for
+
+551
+00:45:06,542 --> 00:45:08,163
+you during fieldwork.
+
+552
+00:45:08,454 --> 00:45:11,696
+One more genuinely useful habit here.
+
+553
+00:45:11,987 --> 00:45:19,550
+Whenever you ship a meaningful architecture change, ask explicitly, in the pull request itself,
+
+554
+00:45:19,842 --> 00:45:24,704
+does this change touch any control in our catalog.
+
+555
+00:45:24,996 --> 00:45:32,559
+Teams that build this question into their normal PR template, right alongside the usual
+
+556
+00:45:32,851 --> 00:45:40,414
+does this need a migration or does this need a runbook update, tend to
+
+557
+00:45:40,705 --> 00:45:48,268
+walk into their Type Two renewal with a control catalog that's still accurate, rather
+
+558
+00:45:48,560 --> 00:45:56,123
+than discovering during fieldwork that half their evidence commands are now pointing at files
+
+559
+00:45:56,415 --> 00:45:58,576
+that no longer exist.
+
+560
+00:45:58,867 --> 00:46:06,430
+That single habit, treated as seriously as any other engineering discipline, is worth more
+
+561
+00:46:06,722 --> 00:46:12,124
+than almost any other single practice in this entire lecture.
+
+562
+00:46:12,416 --> 00:46:19,979
+Let's talk about ordering, specifically which controls to implement first if you're starting completely
+
+563
+00:46:20,271 --> 00:46:27,834
+from zero rather than retrofitting an existing system the way we're doing here with
+
+564
+00:46:28,126 --> 00:46:30,286
+an already built platform.
+
+565
+00:46:30,578 --> 00:46:38,141
+Access controls first, always, because C C six failures are the single most common
+
+566
+00:46:38,433 --> 00:46:45,996
+Type One finding across the industry, and they're also usually the cheapest to fix,
+
+567
+00:46:46,288 --> 00:46:53,851
+an API key middleware and role based access control policy can genuinely be built
+
+568
+00:46:54,142 --> 00:46:57,924
+in a single sprint by one engineer.
+
+569
+00:46:58,216 --> 00:47:05,779
+Encryption second, because it's largely infrastructure configuration rather than new application logic, a KMS
+
+570
+00:47:06,070 --> 00:47:10,932
+key and a Terraform flag flip, not a redesign.
+
+571
+00:47:11,224 --> 00:47:18,787
+Change management third, because it requires organizational buy in around branch protection and review
+
+572
+00:47:19,079 --> 00:47:26,642
+requirements, which takes longer to actually stick as a habit than it takes to
+
+573
+00:47:26,934 --> 00:47:29,635
+configure in GitHub's settings panel.
+
+574
+00:47:29,926 --> 00:47:37,489
+And monitoring and backup last in this rough sequence, not because they matter less,
+
+575
+00:47:37,781 --> 00:47:45,344
+but because they benefit from having a stable, access controlled, encrypted system already in
+
+576
+00:47:45,636 --> 00:47:51,578
+place to actually monitor and back up in the first place.
+
+577
+00:47:51,870 --> 00:47:56,732
+One more genuinely underappreciated point about control ownership specifically.
+
+578
+00:47:57,024 --> 00:48:04,587
+Assign owners by function, not by individual name, wherever your team size allows it.
+
+579
+00:48:04,878 --> 00:48:12,441
+At sign security team owns CC6.8 reads very differently in your control catalog eighteen
+
+580
+00:48:12,733 --> 00:48:20,296
+months from now than at Jamie owns CC6.8, because Jamie leaves companies, teams reorganize,
+
+581
+00:48:20,588 --> 00:48:28,151
+and a control catalog anchored to individual names quietly becomes stale the moment any
+
+582
+00:48:28,443 --> 00:48:30,603
+single person changes roles.
+
+583
+00:48:30,895 --> 00:48:38,458
+Anchor ownership to the function that will always exist in some form, security team,
+
+584
+00:48:38,750 --> 00:48:46,313
+platform team, compliance team, and let whoever currently holds that function inherit the responsibility
+
+585
+00:48:46,605 --> 00:48:54,168
+automatically, without anyone needing to remember to update nineteen separate YAML entries the next
+
+586
+00:48:54,459 --> 00:48:57,160
+time your org chart shifts.
+
+587
+00:48:59,160 --> 00:49:02,660
+LECTURE 4 — EVIDENCE AUTOMATION
+
+588
+00:49:03,660 --> 00:49:12,333
+Here's the uncomfortable truth about SOC two audits that almost nobody says out loud
+
+589
+00:49:12,624 --> 00:49:15,102
+until it's too late.
+
+590
+00:49:15,393 --> 00:49:19,109
+Controls almost never fail an audit.
+
+591
+00:49:19,401 --> 00:49:20,640
+Evidence does.
+
+592
+00:49:20,931 --> 00:49:29,603
+The finding you actually see, again and again, reads something like, evidence was not
+
+593
+00:49:29,894 --> 00:49:31,133
+collected contemporaneously.
+
+594
+00:49:31,424 --> 00:49:40,096
+What that really means is somebody reconstructed proof after the fact from a screenshot,
+
+595
+00:49:40,388 --> 00:49:49,060
+and a screenshot from memory is always weaker, in an auditor's eyes, than a
+
+596
+00:49:49,351 --> 00:49:55,545
+system generated log with a real timestamp attached to it.
+
+597
+00:49:55,837 --> 00:50:00,792
+The fix isn't more discipline from your team.
+
+598
+00:50:01,083 --> 00:50:07,897
+It's automation that runs whether or not anyone remembers it exists.
+
+599
+00:50:08,188 --> 00:50:09,088
+Nightly.
+
+600
+00:50:09,380 --> 00:50:10,280
+Unattended.
+
+601
+00:50:10,571 --> 00:50:11,471
+Immutable.
+
+602
+00:50:11,762 --> 00:50:14,859
+Let's build the actual pipeline.
+
+603
+00:50:15,150 --> 00:50:23,823
+A GitHub Actions workflow, triggered on a cron schedule at midnight U T C
+
+604
+00:50:24,114 --> 00:50:32,786
+every single day, plus a manual dispatch trigger for whenever you need evidence on
+
+605
+00:50:33,077 --> 00:50:33,977
+demand.
+
+606
+00:50:34,268 --> 00:50:42,941
+Two design decisions here matter enough to slow down and actually explain, and everything
+
+607
+00:50:43,232 --> 00:50:46,948
+else can scroll past as configuration.
+
+608
+00:50:47,240 --> 00:50:49,717
+The first is authentication.
+
+609
+00:50:50,009 --> 00:50:58,681
+We use OpenID Connect through configure aws credentials, which means the workflow assumes an
+
+610
+00:50:58,972 --> 00:51:07,644
+I A M role directly, and there are no long lived AWS access keys
+
+611
+00:51:07,935 --> 00:51:16,608
+sitting in GitHub secrets, quietly waiting for someone to leak them in a public
+
+612
+00:51:16,899 --> 00:51:19,996
+repo or a support ticket.
+
+613
+00:51:20,287 --> 00:51:28,959
+This is worth calling out explicitly, because it's not just good practice, it's literally
+
+614
+00:51:29,251 --> 00:51:35,445
+itself a piece of C C six point one evidence.
+
+615
+00:51:35,736 --> 00:51:40,072
+The workflow doesn't just implement the control.
+
+616
+00:51:40,363 --> 00:51:43,461
+The workflow is the control.
+
+617
+00:51:43,752 --> 00:51:46,230
+The second is organization.
+
+618
+00:51:46,521 --> 00:51:54,574
+Evidence lands in S3 organized strictly by date, not by workflow run number.
+
+619
+00:51:54,865 --> 00:52:03,537
+That distinction matters enormously later, because when a Type Two auditor samples March fifteenth
+
+620
+00:52:03,828 --> 00:52:12,500
+specifically, they get exactly one clean folder for that day, not a search through
+
+621
+00:52:12,792 --> 00:52:21,464
+hundreds of historical workflow runs trying to figure out which one corresponds to which
+
+622
+00:52:21,755 --> 00:52:22,994
+calendar date.
+
+623
+00:52:23,285 --> 00:52:30,718
+Inside the workflow, we collect evidence control by control, every single night.
+
+624
+00:52:31,010 --> 00:52:39,682
+For C C six point one, we capture our R B A C configuration
+
+625
+00:52:39,973 --> 00:52:46,787
+directly from the cluster, roles and role bindings, in full YAML.
+
+626
+00:52:47,078 --> 00:52:55,750
+For C C six point six, we query R D S for its encryption
+
+627
+00:52:56,041 --> 00:53:04,714
+status and its K M S key rotation status, proving both that encryption is
+
+628
+00:53:05,005 --> 00:53:12,438
+on and that the keys behind it are actually rotating on schedule.
+
+629
+00:53:12,729 --> 00:53:21,402
+For C C six point seven, we run a live TLS handshake against our
+
+630
+00:53:21,693 --> 00:53:30,365
+production endpoint, forcing TLS one point three specifically, and we capture the protocol, cipher,
+
+631
+00:53:30,656 --> 00:53:32,514
+and verification result.
+
+632
+00:53:32,806 --> 00:53:41,478
+For C C seven point one, we capture our horizontal pod autoscaler status and
+
+633
+00:53:41,769 --> 00:53:50,441
+our pod disruption budget status, proving our availability controls are actually configured, not just
+
+634
+00:53:50,732 --> 00:53:51,971
+documented somewhere.
+
+635
+00:53:52,262 --> 00:54:00,935
+For C C seven point two, we capture our full set of Prometheus alerting
+
+636
+00:54:01,226 --> 00:54:02,126
+rules.
+
+637
+00:54:02,417 --> 00:54:11,089
+For C C seven point four, we capture our automated R D S snapshots
+
+638
+00:54:11,380 --> 00:54:14,478
+from the last seven days.
+
+639
+00:54:14,769 --> 00:54:23,441
+And for C C eight point one, we query GitHub's A P I directly
+
+640
+00:54:23,732 --> 00:54:32,404
+for every merged pull request, capturing who authored it, who approved it, and exactly
+
+641
+00:54:32,696 --> 00:54:38,890
+when it merged, a complete and tamper evident change history.
+
+642
+00:54:39,181 --> 00:54:47,854
+Every night, all of that gets bundled into a manifest, a single JSON file
+
+643
+00:54:48,145 --> 00:54:56,817
+recording the date, an exact timestamp, which workflow run produced it, which controls were
+
+644
+00:54:57,108 --> 00:55:00,205
+covered, and an overall status.
+
+645
+00:55:00,496 --> 00:55:09,169
+Then everything syncs to S3 with server side encryption using our own customer managed
+
+646
+00:55:09,460 --> 00:55:11,938
+K M S key.
+
+647
+00:55:12,229 --> 00:55:20,901
+And now, here's the part that turns this from a nice automation script into
+
+648
+00:55:21,192 --> 00:55:29,864
+genuinely bulletproof evidence, and it's also the part with a real gotcha that nobody
+
+649
+00:55:30,156 --> 00:55:33,872
+warns you about ahead of time.
+
+650
+00:55:34,163 --> 00:55:42,836
+We provision this bucket with S3 Object Lock enabled, and Object Lock has to
+
+651
+00:55:43,127 --> 00:55:46,844
+be turned on at bucket creation.
+
+652
+00:55:47,135 --> 00:55:55,807
+You cannot add it later, full stop, so get this right the first time.
+
+653
+00:55:56,098 --> 00:56:04,770
+We configure it in compliance mode, with a retention period of twenty five fifty
+
+654
+00:56:05,062 --> 00:56:07,539
+five days, seven years.
+
+655
+00:56:07,830 --> 00:56:12,786
+Compliance mode means exactly what it sounds like.
+
+656
+00:56:13,077 --> 00:56:21,749
+Once an object is locked under this mode, no principal whatsoever, not the account
+
+657
+00:56:22,041 --> 00:56:30,713
+root user, not even AWS Support acting on your behalf, can shorten that retention
+
+658
+00:56:31,004 --> 00:56:35,960
+period or delete the object before it expires.
+
+659
+00:56:36,251 --> 00:56:44,923
+That's genuinely the entire point, because it means your evidence is defensible even against
+
+660
+00:56:45,214 --> 00:56:53,886
+a worst case insider threat scenario, someone with root access trying to cover their
+
+661
+00:56:54,178 --> 00:56:55,416
+own tracks.
+
+662
+00:56:55,708 --> 00:57:04,380
+But here's the gotcha, stated plainly, because this is exactly the kind of detail
+
+663
+00:57:04,671 --> 00:57:13,343
+that only shows up after you've actually made this mistake once, or watched someone
+
+664
+00:57:13,634 --> 00:57:15,493
+else make it.
+
+665
+00:57:15,784 --> 00:57:20,120
+Compliance mode is a one way door.
+
+666
+00:57:20,411 --> 00:57:23,508
+There is no undo button.
+
+667
+00:57:23,800 --> 00:57:32,472
+A misconfigured seven year retention period on the wrong bucket is a mistake you
+
+668
+00:57:32,763 --> 00:57:38,338
+cannot fix, only wait out, for seven full years.
+
+669
+00:57:38,629 --> 00:57:47,301
+So test this thoroughly, end to end, in a completely disposable throwaway bucket first.
+
+670
+00:57:47,593 --> 00:57:55,645
+Never validate compliance mode directly against the bucket you actually intend to keep.
+
+671
+00:57:55,937 --> 00:58:04,609
+AWS gives you governance mode specifically as the reversible alternative, use that everywhere in
+
+672
+00:58:04,900 --> 00:58:13,572
+staging, and only flip to compliance mode in production once you've validated the entire
+
+673
+00:58:13,863 --> 00:58:16,961
+pipeline works exactly as intended.
+
+674
+00:58:17,252 --> 00:58:21,588
+Let's verify the whole thing actually works.
+
+675
+00:58:21,879 --> 00:58:24,357
+Trigger the workflow manually.
+
+676
+00:58:24,648 --> 00:58:33,320
+Watch evidence land in S3, organized cleanly by today's date, one folder per control.
+
+677
+00:58:33,611 --> 00:58:42,284
+And then run the actual immutability test that proves this isn't just theoretical protection.
+
+678
+00:58:42,575 --> 00:58:48,150
+Try to delete a file from that locked bucket.
+
+679
+00:58:48,441 --> 00:58:56,494
+It should fail, loudly, with access denied, object is locked in compliance mode.
+
+680
+00:58:56,785 --> 00:59:00,502
+That failure is the entire point.
+
+681
+00:59:00,793 --> 00:59:09,465
+That's your immutable audit trail working exactly as designed, and it's the single strongest
+
+682
+00:59:09,756 --> 00:59:18,428
+piece of infrastructure you'll build in this entire phase, because from this point forward,
+
+683
+00:59:18,720 --> 00:59:26,772
+evidence collection is no longer something your team has to remember to do.
+
+684
+00:59:27,064 --> 00:59:32,639
+It happens whether anyone thinks about it or not.
+
+685
+00:59:32,930 --> 00:59:37,266
+Commit the workflow and the Terraform together.
+
+686
+00:59:37,557 --> 00:59:46,229
+Next lecture, we tackle a decision that costs real companies real deals when they
+
+687
+00:59:46,520 --> 00:59:48,379
+get it wrong.
+
+688
+00:59:48,670 --> 00:59:56,103
+Type One or Type Two, and exactly when to choose each one.
+
+689
+00:59:56,394 --> 01:00:05,067
+Let's talk about a failure mode in evidence automation that's genuinely common and genuinely
+
+690
+01:00:05,358 --> 01:00:14,030
+avoidable, which is treating the nightly workflow itself as if it were infallible simply
+
+691
+01:00:14,321 --> 01:00:16,180
+because it's automated.
+
+692
+01:00:16,471 --> 01:00:25,143
+Automation removes the human forgetting to do something, but it introduces a new risk,
+
+693
+01:00:25,434 --> 01:00:34,106
+silent failure, where the workflow runs, appears green in your GitHub Actions history, and
+
+694
+01:00:34,398 --> 01:00:43,070
+quietly produces an empty or malformed evidence file because some upstream command failed in
+
+695
+01:00:43,361 --> 01:00:48,316
+a way the workflow didn't explicitly check for.
+
+696
+01:00:48,608 --> 01:00:57,280
+This is exactly why our evidence assembly script, which we'll build properly in a
+
+697
+01:00:57,571 --> 01:01:06,243
+later lecture, includes real validation logic rather than trusting that a workflow marked successful
+
+698
+01:01:06,534 --> 01:01:09,012
+actually produced meaningful evidence.
+
+699
+01:01:09,303 --> 01:01:13,020
+Automated does not mean unattended forever.
+
+700
+01:01:13,311 --> 01:01:21,983
+It means the human attention moves from doing the collection to monitoring whether the
+
+701
+01:01:22,275 --> 01:01:24,133
+collection actually worked.
+
+702
+01:01:24,424 --> 01:01:33,096
+Let's also talk about retention strategy beyond just the seven year Object Lock period,
+
+703
+01:01:33,388 --> 01:01:42,060
+because seven years of daily evidence, uncompressed, across every control, adds up to real
+
+704
+01:01:42,351 --> 01:01:51,023
+storage cost over time, and a genuinely senior implementation thinks about lifecycle policy from
+
+705
+01:01:51,314 --> 01:01:58,128
+day one rather than discovering the cost problem two years in.
+
+706
+01:01:58,419 --> 01:02:07,092
+A sensible pattern here is tiering by age, keeping the most recent observation period's
+
+707
+01:02:07,383 --> 01:02:16,055
+evidence in standard S3 storage for fast auditor access, then transitioning older evidence, past
+
+708
+01:02:16,346 --> 01:02:25,018
+your current audit cycle, into Glacier or Glacier Deep Archive, where retrieval is slower
+
+709
+01:02:25,310 --> 01:02:33,982
+but storage cost drops enormously, while the Object Lock retention clock keeps running regardless
+
+710
+01:02:34,273 --> 01:02:36,131
+of storage class.
+
+711
+01:02:36,423 --> 01:02:45,095
+You're not deleting anything early, compliance mode wouldn't let you anyway, you're just being
+
+712
+01:02:45,386 --> 01:02:48,483
+deliberate about where it lives.
+
+713
+01:02:48,774 --> 01:02:57,447
+And here's a smaller but genuinely important detail about the Slack alerting step in
+
+714
+01:02:57,738 --> 01:02:58,977
+our workflow.
+
+715
+01:02:59,268 --> 01:03:07,940
+An alert that fires on failure is only useful if somebody is actually watching
+
+716
+01:03:08,231 --> 01:03:13,806
+that channel and empowered to act on it immediately.
+
+717
+01:03:14,097 --> 01:03:22,770
+Route this specifically to your on call rotation, not to a general engineering channel
+
+718
+01:03:23,061 --> 01:03:31,733
+where it can sit unread for two days, because a failed evidence collection run
+
+719
+01:03:32,024 --> 01:03:40,696
+on a day that later gets sampled by an auditor is exactly the kind
+
+720
+01:03:40,988 --> 01:03:49,660
+of gap that turns into a real finding, and the difference between catching that
+
+721
+01:03:49,951 --> 01:03:58,623
+failure the same night versus discovering it months later during fieldwork is entirely a
+
+722
+01:03:58,914 --> 01:04:05,109
+function of who actually saw the alert and how quickly.
+
+723
+01:04:05,400 --> 01:04:14,072
+Let's go one level deeper on the actual IAM role you assume through OIDC,
+
+724
+01:04:14,363 --> 01:04:23,036
+because the scope of permissions on that role matters just as much as the
+
+725
+01:04:23,327 --> 01:04:25,185
+authentication mechanism itself.
+
+726
+01:04:25,476 --> 01:04:34,149
+A genuinely well built evidence collector role has read only permissions, full stop, scoped
+
+727
+01:04:34,440 --> 01:04:43,112
+precisely to the specific describe and get style API calls each collection step actually
+
+728
+01:04:43,403 --> 01:04:45,261
+needs, nothing broader.
+
+729
+01:04:45,553 --> 01:04:54,225
+This is worth stating explicitly because it's tempting, especially under deadline pressure, to just
+
+730
+01:04:54,516 --> 01:05:00,710
+attach a broad read only managed policy and move on.
+
+731
+01:05:01,002 --> 01:05:02,241
+Resist that.
+
+732
+01:05:02,532 --> 01:05:11,204
+An evidence collection pipeline with narrowly scoped, explicitly enumerated permissions is itself stronger evidence
+
+733
+01:05:11,495 --> 01:05:20,167
+of least privilege discipline than one built on a convenient but overly broad policy,
+
+734
+01:05:20,459 --> 01:05:29,131
+and a careful auditor reviewing your IAM configuration during fieldwork will absolutely notice the
+
+735
+01:05:29,422 --> 01:05:31,900
+difference between the two.
+
+736
+01:05:32,191 --> 01:05:40,863
+Let's also talk about what happens the very first time this pipeline actually fails
+
+737
+01:05:41,154 --> 01:05:49,826
+in production, because it will, eventually, some tool will have a transient outage or
+
+738
+01:05:50,118 --> 01:05:57,551
+an API rate limit will get hit on a particularly busy night.
+
+739
+01:05:57,842 --> 01:06:06,514
+The correct response is not panic, it's exactly what the Slack alert exists to
+
+740
+01:06:06,806 --> 01:06:15,478
+trigger, a quick manual re-run using the workflow dispatch trigger once whatever transient issue
+
+741
+01:06:15,769 --> 01:06:18,866
+caused the failure has cleared.
+
+742
+01:06:19,157 --> 01:06:27,830
+Document that specific incident, briefly, in your own internal notes, not because it needs
+
+743
+01:06:28,121 --> 01:06:36,793
+to become a formal finding, but because a pattern of the same collection step
+
+744
+01:06:37,084 --> 01:06:45,756
+failing repeatedly over time is itself a signal that something about that specific evidence
+
+745
+01:06:46,048 --> 01:06:54,720
+source has become unreliable and needs real engineering attention, not just repeated manual re-runs
+
+746
+01:06:55,011 --> 01:06:56,869
+treated as routine.
+
+747
+01:06:58,869 --> 01:07:02,369
+LECTURE 5 — TYPE ONE VERSUS TYPE TWO STRATEGY
+
+748
+01:07:03,369 --> 01:07:11,010
+This is the decision that determines whether you close your next enterprise deal or
+
+749
+01:07:11,297 --> 01:07:18,938
+lose it to a competitor who simply moved faster, and I want to be
+
+750
+01:07:19,225 --> 01:07:26,866
+direct about the pattern I see constantly with Series A companies preparing for their
+
+751
+01:07:27,154 --> 01:07:29,336
+very first big logo.
+
+752
+01:07:29,624 --> 01:07:37,265
+A team insists on waiting for Type Two, because, in their words, that's what
+
+753
+01:07:37,552 --> 01:07:39,735
+enterprise customers actually want.
+
+754
+01:07:40,023 --> 01:07:41,660
+So they wait.
+
+755
+01:07:41,948 --> 01:07:49,588
+They burn the entire six to twelve month observation period before even engaging an
+
+756
+01:07:49,876 --> 01:07:50,776
+auditor.
+
+757
+01:07:51,064 --> 01:07:58,704
+And in that window, a competitor with nothing more than a Type One shows
+
+758
+01:07:58,992 --> 01:08:03,358
+up first, closes the deal, and moves on.
+
+759
+01:08:03,646 --> 01:08:09,103
+Type One is not a lesser product you settle for.
+
+760
+01:08:09,391 --> 01:08:17,031
+For a deal happening next quarter, it is the only product that exists in
+
+761
+01:08:17,319 --> 01:08:18,956
+time to matter.
+
+762
+01:08:19,244 --> 01:08:26,884
+Let's define both precisely, because the difference is a different question entirely, not just
+
+763
+01:08:27,172 --> 01:08:29,355
+a difference in thoroughness.
+
+764
+01:08:29,643 --> 01:08:35,646
+Type One answers, are your controls suitably designed, as of today.
+
+765
+01:08:35,934 --> 01:08:43,574
+An auditor reviews your architecture, your policies, your configurations, and concludes, yes, these controls
+
+766
+01:08:43,862 --> 01:08:45,499
+are appropriately designed.
+
+767
+01:08:45,787 --> 01:08:48,516
+Timeline, six to ten weeks.
+
+768
+01:08:48,804 --> 01:08:56,444
+Cost, twenty to fifty thousand dollars with a boutique firm, forty to eighty thousand
+
+769
+01:08:56,732 --> 01:08:59,460
+with a Big Four firm.
+
+770
+01:08:59,748 --> 01:09:05,751
+Customer value, moderate, because it proves intent, not execution over time.
+
+771
+01:09:06,039 --> 01:09:09,859
+Type Two answers a genuinely different question.
+
+772
+01:09:10,147 --> 01:09:17,787
+Have your controls been operating effectively, consistently, over the past six to twelve months.
+
+773
+01:09:18,075 --> 01:09:25,715
+The auditor reviews that same design, plus logs, screenshots, change records, backup reports, and
+
+774
+01:09:26,003 --> 01:09:33,643
+incident response records, collected across the entire observation period, which is exactly what our
+
+775
+01:09:33,931 --> 01:09:41,026
+automated evidence pipeline from the last lecture was built to produce without gaps.
+
+776
+01:09:41,314 --> 01:09:46,771
+Timeline, four to eight months total, including that observation period.
+
+777
+01:09:47,059 --> 01:09:54,699
+Cost, forty five to seventy five thousand with a boutique firm, one hundred to
+
+778
+01:09:54,987 --> 01:09:59,898
+two hundred thousand plus with a Big Four firm.
+
+779
+01:10:00,186 --> 01:10:06,735
+Customer value, high, because enterprise procurement specifically, explicitly, asks for Type Two.
+
+780
+01:10:07,023 --> 01:10:13,572
+Here's the actual strategy, stated as a rule you can apply immediately.
+
+781
+01:10:13,859 --> 01:10:21,500
+Get Type One right after your controls are genuinely implemented, because it gives you
+
+782
+01:10:21,788 --> 01:10:26,699
+something real to put in front of customers today.
+
+783
+01:10:26,987 --> 01:10:34,627
+While that Type One is fresh, start accumulating the operating history you need for
+
+784
+01:10:34,915 --> 01:10:36,007
+Type Two.
+
+785
+01:10:36,294 --> 01:10:43,935
+Never wait for Type Two before you start talking to enterprise customers, because that
+
+786
+01:10:44,222 --> 01:10:48,043
+window is exactly where deals get lost.
+
+787
+01:10:48,330 --> 01:10:55,971
+And never let a Type One age out either, because a stale Type One
+
+788
+01:10:56,258 --> 01:11:03,899
+with zero visible progress toward Type Two is itself a signal to a sophisticated
+
+789
+01:11:04,187 --> 01:11:07,461
+buyer that momentum has quietly stalled.
+
+790
+01:11:07,749 --> 01:11:15,389
+Here's a piece most explanations of this topic skip entirely, and it's exactly the
+
+791
+01:11:15,677 --> 01:11:23,317
+kind of detail that matters once you're actually running a compliance program instead of
+
+792
+01:11:23,605 --> 01:11:25,788
+just reading about one.
+
+793
+01:11:26,076 --> 01:11:27,167
+Bridge letters.
+
+794
+01:11:27,455 --> 01:11:35,095
+Your Type Two report always has a period end date sitting in the past.
+
+795
+01:11:35,383 --> 01:11:43,023
+Your observation window might run January through June, but the report itself doesn't actually
+
+796
+01:11:43,311 --> 01:11:45,494
+get issued until August.
+
+797
+01:11:45,782 --> 01:11:53,422
+So what happens when a customer in September asks, what's your current control status,
+
+798
+01:11:53,710 --> 01:12:01,350
+and the answer isn't fully covered by a report that technically ended in June.
+
+799
+01:12:01,638 --> 01:12:09,278
+A bridge letter, sometimes called a gap letter, is a management signed statement confirming
+
+800
+01:12:09,566 --> 01:12:15,569
+that no material changes have occurred since the report's period end.
+
+801
+01:12:15,857 --> 01:12:18,586
+It covers exactly that gap.
+
+802
+01:12:18,874 --> 01:12:23,239
+And here's the thing nobody tells you upfront.
+
+803
+01:12:23,527 --> 01:12:27,893
+Auditors don't always volunteer that you'll need one.
+
+804
+01:12:28,181 --> 01:12:35,821
+Build this into your compliance calendar now, proactively, not the week a customer asks
+
+805
+01:12:36,109 --> 01:12:41,021
+and you're improvising an answer under real time pressure.
+
+806
+01:12:41,309 --> 01:12:48,949
+Let's talk real market numbers for twenty twenty six, because pricing opacity is its
+
+807
+01:12:49,237 --> 01:12:51,965
+own source of wasted time.
+
+808
+01:12:52,253 --> 01:12:59,893
+A boutique firm, think Schellman, Coalfire, A-LIGN, runs twenty to thirty five thousand for
+
+809
+01:13:00,181 --> 01:13:06,730
+Type One and forty five to seventy five thousand for Type Two.
+
+810
+01:13:07,018 --> 01:13:14,658
+A Big Four firm runs forty to eighty thousand for Type One and a
+
+811
+01:13:14,946 --> 01:13:19,857
+hundred to two hundred thousand plus for Type Two.
+
+812
+01:13:20,145 --> 01:13:27,785
+The strategy that actually saves you real money, start with a boutique firm for
+
+813
+01:13:28,073 --> 01:13:35,714
+your Type One, get the report, and go close your first enterprise deals with
+
+814
+01:13:36,001 --> 01:13:36,901
+it.
+
+815
+01:13:37,189 --> 01:13:44,830
+Then, if a specific customer's procurement team contractually requires a bigger brand name, move
+
+816
+01:13:45,117 --> 01:13:48,392
+to Big Four for Type Two.
+
+817
+01:13:48,680 --> 01:13:51,408
+Otherwise, stick with the boutique.
+
+818
+01:13:51,696 --> 01:13:54,425
+Both paths are completely legitimate.
+
+819
+01:13:54,713 --> 01:14:02,353
+Now, before you engage any auditor at all, run your own readiness assessment first,
+
+820
+01:14:02,641 --> 01:14:10,281
+because finding your own gaps costs you nothing and finding them through an auditor
+
+821
+01:14:10,569 --> 01:14:14,935
+costs you a finding on your permanent record.
+
+822
+01:14:15,222 --> 01:14:22,863
+We built a genuine readiness check script that runs against your live system and
+
+823
+01:14:23,151 --> 01:14:27,516
+tells you exactly what's missing, no guessing involved.
+
+824
+01:14:27,804 --> 01:14:35,444
+It checks whether A P I key authentication is actually enabled in your production
+
+825
+01:14:35,732 --> 01:14:36,632
+deployment.
+
+826
+01:14:36,920 --> 01:14:44,560
+It checks whether R D S encryption at rest is genuinely turned on, by
+
+827
+01:14:44,848 --> 01:14:51,943
+querying AWS directly rather than trusting a Terraform file that might be stale.
+
+828
+01:14:52,231 --> 01:14:59,871
+It checks whether TLS one point three is actually negotiated on your public endpoint,
+
+829
+01:15:00,159 --> 01:15:03,979
+live, right now, through an actual handshake.
+
+830
+01:15:04,267 --> 01:15:11,361
+It checks whether your backup retention period genuinely meets or exceeds thirty days.
+
+831
+01:15:11,649 --> 01:15:19,289
+And it checks whether your branch protection rules actually require pull request reviews before
+
+832
+01:15:19,577 --> 01:15:21,214
+merging to main.
+
+833
+01:15:21,502 --> 01:15:23,139
+Run it today.
+
+834
+01:15:23,427 --> 01:15:31,067
+Every single failure it reports is a remediation item, which we formalize with real
+
+835
+01:15:31,355 --> 01:15:36,267
+ownership and real deadlines in the very next lecture.
+
+836
+01:15:36,555 --> 01:15:40,375
+The discipline that matters here isn't complicated.
+
+837
+01:15:40,663 --> 01:15:48,303
+Fix it before an auditor finds it, not after, because the cost of those
+
+838
+01:15:48,591 --> 01:15:52,957
+two outcomes is not remotely close to equal.
+
+839
+01:15:53,244 --> 01:16:00,885
+Let's talk about a decision point that sits right alongside the Type One versus
+
+840
+01:16:01,172 --> 01:16:08,813
+Type Two choice, which is choosing your audit firm itself, because this decision compounds
+
+841
+01:16:09,101 --> 01:16:14,012
+across every future renewal, not just your first engagement.
+
+842
+01:16:14,300 --> 01:16:21,940
+Beyond the boutique versus Big Four cost difference we already covered, ask about auditor
+
+843
+01:16:22,228 --> 01:16:23,320
+continuity specifically.
+
+844
+01:16:23,607 --> 01:16:31,248
+Some firms rotate the actual engagement team every cycle, which means you're re-explaining your
+
+845
+01:16:31,535 --> 01:16:39,176
+entire architecture from scratch every single year, while others assign a consistent lead auditor
+
+846
+01:16:39,464 --> 01:16:47,104
+across renewals, who already understands your system and can focus fieldwork time on what's
+
+847
+01:16:47,392 --> 01:16:51,757
+actually changed rather than relearning your whole stack.
+
+848
+01:16:52,045 --> 01:16:59,686
+For a fast moving engineering organization, that continuity is worth real money in reduced
+
+849
+01:16:59,973 --> 01:17:05,976
+fieldwork hours, even if the headline price looks similar on paper.
+
+850
+01:17:06,264 --> 01:17:13,904
+Here's something else worth planning for explicitly, the readiness assessment as its own separate,
+
+851
+01:17:14,192 --> 01:17:15,284
+smaller engagement.
+
+852
+01:17:15,572 --> 01:17:23,212
+Many firms, boutique and Big Four alike, will sell you a standalone gap assessment
+
+853
+01:17:23,500 --> 01:17:31,140
+before the actual Type One or Type Two engagement begins, essentially a paid dry
+
+854
+01:17:31,428 --> 01:17:39,068
+run where an experienced auditor reviews your control catalog and evidence pipeline and tells
+
+855
+01:17:39,356 --> 01:17:46,996
+you, in writing, exactly where they expect findings before you've spent real fieldwork time
+
+856
+01:17:47,284 --> 01:17:51,104
+and real fieldwork dollars discovering it yourself.
+
+857
+01:17:51,392 --> 01:17:59,032
+For a first time SOC two program specifically, this is frequently worth the extra
+
+858
+01:17:59,320 --> 01:18:06,960
+cost, because it converts unknown unknowns into a concrete, prioritized list weeks before the
+
+859
+01:18:07,248 --> 01:18:11,614
+clock on your formal engagement even starts running.
+
+860
+01:18:11,902 --> 01:18:19,542
+And let's close this out with the actual timeline math laid out plainly, because
+
+861
+01:18:19,830 --> 01:18:27,470
+vague timeline language is where teams miscalculate their own readiness for a specific deal.
+
+862
+01:18:27,758 --> 01:18:35,398
+If a customer needs to see something in ninety days, and you haven't started
+
+863
+01:18:35,686 --> 01:18:43,326
+your Type One engagement yet, you are almost certainly not getting a Type Two
+
+864
+01:18:43,614 --> 01:18:51,254
+in that window, full stop, no matter how good your controls already are, because
+
+865
+01:18:51,542 --> 01:18:56,999
+the observation period alone is longer than that entire window.
+
+866
+01:18:57,287 --> 01:19:04,928
+But you can absolutely get a Type One signed and delivered inside ninety days
+
+867
+01:19:05,215 --> 01:19:12,856
+if you engage a firm now, which is exactly the kind of arithmetic that
+
+868
+01:19:13,143 --> 01:19:20,784
+should drive which conversation you have with your own sales team the moment a
+
+869
+01:19:21,072 --> 01:19:28,712
+big deal starts moving, rather than after the customer's procurement team has already asked
+
+870
+01:19:29,000 --> 01:19:32,274
+the question you weren't ready for.
+
+871
+01:19:32,562 --> 01:19:40,202
+Let's also address something sales teams specifically need to understand about this timeline, because
+
+872
+01:19:40,490 --> 01:19:48,130
+engineering readiness and sales readiness are two different clocks that need to be synchronized
+
+873
+01:19:48,418 --> 01:19:49,318
+deliberately.
+
+874
+01:19:49,606 --> 01:19:57,246
+The moment your engineering team commits to starting a Type One engagement, that's the
+
+875
+01:19:57,534 --> 01:20:05,174
+moment sales should start telling prospective enterprise customers a specific, honest date, not we're
+
+876
+01:20:05,462 --> 01:20:13,102
+working on it, but we expect our SOC two Type One report by this
+
+877
+01:20:13,390 --> 01:20:14,482
+specific month.
+
+878
+01:20:14,769 --> 01:20:22,410
+Vague compliance timelines read, to a sophisticated buyer, exactly like vague product roadmaps do,
+
+879
+01:20:22,697 --> 01:20:30,338
+as a soft signal that the team either doesn't have a real plan or
+
+880
+01:20:30,626 --> 01:20:36,083
+isn't confident enough in it to commit to a date.
+
+881
+01:20:36,371 --> 01:20:44,011
+A specific date, even a conservative one, reads as operational maturity, and operational maturity
+
+882
+01:20:44,299 --> 01:20:51,939
+is frequently what actually closes a security conscious enterprise deal, more than the report
+
+883
+01:20:52,227 --> 01:20:53,127
+itself.
+
+884
+01:20:53,415 --> 01:21:01,055
+And let's close this lecture with the actual internal communication template worth adopting, because
+
+885
+01:21:01,343 --> 01:21:08,983
+how you frame this internally shapes how confidently your own sales team can talk
+
+886
+01:21:09,271 --> 01:21:10,908
+about it externally.
+
+887
+01:21:11,196 --> 01:21:18,836
+Every time your readiness check script runs clean, share that result with sales and
+
+888
+01:21:19,124 --> 01:21:21,307
+leadership, not just engineering.
+
+889
+01:21:21,595 --> 01:21:27,052
+Every time a critical remediation item closes, share that too.
+
+890
+01:21:27,340 --> 01:21:34,980
+By the time you actually engage an auditor, your own commercial team should already
+
+891
+01:21:35,268 --> 01:21:42,908
+understand exactly what SOC two Type One means, exactly what it doesn't mean, and
+
+892
+01:21:43,196 --> 01:21:50,836
+exactly how to answer a prospect's question honestly without either overselling your current posture
+
+893
+01:21:51,124 --> 01:21:56,581
+or underselling the very real work you've already put in.
+
+894
+01:21:58,581 --> 01:22:02,081
+LECTURE 6 — THE AUDITOR WALKTHROUGH
+
+895
+01:22:03,081 --> 01:22:10,279
+Let's completely reframe what a walkthrough actually is, because most people walk in with
+
+896
+01:22:10,559 --> 01:22:17,756
+the wrong mental model entirely, and that wrong model is what causes the nerves.
+
+897
+01:22:18,036 --> 01:22:24,205
+This is not a performance, and it is absolutely not an interrogation.
+
+898
+01:22:24,485 --> 01:22:31,682
+It's a structured conversation, typically sixty to ninety minutes, entrance conference style, with your
+
+899
+01:22:31,962 --> 01:22:39,160
+engineering and compliance leads in the room, where the auditor is building their own
+
+900
+01:22:39,439 --> 01:22:43,552
+understanding of your system before fieldwork actually begins.
+
+901
+01:22:43,831 --> 01:22:46,916
+What they're genuinely evaluating is this.
+
+902
+01:22:47,196 --> 01:22:54,393
+Do you understand your own controls well enough to produce evidence on demand, and
+
+903
+01:22:54,673 --> 01:23:01,871
+does what you're telling them in the room actually match what your system description
+
+904
+01:23:02,150 --> 01:23:03,692
+claims on paper.
+
+905
+01:23:03,972 --> 01:23:05,000
+That's it.
+
+906
+01:23:05,280 --> 01:23:07,336
+That's the whole test.
+
+907
+01:23:07,615 --> 01:23:14,813
+Here's a concept that I think is the single most useful mental model missing
+
+908
+01:23:15,093 --> 01:23:22,290
+from most SOC two training, and once you internalize it, the entire audit stops
+
+909
+01:23:22,570 --> 01:23:23,598
+feeling unpredictable.
+
+910
+01:23:23,878 --> 01:23:24,906
+Auditors sample.
+
+911
+01:23:25,185 --> 01:23:29,298
+They do not review your entire evidence corpus.
+
+912
+01:23:29,578 --> 01:23:36,775
+Picture a six month observation period as roughly one hundred eighty daily evidence folders
+
+913
+01:23:37,055 --> 01:23:39,625
+sitting in your immutable bucket.
+
+914
+01:23:39,905 --> 01:23:44,018
+The auditor doesn't open all one hundred eighty.
+
+915
+01:23:44,297 --> 01:23:51,495
+They select a sparse, semi random subset, maybe twenty five to forty specific days,
+
+916
+01:23:51,774 --> 01:23:58,458
+depending on the size of the population and their own assessed risk level.
+
+917
+01:23:58,738 --> 01:24:05,935
+A control that runs continuously, like your nightly evidence cron, gets one kind of
+
+918
+01:24:06,215 --> 01:24:07,243
+sample size.
+
+919
+01:24:07,522 --> 01:24:14,720
+A control that only runs quarterly, like your restore test, might get every single
+
+920
+01:24:15,000 --> 01:24:22,197
+instance reviewed, because when the total population is only two or three occurrences, sampling
+
+921
+01:24:22,477 --> 01:24:27,618
+doesn't even apply anymore, they just check all of them.
+
+922
+01:24:27,897 --> 01:24:35,095
+The practical consequence of this is genuinely important, and it's the real argument for
+
+923
+01:24:35,375 --> 01:24:38,973
+everything we automated in the evidence lecture.
+
+924
+01:24:39,253 --> 01:24:46,451
+Your pipeline has to make every single day equally retrievable, because you do not
+
+925
+01:24:46,730 --> 01:24:51,357
+get to choose which subset the auditor asks for.
+
+926
+01:24:51,637 --> 01:24:54,207
+That's not an efficiency argument.
+
+927
+01:24:54,487 --> 01:25:01,684
+It's a control over what gets tested argument, and it's precisely why manual, remember
+
+928
+01:25:01,964 --> 01:25:09,162
+to screenshot it evidence collection fails the moment sampling lands on a day nobody
+
+929
+01:25:09,441 --> 01:25:10,983
+happened to document.
+
+930
+01:25:11,263 --> 01:25:18,461
+Let's walk through the five questions every auditor asks about a production A P
+
+931
+01:25:18,740 --> 01:25:25,938
+I system, delivered the way you'd actually deliver them in the room, confidently, with
+
+932
+01:25:26,217 --> 01:25:32,387
+the live evidence command ready to run, not memorized as a paragraph.
+
+933
+01:25:32,666 --> 01:25:33,566
+First.
+
+934
+01:25:33,846 --> 01:25:38,987
+How do you ensure only authorized users access the system.
+
+935
+01:25:39,266 --> 01:25:45,950
+The answer is defense in depth, layered, with no single point of failure.
+
+936
+01:25:46,229 --> 01:25:53,427
+Every request requires a valid A P I key, hashed with SHA two fifty
+
+937
+01:25:53,706 --> 01:26:00,904
+six, never stored in plaintext, carrying a ninety day time to live, and revocable
+
+938
+01:26:01,184 --> 01:26:03,754
+immediately with no grace period.
+
+939
+01:26:04,034 --> 01:26:11,231
+Internally, Vault issues unique database credentials per pod, each with a one hour time
+
+940
+01:26:11,511 --> 01:26:12,539
+to live.
+
+941
+01:26:12,819 --> 01:26:20,016
+Underneath that, Kubernetes R B A C and Cilium's zero trust network policies enforce
+
+942
+01:26:20,296 --> 01:26:24,923
+exactly what each service account is allowed to touch.
+
+943
+01:26:25,202 --> 01:26:32,400
+And then you open the actual middleware file, live, on screen, and show them
+
+944
+01:26:32,680 --> 01:26:36,792
+the code doing exactly what you just described.
+
+945
+01:26:37,072 --> 01:26:37,972
+Second.
+
+946
+01:26:38,251 --> 01:26:42,878
+How do you detect and respond to security incidents.
+
+947
+01:26:43,158 --> 01:26:50,356
+Falco runs on every single node through a DaemonSet, using e B P F
+
+948
+01:26:50,635 --> 01:26:57,833
+probes to monitor system calls in real time, with custom rules written specifically for
+
+949
+01:26:58,112 --> 01:27:05,310
+our workload, alerting the moment a pod attempts an unexpected outbound connection or an
+
+950
+01:27:05,589 --> 01:27:07,132
+unexpected shell execution.
+
+951
+01:27:07,411 --> 01:27:12,553
+Alerts route through Falcosidekick to PagerDuty with severity based escalation.
+
+952
+01:27:12,832 --> 01:27:20,030
+Our incident response runbook lives in Git, version controlled, reviewed quarterly, and every single
+
+953
+01:27:20,309 --> 01:27:27,507
+security event generates a formal post incident review that itself becomes Type Two evidence.
+
+954
+01:27:27,786 --> 01:27:28,686
+Third.
+
+955
+01:27:28,966 --> 01:27:34,107
+How do you ensure data integrity and prevent unauthorized changes.
+
+956
+01:27:34,386 --> 01:27:41,584
+Every SEC filing gets SHA two fifty six hashed before storage, so ingesting the
+
+957
+01:27:41,864 --> 01:27:48,033
+same filing twice simply skips the duplicate, making the entire pipeline idempotent.
+
+958
+01:27:48,313 --> 01:27:55,510
+Our analysis history table is append only by design, with PostgreSQL triggers physically blocking
+
+959
+01:27:55,790 --> 01:28:02,987
+update and delete statements, plus hash chaining across records so any tampering becomes immediately,
+
+960
+01:28:03,267 --> 01:28:04,295
+mathematically detectable.
+
+961
+01:28:04,575 --> 01:28:11,772
+Every infrastructure change goes through a pull request requiring two reviewers, with CODEOWNERS routing
+
+962
+01:28:12,052 --> 01:28:16,165
+security touching files specifically to the security team.
+
+963
+01:28:16,444 --> 01:28:23,642
+And ArgoCD manages all cluster state from Git, so if anyone ever runs a
+
+964
+01:28:23,921 --> 01:28:31,119
+manual kubectl change directly against the cluster, drift detection catches it within seconds and
+
+965
+01:28:31,399 --> 01:28:37,054
+self heals it back to what Git says should be true.
+
+966
+01:28:37,333 --> 01:28:38,233
+Fourth.
+
+967
+01:28:38,513 --> 01:28:43,654
+How do you ensure the system meets its availability commitments.
+
+968
+01:28:43,933 --> 01:28:51,131
+We target ninety nine point nine percent availability, which is forty three minutes of
+
+969
+01:28:51,411 --> 01:28:58,608
+allowed downtime per month, and the architecture has genuinely no single point of failure
+
+970
+01:28:58,888 --> 01:28:59,788
+anywhere.
+
+971
+01:29:00,067 --> 01:29:06,751
+R D S runs multi A Z with automatic failover under two minutes.
+
+972
+01:29:07,030 --> 01:29:12,686
+E K S spans three availability zones with topology spread constraints.
+
+973
+01:29:12,965 --> 01:29:20,163
+Horizontal pod autoscaling takes us from three replicas to twenty based on real CPU
+
+974
+01:29:20,442 --> 01:29:21,342
+utilization.
+
+975
+01:29:21,622 --> 01:29:28,819
+Karpenter provisions brand new nodes in under thirty seconds during a scale up event.
+
+976
+01:29:29,099 --> 01:29:36,297
+And pod disruption budgets guarantee a minimum of two A P I replicas running
+
+977
+01:29:36,576 --> 01:29:40,689
+at all times, even during active node maintenance.
+
+978
+01:29:40,969 --> 01:29:41,869
+Fifth.
+
+979
+01:29:42,148 --> 01:29:46,261
+How do you manage third party vendor risk.
+
+980
+01:29:46,540 --> 01:29:53,738
+We maintain a tiered vendor register, critical, high, medium, low, with reassessment frequency scaled
+
+981
+01:29:54,018 --> 01:29:56,074
+directly to that tier.
+
+982
+01:29:56,354 --> 01:30:03,551
+Critical vendors, AWS and OpenAI, get reassessed quarterly, with their own SOC two reports
+
+983
+01:30:03,831 --> 01:30:07,944
+reviewed and executed Data Processing Addendums on file.
+
+984
+01:30:08,223 --> 01:30:15,421
+AWS specifically runs through the Shared Responsibility Model, documented explicitly so everyone knows exactly
+
+985
+01:30:15,700 --> 01:30:19,299
+what AWS owns versus what we own.
+
+986
+01:30:19,579 --> 01:30:26,776
+And OpenAI is configured with a zero retention policy, since no personally identifiable information
+
+987
+01:30:27,056 --> 01:30:32,197
+is ever sent in a query payload to begin with.
+
+988
+01:30:32,476 --> 01:30:39,160
+And here's the one rule that matters more than any individual answer above.
+
+989
+01:30:39,440 --> 01:30:45,609
+If you genuinely don't know something in the room, say so, plainly.
+
+990
+01:30:45,888 --> 01:30:49,487
+Let me verify that and follow up.
+
+991
+01:30:49,767 --> 01:30:51,309
+Do not guess.
+
+992
+01:30:51,589 --> 01:30:58,786
+Auditors treat a wrong answer discovered later as significantly worse than an honestly admitted
+
+993
+01:30:59,066 --> 01:31:05,749
+gap in the moment, and there's a real reason for that beyond etiquette.
+
+994
+01:31:06,029 --> 01:31:13,227
+You're operating under a signed management assertion, and fabrication under that assertion carries consequences
+
+995
+01:31:13,506 --> 01:31:16,591
+well beyond just a routine finding.
+
+996
+01:31:16,870 --> 01:31:19,955
+This isn't a soft skills tip.
+
+997
+01:31:20,234 --> 01:31:27,432
+It's the mathematically correct response to the actual incentive structure of the entire engagement.
+
+998
+01:31:27,712 --> 01:31:34,909
+Practice these five questions with whoever will genuinely be in that room, not by
+
+999
+01:31:35,189 --> 01:31:42,386
+memorizing a script, but by running the live evidence command until pulling it up
+
+1000
+01:31:42,666 --> 01:31:44,208
+is completely automatic.
+
+1001
+01:31:44,488 --> 01:31:51,685
+Next lecture, we build the tracker that turns every gap we've surfaced across this
+
+1002
+01:31:51,965 --> 01:31:56,592
+entire phase into an owned, dated, evidenced remediation plan.
+
+1003
+01:31:56,871 --> 01:32:04,069
+Let's go deeper on how sample size actually scales, because the mental model matters
+
+1004
+01:32:04,349 --> 01:32:08,976
+more than the exact formula an auditor uses internally.
+
+1005
+01:32:09,255 --> 01:32:13,882
+Broadly, auditors think in terms of population and frequency.
+
+1006
+01:32:14,162 --> 01:32:21,359
+A control tested daily across a full year gives you a population of roughly
+
+1007
+01:32:21,639 --> 01:32:28,837
+two hundred fifty business days, and a typical sample from a population that size
+
+1008
+01:32:29,116 --> 01:32:36,314
+might land somewhere in the twenty five to forty range, enough to give the
+
+1009
+01:32:36,593 --> 01:32:43,791
+auditor statistical confidence the control operated consistently without needing to review every single day.
+
+1010
+01:32:44,070 --> 01:32:51,268
+A control tested quarterly gives you a population of four, and at that population
+
+1011
+01:32:51,548 --> 01:32:58,745
+size, sampling doesn't really apply in any meaningful sense, the auditor typically just reviews
+
+1012
+01:32:59,025 --> 01:33:00,053
+all four.
+
+1013
+01:33:00,332 --> 01:33:07,530
+This is exactly why less frequent controls, quarterly restore tests being the clearest example,
+
+1014
+01:33:07,810 --> 01:33:15,007
+actually carry more individual weight per instance than a daily control does, because there's
+
+1015
+01:33:15,287 --> 01:33:20,942
+no averaging out a single bad instance across a larger sample.
+
+1016
+01:33:21,222 --> 01:33:28,419
+Here's a genuinely practical implication of that math for how you should prepare your
+
+1017
+01:33:28,699 --> 01:33:31,269
+team before the actual walkthrough.
+
+1018
+01:33:31,549 --> 01:33:35,662
+Don't just rehearse your happy path evidence commands.
+
+1019
+01:33:35,941 --> 01:33:43,139
+Rehearse what you'd say if the auditor's sample happens to land on the one
+
+1020
+01:33:43,418 --> 01:33:50,616
+day where something looked slightly unusual, a deployment that took longer than normal, an
+
+1021
+01:33:50,896 --> 01:33:57,579
+alert that fired and required actual investigation, a backup that needed a retry.
+
+1022
+01:33:57,859 --> 01:34:00,943
+These moments are not automatically findings.
+
+1023
+01:34:01,223 --> 01:34:08,421
+An auditor who sees your team detect a real event, respond according to the
+
+1024
+01:34:08,700 --> 01:34:15,898
+documented runbook, and generate a clean post incident review, is actually seeing your controls
+
+1025
+01:34:16,177 --> 01:34:18,234
+work exactly as designed.
+
+1026
+01:34:18,513 --> 01:34:25,711
+The failure mode isn't having an incident during your observation period, every real system
+
+1027
+01:34:25,990 --> 01:34:26,890
+does.
+
+1028
+01:34:27,170 --> 01:34:34,367
+The failure mode is not being able to show, clearly and quickly, that your
+
+1029
+01:34:34,647 --> 01:34:38,246
+response process actually functioned when it mattered.
+
+1030
+01:34:38,525 --> 01:34:45,723
+One last thing worth internalizing about the entrance conference specifically, beyond the five technical
+
+1031
+01:34:46,002 --> 01:34:46,902
+questions.
+
+1032
+01:34:47,182 --> 01:34:54,380
+Auditors are also quietly assessing whether your team communicates consistently with each other, not
+
+1033
+01:34:54,659 --> 01:34:56,201
+just with them.
+
+1034
+01:34:56,481 --> 01:35:03,679
+If your security lead describes a control one way and your platform lead describes
+
+1035
+01:35:03,958 --> 01:35:11,156
+the same control slightly differently in the same room, that inconsistency itself becomes a
+
+1036
+01:35:11,435 --> 01:35:18,633
+data point, suggesting the control might not be as well understood internally as your
+
+1037
+01:35:18,912 --> 01:35:19,941
+documentation claims.
+
+1038
+01:35:20,220 --> 01:35:27,418
+Before the actual walkthrough, get your team in a room together and have each
+
+1039
+01:35:27,697 --> 01:35:34,895
+person explain, out loud, the control they personally own, to each other, not just
+
+1040
+01:35:35,174 --> 01:35:37,231
+to an imagined auditor.
+
+1041
+01:35:37,510 --> 01:35:44,708
+The goal isn't a rehearsed script, it's genuine shared understanding, and the difference between
+
+1042
+01:35:44,988 --> 01:35:52,185
+those two things is exactly what a good auditor is trained to notice within
+
+1043
+01:35:52,465 --> 01:35:55,549
+the first ten minutes of conversation.
+
+1044
+01:35:55,829 --> 01:36:03,027
+Let's talk about a specific trap that catches even well prepared teams during the
+
+1045
+01:36:03,306 --> 01:36:04,334
+walkthrough, over-explaining.
+
+1046
+01:36:04,614 --> 01:36:11,811
+When an auditor asks a direct question, the correct instinct is a direct, complete,
+
+1047
+01:36:12,091 --> 01:36:19,289
+but bounded answer, followed by silence, not a continuation into three adjacent topics nobody
+
+1048
+01:36:19,568 --> 01:36:20,596
+asked about.
+
+1049
+01:36:20,876 --> 01:36:28,074
+Every extra thing you volunteer is a new thread the auditor might reasonably pull
+
+1050
+01:36:28,353 --> 01:36:35,551
+on, and a thread you volunteered but weren't actually prepared to defend in depth
+
+1051
+01:36:35,830 --> 01:36:39,943
+creates unnecessary risk you didn't need to introduce.
+
+1052
+01:36:40,223 --> 01:36:47,420
+Answer exactly what was asked, thoroughly and honestly, show the live evidence, and then
+
+1053
+01:36:47,700 --> 01:36:48,728
+stop talking.
+
+1054
+01:36:49,007 --> 01:36:56,205
+If they want more, they'll ask a specific follow up, and you answer that
+
+1055
+01:36:56,485 --> 01:36:58,541
+one just as precisely.
+
+1056
+01:36:58,821 --> 01:37:04,990
+Here's a final practical tip worth building into your actual walkthrough logistics.
+
+1057
+01:37:05,269 --> 01:37:12,467
+Have every single live evidence command you might need pre-typed and ready in a
+
+1058
+01:37:12,747 --> 01:37:19,944
+terminal, in a dedicated tab or window, before the call even starts, not something
+
+1059
+01:37:20,224 --> 01:37:26,393
+you're constructing live under mild pressure while an auditor watches you type.
+
+1060
+01:37:26,673 --> 01:37:33,870
+The content of your answer matters enormously, but so does the visible fluency of
+
+1061
+01:37:34,150 --> 01:37:41,348
+producing the proof, because a team that pulls up exactly the right command in
+
+1062
+01:37:41,627 --> 01:37:48,825
+three seconds looks, correctly, like a team that runs this evidence pipeline constantly as
+
+1063
+01:37:49,104 --> 01:37:56,302
+part of normal operations, not one that's assembling a demonstration specifically for this call.
+
+1064
+01:37:58,302 --> 01:38:01,802
+LECTURE 7 — REMEDIATION PLANNING
+
+1065
+01:38:02,802 --> 01:38:10,418
+A gap you know about and haven't fixed yet is not a neutral, harmless
+
+1066
+01:38:10,706 --> 01:38:13,969
+thing sitting quietly on a backlog.
+
+1067
+01:38:14,257 --> 01:38:21,873
+During your Type Two observation period specifically, it is active evidence that the control
+
+1068
+01:38:22,161 --> 01:38:29,777
+was genuinely absent for however long it took your team to notice and act.
+
+1069
+01:38:30,064 --> 01:38:36,048
+That reframing is the entire reason a real remediation tracker exists.
+
+1070
+01:38:36,336 --> 01:38:43,952
+It converts we'll get to it eventually into a named owner, a specific due
+
+1071
+01:38:44,240 --> 01:38:51,855
+date, and, if the timeline ever slips, a defensible reason why, written down before
+
+1072
+01:38:52,143 --> 01:38:53,775
+an auditor asks.
+
+1073
+01:38:54,063 --> 01:39:01,679
+Let's build this properly, with severity that actually drives urgency, not severity as decoration.
+
+1074
+01:39:01,966 --> 01:39:09,582
+Critical gaps block your Type One entirely, full stop, and must close before fieldwork
+
+1075
+01:39:09,870 --> 01:39:10,958
+even begins.
+
+1076
+01:39:11,246 --> 01:39:18,861
+High gaps survive a Type One just fine, but they become genuine Type Two
+
+1077
+01:39:19,149 --> 01:39:24,589
+findings if they're still open when your observation period starts.
+
+1078
+01:39:24,877 --> 01:39:32,493
+Medium gaps are acceptable, but only with a documented compensating control explaining exactly why
+
+1079
+01:39:32,780 --> 01:39:36,588
+the risk is managed despite the gap.
+
+1080
+01:39:36,876 --> 01:39:44,492
+And low gaps are legitimate roadmap items that almost never generate an actual finding
+
+1081
+01:39:44,780 --> 01:39:46,412
+on their own.
+
+1082
+01:39:46,699 --> 01:39:54,315
+Let's walk through four real gaps, exactly the kind you'll actually encounter, each with
+
+1083
+01:39:54,603 --> 01:40:01,131
+the specific remediation steps that make the fix concrete instead of vague.
+
+1084
+01:40:01,419 --> 01:40:03,051
+Gap one, critical.
+
+1085
+01:40:03,338 --> 01:40:10,954
+No A P I key rotation policy enforced, mapping to control C C six
+
+1086
+01:40:11,242 --> 01:40:12,330
+point one.
+
+1087
+01:40:12,618 --> 01:40:18,057
+Think about what a key that never expires actually is.
+
+1088
+01:40:18,345 --> 01:40:25,961
+It's a password that never changes, and if it ever leaks, it stays compromised
+
+1089
+01:40:26,249 --> 01:40:29,513
+forever, silently, with nobody the wiser.
+
+1090
+01:40:29,801 --> 01:40:37,416
+The fix, a rotation Lambda triggered by EventBridge on a fourteen day notice window,
+
+1091
+01:40:37,704 --> 01:40:45,320
+a new notification tracking column on the A P I keys table, a staging
+
+1092
+01:40:45,608 --> 01:40:53,223
+test that verifies an old key genuinely gets rejected after rotation completes, and the
+
+1093
+01:40:53,511 --> 01:40:58,407
+whole policy documented in a dedicated security policy file.
+
+1094
+01:40:58,695 --> 01:41:06,311
+Evidence required, the rotation Lambda's A R N plus the very first rotation log
+
+1095
+01:41:06,598 --> 01:41:07,686
+it produces.
+
+1096
+01:41:07,974 --> 01:41:15,590
+Gap two, also critical, and this one is subtle enough that teams miss it
+
+1097
+01:41:15,878 --> 01:41:16,778
+constantly.
+
+1098
+01:41:17,066 --> 01:41:20,873
+R D S staging environment not encrypted.
+
+1099
+01:41:21,161 --> 01:41:28,777
+Most teams encrypt production diligently and then think, it's just staging, it doesn't really
+
+1100
+01:41:29,065 --> 01:41:29,965
+matter.
+
+1101
+01:41:30,253 --> 01:41:33,517
+Here's exactly why that reasoning fails.
+
+1102
+01:41:33,804 --> 01:41:41,420
+Staging routinely contains production like data, and auditors check every single environment that falls
+
+1103
+01:41:41,708 --> 01:41:47,692
+within scope, not just the one you assumed they'd care about.
+
+1104
+01:41:47,979 --> 01:41:53,963
+If staging is in scope, it must be encrypted, no exceptions.
+
+1105
+01:41:54,251 --> 01:42:01,867
+The fix, create an encrypted snapshot of the existing staging database, restore it as
+
+1106
+01:42:02,155 --> 01:42:09,770
+a new encrypted instance, cut the application connection string over, validate for forty eight
+
+1107
+01:42:10,058 --> 01:42:17,674
+hours, then delete the original unencrypted instance, and update your Terraform so storage encryption
+
+1108
+01:42:17,962 --> 01:42:24,490
+defaults to true across every single environment going forward, not just production.
+
+1109
+01:42:24,777 --> 01:42:26,953
+Gap three, high severity.
+
+1110
+01:42:27,241 --> 01:42:33,769
+No vendor assessment for Groq, despite it running in production since March.
+
+1111
+01:42:34,057 --> 01:42:37,865
+This is a vendor risk gap, plainly.
+
+1112
+01:42:38,152 --> 01:42:45,768
+Groq is live, handling real traffic, and nobody ever formally assessed their security posture.
+
+1113
+01:42:46,056 --> 01:42:53,672
+The fix, request their SOC two report or security questionnaire directly, complete our own
+
+1114
+01:42:53,959 --> 01:43:01,575
+internal vendor questionnaire, execute a Data Processing Addendum, and add the entry to our
+
+1115
+01:43:01,863 --> 01:43:06,215
+vendor register with a real assessment date attached.
+
+1116
+01:43:06,503 --> 01:43:09,223
+Gap four, also high severity.
+
+1117
+01:43:09,510 --> 01:43:14,406
+No quarterly restore test has ever actually been performed.
+
+1118
+01:43:14,694 --> 01:43:21,766
+Backups that have never been tested are, functionally, a belief, not a control.
+
+1119
+01:43:22,054 --> 01:43:29,669
+Having a backup is like having a lifeboat on a ship, it's only genuinely
+
+1120
+01:43:29,957 --> 01:43:37,573
+useful if someone has actually confirmed how to use it and that it actually
+
+1121
+01:43:37,861 --> 01:43:38,761
+floats.
+
+1122
+01:43:39,049 --> 01:43:46,664
+The fix, write an actual restore test script, run the very first restore test
+
+1123
+01:43:46,952 --> 01:43:54,568
+against staging, document the results including a measured recovery time objective, and schedule it
+
+1124
+01:43:54,856 --> 01:43:58,664
+to run automatically every quarter going forward.
+
+1125
+01:43:58,951 --> 01:44:06,567
+Now, here's a mechanism most explanations of remediation planning skip entirely, and it's genuinely
+
+1126
+01:44:06,855 --> 01:44:10,119
+reassuring once you understand it correctly.
+
+1127
+01:44:10,407 --> 01:44:18,022
+If a gap isn't fully closed by the time fieldwork happens, that doesn't automatically
+
+1128
+01:44:18,310 --> 01:44:19,942
+sink your report.
+
+1129
+01:44:20,230 --> 01:44:27,846
+It typically becomes a qualified opinion, or a noted exception, and critically, you get
+
+1130
+01:44:28,133 --> 01:44:35,749
+to attach a management response, a written statement explaining what happened, why, and your
+
+1131
+01:44:36,037 --> 01:44:38,757
+specific remediation timeline going forward.
+
+1132
+01:44:39,045 --> 01:44:46,661
+Auditors, and sophisticated customers reading the report, both genuinely understand that no system is
+
+1133
+01:44:46,948 --> 01:44:48,580
+ever completely gapless.
+
+1134
+01:44:48,868 --> 01:44:56,484
+What they're actually assessing is whether you know your own gaps and are managing
+
+1135
+01:44:56,772 --> 01:44:58,948
+them honestly and visibly.
+
+1136
+01:44:59,235 --> 01:45:06,851
+A tracker with dated, owned, evidenced remediation is exactly what makes that management response
+
+1137
+01:45:07,139 --> 01:45:10,403
+land as credible instead of defensive.
+
+1138
+01:45:10,691 --> 01:45:18,306
+Build a weekly cadence around this tracker, because a tracker nobody looks at again
+
+1139
+01:45:18,594 --> 01:45:22,402
+is worse than useless, it's false confidence.
+
+1140
+01:45:22,690 --> 01:45:30,306
+We wrote a small script that checks every remediation item's due date against today,
+
+1141
+01:45:30,593 --> 01:45:38,209
+and fails loudly, with a nonzero exit code, whenever something is overdue and still
+
+1142
+01:45:38,497 --> 01:45:40,673
+marked as not done.
+
+1143
+01:45:40,961 --> 01:45:42,593
+Run it weekly.
+
+1144
+01:45:42,880 --> 01:45:50,496
+It keeps the whole team honest, and it prevents exactly the kind of last
+
+1145
+01:45:50,784 --> 01:45:58,400
+minute panic that happens when someone realizes, three days before fieldwork, that a critical
+
+1146
+01:45:58,688 --> 01:46:01,951
+item quietly slipped for two months.
+
+1147
+01:46:02,239 --> 01:46:07,679
+The actual skill here was never the tracker's file format.
+
+1148
+01:46:07,967 --> 01:46:10,143
+It's the prioritization discipline.
+
+1149
+01:46:10,431 --> 01:46:14,239
+Critical gaps close before fieldwork, full stop.
+
+1150
+01:46:14,526 --> 01:46:19,966
+High gaps close before your Type Two observation window opens.
+
+1151
+01:46:20,254 --> 01:46:25,694
+Medium gaps get a documented compensating control instead of silence.
+
+1152
+01:46:25,982 --> 01:46:30,877
+Low gaps go on the roadmap where they belong.
+
+1153
+01:46:31,165 --> 01:46:37,693
+Get that prioritization right, and the tracker basically runs itself from there.
+
+1154
+01:46:37,981 --> 01:46:45,597
+Let's talk about how to actually run the weekly remediation review meeting itself, because
+
+1155
+01:46:45,884 --> 01:46:53,500
+the tracker file is only as good as the discipline around looking at it.
+
+1156
+01:46:53,788 --> 01:47:01,404
+Keep this meeting genuinely short, fifteen minutes is enough, and structure it around exactly
+
+1157
+01:47:01,691 --> 01:47:04,955
+three questions for every open item.
+
+1158
+01:47:05,243 --> 01:47:07,963
+What changed since last week.
+
+1159
+01:47:08,251 --> 01:47:13,147
+Is the due date still realistic given what changed.
+
+1160
+01:47:13,435 --> 01:47:21,050
+And does anything here need to be escalated above the owner's pay grade because
+
+1161
+01:47:21,338 --> 01:47:26,778
+it's now blocked on a decision only leadership can make.
+
+1162
+01:47:27,066 --> 01:47:34,681
+Teams that let this meeting sprawl into a general engineering standup lose the specific
+
+1163
+01:47:34,969 --> 01:47:42,585
+focus that makes a remediation tracker actually work, which is ruthless, weekly accountability against
+
+1164
+01:47:42,873 --> 01:47:46,681
+dated commitments, nothing more and nothing less.
+
+1165
+01:47:46,969 --> 01:47:54,584
+Here's a nuance worth adding to how you think about medium severity, accepted risk
+
+1166
+01:47:54,872 --> 01:48:02,488
+items specifically, because accepted risk isn't the same thing as ignored risk, and auditors
+
+1167
+01:48:02,776 --> 01:48:05,496
+can absolutely tell the difference.
+
+1168
+01:48:05,783 --> 01:48:13,399
+A properly documented accepted risk includes not just what the gap is, but a
+
+1169
+01:48:13,687 --> 01:48:21,303
+specific compensating control that's already active today, a specific reason the residual risk is
+
+1170
+01:48:21,590 --> 01:48:29,206
+tolerable given that compensating control, and a specific review date where someone will reassess
+
+1171
+01:48:29,494 --> 01:48:32,758
+whether the acceptance still makes sense.
+
+1172
+01:48:33,046 --> 01:48:40,661
+An accepted risk with no review date attached tends to quietly become permanent, and
+
+1173
+01:48:40,949 --> 01:48:48,565
+a permanent accepted risk that's never actually been revisited starts to look, to an
+
+1174
+01:48:48,853 --> 01:48:56,469
+experienced auditor, exactly like a gap somebody simply decided not to fix rather than
+
+1175
+01:48:56,756 --> 01:48:58,932
+a genuinely managed risk.
+
+1176
+01:48:59,220 --> 01:49:06,836
+And finally, let's talk about the moment right before fieldwork begins, when your critical
+
+1177
+01:49:07,124 --> 01:49:14,739
+and high severity items should already be closed, and what to do if one
+
+1178
+01:49:15,027 --> 01:49:19,379
+is stubbornly still open despite your best planning.
+
+1179
+01:49:19,667 --> 01:49:27,283
+The honest move here is not to hide it and hope the sample doesn't
+
+1180
+01:49:27,570 --> 01:49:29,202
+land on it.
+
+1181
+01:49:29,490 --> 01:49:37,106
+The honest move is to raise it proactively with your auditor before fieldwork starts,
+
+1182
+01:49:37,394 --> 01:49:45,010
+explain exactly where you are, and ask what they'd need to see to still
+
+1183
+01:49:45,297 --> 01:49:51,281
+consider the broader control environment sound despite this one open item.
+
+1184
+01:49:51,569 --> 01:49:59,185
+Auditors deal with this situation constantly, it is not unusual to them, and firms
+
+1185
+01:49:59,473 --> 01:50:07,088
+that see a team surface their own remaining gap ahead of time, with a
+
+1186
+01:50:07,376 --> 01:50:14,992
+credible plan already attached, generally treat that transparency as a positive signal about the
+
+1187
+01:50:15,280 --> 01:50:20,719
+overall program, not as an automatic black mark against it.
+
+1188
+01:50:21,007 --> 01:50:28,623
+Let's talk about a category of remediation item that's easy to underestimate specifically because
+
+1189
+01:50:28,911 --> 01:50:35,439
+it doesn't show up as a technical gap at all, documentation gaps.
+
+1190
+01:50:35,726 --> 01:50:43,342
+A control that's genuinely well implemented in code but has no corresponding written policy
+
+1191
+01:50:43,630 --> 01:50:51,246
+describing it is still a finding waiting to happen, because auditors test both the
+
+1192
+01:50:51,534 --> 01:50:57,517
+technical implementation and the existence of a documented policy governing it.
+
+1193
+01:50:57,805 --> 01:51:05,421
+If your incident response process lives entirely in the collective memory of two senior
+
+1194
+01:51:05,709 --> 01:51:13,324
+engineers and nowhere in writing, that's a remediation item, severity high, regardless of how
+
+1195
+01:51:13,612 --> 01:51:20,140
+good those two engineers actually are at handling incidents when they happen.
+
+1196
+01:51:20,428 --> 01:51:28,044
+Write it down, in Git, version controlled, reviewed on a real cadence, exactly like
+
+1197
+01:51:28,331 --> 01:51:32,139
+every other control artifact in this phase.
+
+1198
+01:51:32,427 --> 01:51:40,043
+And let's talk about the emotional dimension of remediation planning honestly, because it's rarely
+
+1199
+01:51:40,331 --> 01:51:44,138
+addressed directly and it genuinely affects execution.
+
+1200
+01:51:44,426 --> 01:51:52,042
+Nobody enjoys maintaining a list of their own system's shortcomings in a shared, visible
+
+1201
+01:51:52,330 --> 01:51:53,230
+document.
+
+1202
+01:51:53,518 --> 01:52:01,133
+The instinct to under-report, to mark something in progress when it's genuinely not started,
+
+1203
+01:52:01,421 --> 01:52:09,037
+or to quietly narrow a gap's description until it sounds smaller than it actually
+
+1204
+01:52:09,325 --> 01:52:15,309
+is, is completely human and completely corrosive to the entire exercise.
+
+1205
+01:52:15,596 --> 01:52:23,212
+The teams that get real value out of a remediation tracker are the ones
+
+1206
+01:52:23,500 --> 01:52:31,116
+that have explicitly, culturally, decoupled finding a gap from any sense of individual blame.
+
+1207
+01:52:31,404 --> 01:52:39,019
+A gap discovered internally, before an auditor ever sees it, is a genuine win
+
+1208
+01:52:39,307 --> 01:52:46,923
+for the team that found it, not a mark against them, and building that
+
+1209
+01:52:47,211 --> 01:52:54,826
+culture deliberately is worth more than any specific YAML structure we've covered in this
+
+1210
+01:52:55,114 --> 01:52:56,014
+lecture.
+
+1211
+01:52:58,014 --> 01:53:01,514
+LECTURE 8 — EVIDENCE ASSEMBLY AND PHASE SYNTHESIS
+
+1212
+01:53:02,514 --> 01:53:11,727
+Everything in this entire phase converges right here, in one single command that produces
+
+1213
+01:53:12,016 --> 01:53:17,938
+a complete, timestamped, sampling ready evidence package on demand.
+
+1214
+01:53:18,228 --> 01:53:27,440
+And here's why this specific moment matters more than it might seem to on
+
+1215
+01:53:27,730 --> 01:53:29,046
+the surface.
+
+1216
+01:53:29,335 --> 01:53:38,548
+An auditor's confidence in your entire program gets set by how you respond to
+
+1217
+01:53:38,837 --> 01:53:42,127
+their very first evidence request.
+
+1218
+01:53:42,416 --> 01:53:51,629
+A five minute turnaround versus a scramble through CloudWatch logs changes the entire tone
+
+1219
+01:53:51,918 --> 01:54:01,131
+of everything that follows in the engagement, not because auditors are being petty about
+
+1220
+01:54:01,420 --> 01:54:10,633
+it, but because a fast, clean response is itself, genuinely, evidence of a functioning
+
+1221
+01:54:10,922 --> 01:54:13,554
+control environment underneath it.
+
+1222
+01:54:13,843 --> 01:54:21,740
+The package structure mirrors exactly what we've built across this whole phase.
+
+1223
+01:54:22,029 --> 01:54:25,977
+One dated folder per evidence date.
+
+1224
+01:54:26,267 --> 01:54:35,479
+Inside it, a manifest, and then one subdirectory per control, each holding its actual
+
+1225
+01:54:35,769 --> 01:54:37,085
+evidence files.
+
+1226
+01:54:37,374 --> 01:54:46,587
+Alongside that, our policies and our runbooks, folded directly into the package, because a
+
+1227
+01:54:46,876 --> 01:54:54,772
+security program is documentation plus proof together, never one without the other.
+
+1228
+01:54:55,062 --> 01:55:04,274
+The assembly script itself takes an optional date argument, defaulting to today if you
+
+1229
+01:55:04,564 --> 01:55:13,776
+don't specify one, which matters because you'll absolutely need to regenerate a package for
+
+1230
+01:55:14,065 --> 01:55:21,962
+some specific date months from now when an auditor's sample lands there.
+
+1231
+01:55:22,251 --> 01:55:28,174
+It creates every control directory in a single command.
+
+1232
+01:55:28,463 --> 01:55:37,676
+It runs through C C six point one, pulling live R B A C
+
+1233
+01:55:37,965 --> 01:55:38,865
+configuration.
+
+1234
+01:55:39,154 --> 01:55:48,367
+C C six point six, pulling R D S encryption status and K M
+
+1235
+01:55:48,656 --> 01:55:51,288
+S rotation status together.
+
+1236
+01:55:51,577 --> 01:55:58,816
+C C six point seven, running a live TLS handshake test.
+
+1237
+01:55:59,105 --> 01:56:08,318
+C C seven point one, pulling H P A status, pod disruption budget status,
+
+1238
+01:56:08,607 --> 01:56:13,871
+and R D S multi A Z status.
+
+1239
+01:56:14,161 --> 01:56:20,741
+C C seven point two, pulling every Prometheus alerting rule.
+
+1240
+01:56:21,030 --> 01:56:30,243
+C C seven point four, pulling Velero backups and R D S snapshots side
+
+1241
+01:56:30,532 --> 01:56:31,848
+by side.
+
+1242
+01:56:32,138 --> 01:56:41,350
+And C C eight point one, pulling branch protection settings and full deployment history
+
+1243
+01:56:41,639 --> 01:56:42,539
+together.
+
+1244
+01:56:42,829 --> 01:56:52,041
+Two design decisions here genuinely matter more than the rest of the script combined,
+
+1245
+01:56:52,331 --> 01:56:56,937
+so let's slow down specifically for these.
+
+1246
+01:56:57,226 --> 01:57:06,439
+The first is empty file detection, and it matters more than you'd initially guess,
+
+1247
+01:57:06,728 --> 01:57:13,308
+because a command that silently fails still creates a file.
+
+1248
+01:57:13,598 --> 01:57:22,810
+It's zero bytes, but it still shows up in a directory listing looking present,
+
+1249
+01:57:23,100 --> 01:57:26,390
+looking fine, proving absolutely nothing.
+
+1250
+01:57:26,679 --> 01:57:35,892
+This exact failure mode is precisely what reaches real auditors, because it slides right
+
+1251
+01:57:36,181 --> 01:57:43,419
+past any naive check that only asks does the file exist.
+
+1252
+01:57:43,709 --> 01:57:52,921
+Our script checks file size specifically, not just file presence, for every single control
+
+1253
+01:57:53,211 --> 01:57:54,111
+directory.
+
+1254
+01:57:54,400 --> 01:58:02,296
+The second is that the script's exit code is meaningful on purpose.
+
+1255
+01:58:02,586 --> 01:58:07,192
+Zero means the package is genuinely complete.
+
+1256
+01:58:07,481 --> 01:58:11,430
+One means there are real gaps.
+
+1257
+01:58:11,719 --> 01:58:20,931
+That means this composes cleanly into a CI pipeline, you can gate a release
+
+1258
+01:58:21,221 --> 01:58:30,433
+on it, or simply run it every night and alert only on failure, without
+
+1259
+01:58:30,723 --> 01:58:39,277
+a single human ever needing to manually open the directory and eyeball it.
+
+1260
+01:58:39,566 --> 01:58:48,779
+Now let's have an honest conversation about build versus buy, because pretending this trade
+
+1261
+01:58:49,068 --> 01:58:58,281
+off doesn't exist helps nobody, and glossing over it is exactly the kind of
+
+1262
+01:58:58,570 --> 01:59:07,783
+thing that makes a course feel written by someone who's never actually had this
+
+1263
+01:59:08,072 --> 01:59:11,362
+conversation with a real client.
+
+1264
+01:59:11,652 --> 01:59:20,864
+Platforms like Vanta, Drata, and Secureframe exist, and they are genuinely useful for plenty
+
+1265
+01:59:21,153 --> 01:59:30,366
+of teams, especially smaller ones running fairly standard SaaS infrastructure who want a GRC
+
+1266
+01:59:30,655 --> 01:59:39,868
+platform with built in auditor workflows and meaningfully less custom tooling to maintain themselves.
+
+1267
+01:59:40,157 --> 01:59:49,370
+Buy, when your team is small, your infrastructure is mostly standard, and speed to
+
+1268
+01:59:49,659 --> 01:59:57,556
+your first Type One matters more than owning the entire pipeline yourself.
+
+1269
+01:59:57,845 --> 02:00:07,058
+Build, which is exactly what we did across this whole phase, when your infrastructure
+
+1270
+02:00:07,347 --> 02:00:16,559
+doesn't map cleanly onto a GRC platform's connector model, because in cluster evidence like
+
+1271
+02:00:16,849 --> 02:00:26,061
+Falco alerts or ArgoCD sync status rarely has a proper first class connector on
+
+1272
+02:00:26,351 --> 02:00:35,563
+any of these platforms, and because you genuinely want your own engineers to understand
+
+1273
+02:00:35,852 --> 02:00:45,065
+these controls deeply, rather than treating compliance as a dashboard some outside vendor quietly
+
+1274
+02:00:45,354 --> 02:00:47,987
+maintains on your behalf.
+
+1275
+02:00:48,276 --> 02:00:51,566
+Both paths are completely legitimate.
+
+1276
+02:00:51,855 --> 02:01:01,068
+Recommending one without first asking about team size and infrastructure shape is the mark
+
+1277
+02:01:01,357 --> 02:01:10,570
+of someone who hasn't actually run this trade off with a real paying client.
+
+1278
+02:01:10,859 --> 02:01:20,072
+Let's zoom all the way out and see how this entire phase actually fits
+
+1279
+02:01:20,361 --> 02:01:29,574
+together as one continuous system, because none of these eight lectures were ever meant
+
+1280
+02:01:29,863 --> 02:01:31,837
+to stand alone.
+
+1281
+02:01:32,126 --> 02:01:38,049
+The system boundary document defines the claim you're making.
+
+1282
+02:01:38,338 --> 02:01:47,551
+The trust boundary and data flow mapping draw the actual fence line around that
+
+1283
+02:01:47,840 --> 02:01:48,740
+claim.
+
+1284
+02:01:49,029 --> 02:01:57,584
+The control catalog is the specific set of commitments living inside that fence.
+
+1285
+02:01:57,873 --> 02:02:07,085
+Evidence automation proves every one of those commitments continuously, every single night, without anyone
+
+1286
+02:02:07,375 --> 02:02:10,665
+remembering to do it manually.
+
+1287
+02:02:10,954 --> 02:02:20,167
+Your Type One versus Type Two strategy decides which specific version of the claim
+
+1288
+02:02:20,456 --> 02:02:25,062
+you're actually ready to make right now.
+
+1289
+02:02:25,352 --> 02:02:34,564
+The auditor walkthrough is you defending that claim live, in the room, with real
+
+1290
+02:02:34,854 --> 02:02:38,144
+evidence pulled up on demand.
+
+1291
+02:02:38,433 --> 02:02:47,646
+Remediation planning is honest, proactive handling of exactly where the claim isn't fully true
+
+1292
+02:02:47,935 --> 02:02:48,835
+yet.
+
+1293
+02:02:49,124 --> 02:02:58,337
+And evidence assembly is the one command proof, instantly available, for absolutely any sampled
+
+1294
+02:02:58,626 --> 02:03:02,574
+day an auditor could possibly choose.
+
+1295
+02:03:02,864 --> 02:03:10,102
+You are not theoretically ready for a Type One audit anymore.
+
+1296
+02:03:10,391 --> 02:03:19,604
+You have real, contemporaneous, immutable evidence that a complete stranger holding a CPA license
+
+1297
+02:03:19,893 --> 02:03:29,106
+would accept without you needing to be standing in the room defending every single
+
+1298
+02:03:29,395 --> 02:03:30,295
+line.
+
+1299
+02:03:30,584 --> 02:03:39,797
+That's the actual outcome of this entire phase, and it's a genuinely rare thing
+
+1300
+02:03:40,086 --> 02:03:46,667
+for an engineering team to be able to say honestly.
+
+1301
+02:03:46,956 --> 02:03:56,169
+Phase Two builds the cryptographic layer that all of this evidence has been quietly
+
+1302
+02:03:56,458 --> 02:03:59,748
+resting on this entire time.
+
+1303
+02:04:00,037 --> 02:04:09,250
+Full K M S key architecture, end to end TLS one point three, and
+
+1304
+02:04:09,539 --> 02:04:18,752
+the complete field level encryption design behind that encryption module we've referenced constantly throughout
+
+1305
+02:04:19,041 --> 02:04:20,357
+this phase.
+
+1306
+02:04:20,646 --> 02:04:29,859
+We build all of it for real, from the ground up, starting next time.
+
+1307
+02:04:30,148 --> 02:04:39,361
+Let's talk about what actually happens organizationally once this evidence pipeline has been running
+
+1308
+02:04:39,650 --> 02:04:48,863
+for a full observation period, because the value of everything we built in this
+
+1309
+02:04:49,152 --> 02:04:55,075
+phase compounds well beyond just passing a single audit.
+
+1310
+02:04:55,364 --> 02:05:04,576
+Six months in, you don't just have a stack of JSON files sitting in
+
+1311
+02:05:04,866 --> 02:05:14,078
+an S3 bucket, you have a genuinely reliable, queryable history of your own security
+
+1312
+02:05:14,368 --> 02:05:16,342
+posture over time.
+
+1313
+02:05:16,631 --> 02:05:25,844
+You can ask, and actually answer, questions like, how has our encryption coverage changed
+
+1314
+02:05:26,133 --> 02:05:35,345
+over the last two quarters, or how many times did our restore test actually
+
+1315
+02:05:35,635 --> 02:05:44,847
+get executed versus scheduled, using nothing but the evidence you were already collecting for
+
+1316
+02:05:45,137 --> 02:05:47,111
+the audit itself.
+
+1317
+02:05:47,400 --> 02:05:55,297
+Teams that treat this pipeline as pure audit overhead miss this entirely.
+
+1318
+02:05:55,586 --> 02:06:04,798
+Teams that treat it as genuine operational telemetry about their own security program start
+
+1319
+02:06:05,088 --> 02:06:14,300
+using it to make real engineering decisions, not just audit decisions, which is exactly
+
+1320
+02:06:14,590 --> 02:06:23,144
+the point where compliance stops being a tax and starts being a capability.
+
+1321
+02:06:23,433 --> 02:06:32,646
+Let's also be honest about maintenance cost over time, because a system like this,
+
+1322
+02:06:32,935 --> 02:06:36,226
+left completely untouched, does decay.
+
+1323
+02:06:36,515 --> 02:06:38,489
+API endpoints change.
+
+1324
+02:06:38,778 --> 02:06:44,701
+Tool versions get upgraded and command flags shift slightly.
+
+1325
+02:06:44,990 --> 02:06:54,202
+A resource gets renamed during a refactor and an evidence collection command that referenced
+
+1326
+02:06:54,492 --> 02:06:58,440
+the old name silently starts failing.
+
+1327
+02:06:58,729 --> 02:07:07,942
+The discipline that keeps this pipeline honest long term is exactly the same discipline
+
+1328
+02:07:08,231 --> 02:07:13,495
+we talked about for the control catalog, ownership.
+
+1329
+02:07:13,785 --> 02:07:22,997
+Every collection step in the workflow should have a name attached to it, someone
+
+1330
+02:07:23,287 --> 02:07:32,499
+whose job includes noticing when their step breaks, the same way you'd expect someone
+
+1331
+02:07:32,789 --> 02:07:38,711
+to notice when a production alert starts firing spuriously.
+
+1332
+02:07:39,000 --> 02:07:48,213
+Compliance infrastructure that nobody owns quietly rots, exactly like any other infrastructure that nobody
+
+1333
+02:07:48,502 --> 02:07:57,715
+owns, and the rot is invisible until precisely the moment an auditor's sample lands
+
+1334
+02:07:58,004 --> 02:08:01,294
+on the day it broke.
+
+1335
+02:08:01,583 --> 02:08:10,796
+Let's also name explicitly what this phase actually prepares you to sell, if you're
+
+1336
+02:08:11,085 --> 02:08:20,298
+a consultant, or to defend, if you're the engineering leader signing the management assertion
+
+1337
+02:08:20,587 --> 02:08:21,487
+yourself.
+
+1338
+02:08:21,776 --> 02:08:29,015
+You now have a repeatable methodology, not a one time project.
+
+1339
+02:08:29,304 --> 02:08:38,517
+System boundary, trust boundary, control catalog, evidence automation, strategy, walkthrough readiness, remediation discipline, assembly
+
+1340
+02:08:38,806 --> 02:08:48,019
+automation, that sequence applies to essentially any production system, not just a financial RAG
+
+1341
+02:08:48,308 --> 02:08:50,940
+platform running on Kubernetes.
+
+1342
+02:08:51,229 --> 02:09:00,442
+The specific file names and specific AWS services will differ from client to client,
+
+1343
+02:09:00,731 --> 02:09:09,944
+but the actual shape of the work, the order of operations, and the judgment
+
+1344
+02:09:10,233 --> 02:09:14,181
+calls at each step, transfer directly.
+
+1345
+02:09:14,471 --> 02:09:23,683
+That transferability is exactly what turns a single successful audit into a genuinely repeatable
+
+1346
+02:09:23,973 --> 02:09:33,185
+practice, and it's the single biggest reason this phase was worth building this thoroughly
+
+1347
+02:09:33,475 --> 02:09:38,081
+instead of rushing straight to a checklist.
+
+1348
+02:09:38,370 --> 02:09:47,583
+Take a moment and actually look at what exists now, all the way back
+
+1349
+02:09:47,872 --> 02:09:49,846
+to lecture one.
+
+1350
+02:09:50,135 --> 02:09:59,348
+A system boundary document with an honest subservice organization disclosure most teams never think
+
+1351
+02:09:59,637 --> 02:10:02,269
+to write down explicitly.
+
+1352
+02:10:02,559 --> 02:10:11,771
+A trust boundary and data flow map that would let a stranger understand your
+
+1353
+02:10:12,061 --> 02:10:15,351
+entire architecture in twenty minutes.
+
+1354
+02:10:15,640 --> 02:10:23,537
+Nineteen controls, each one anchored to real code, not aspirational policy language.
+
+1355
+02:10:23,826 --> 02:10:33,038
+A nightly, unattended, immutable evidence pipeline that makes every single day of your observation
+
+1356
+02:10:33,328 --> 02:10:35,302
+period equally defensible.
+
+1357
+02:10:35,591 --> 02:10:44,804
+A clear, honest strategy for exactly which audit product you're ready to claim right
+
+1358
+02:10:45,093 --> 02:10:45,993
+now.
+
+1359
+02:10:46,282 --> 02:10:55,495
+A walkthrough playbook built around how auditors actually sample, not how nervous engineers imagine
+
+1360
+02:10:55,784 --> 02:10:57,100
+they do.
+
+1361
+02:10:57,389 --> 02:11:06,602
+A remediation discipline that turns known gaps into a credible, evidenced story rather than
+
+1362
+02:11:06,891 --> 02:11:08,866
+something to hide.
+
+1363
+02:11:09,155 --> 02:11:18,367
+And a one command evidence package that turns your auditor's very first request into
+
+1364
+02:11:18,657 --> 02:11:25,237
+a five minute win instead of a multi day scramble.
+
+1365
+02:11:25,526 --> 02:11:34,739
+That is a genuinely complete foundation, and very few engineering teams, at any stage,
+
+1366
+02:11:35,028 --> 02:11:44,241
+actually have all eight of these pieces built this deliberately before their first real
+
+1367
+02:11:44,530 --> 02:11:45,846
+audit begins.
+
+1368
+02:11:46,135 --> 02:11:55,348
+Let's talk, finally, about the actual commercial angle of everything we built in this
+
+1369
+02:11:55,637 --> 02:12:04,850
+phase, because if you're operating as a consultant rather than an in house engineer,
+
+1370
+02:12:05,139 --> 02:12:13,694
+this entire methodology is itself a productized service, not just a teaching exercise.
+
+1371
+02:12:13,983 --> 02:12:23,196
+A client engagement built around exactly these eight deliverables, system boundary, trust boundary and
+
+1372
+02:12:23,485 --> 02:12:32,698
+data flow mapping, control catalog, evidence automation, Type strategy, walkthrough preparation, remediation tracking, and
+
+1373
+02:12:32,987 --> 02:12:42,200
+evidence assembly, gives a prospective client a genuinely concrete scope of work, with clear
+
+1374
+02:12:42,489 --> 02:12:49,069
+milestones, rather than a vague promise to help with compliance.
+
+1375
+02:12:49,358 --> 02:12:58,571
+Price each deliverable as its own milestone if it helps the client budget in
+
+1376
+02:12:58,860 --> 02:13:08,073
+stages, or bundle the whole phase as a fixed scope engagement if they'd rather
+
+1377
+02:13:08,362 --> 02:13:09,678
+commit once.
+
+1378
+02:13:09,968 --> 02:13:19,180
+Either way, the specificity of these eight artifacts is exactly what separates a credible
+
+1379
+02:13:19,469 --> 02:13:28,682
+compliance engagement proposal from a vague one, and specificity is what actually gets proposals
+
+1380
+02:13:28,971 --> 02:13:33,578
+approved by a client's own finance team.
+
+1381
+02:13:33,867 --> 02:13:39,789
+One last thought to carry forward into Phase Two.
+
+1382
+02:13:40,079 --> 02:13:49,291
+Everything we built here assumed encryption, TLS, and field level protection already existed as
+
+1383
+02:13:49,580 --> 02:13:53,529
+controls you could point evidence at.
+
+1384
+02:13:53,818 --> 02:14:03,031
+Phase Two is where we actually build that layer from the ground up, the
+
+1385
+02:14:03,320 --> 02:14:12,533
+KMS key architecture, the TLS termination configuration, the field encryption module itself, rather than
+
+1386
+02:14:12,822 --> 02:14:16,112
+treating it as a given.
+
+1387
+02:14:16,401 --> 02:14:25,614
+If Phase One taught you how to prove a control works, Phase Two teaches
+
+1388
+02:14:25,903 --> 02:14:35,116
+you how to build the control in the first place, and the two phases
+
+1389
+02:14:35,405 --> 02:14:44,618
+together are what actually turn a team from compliant on paper into genuinely secure
+
+1390
+02:14:44,907 --> 02:14:54,120
+in practice, which, done right, are the same thing, but very rarely start out
+
+1391
+02:14:54,409 --> 02:14:55,725
+that way.
+

@@ -1,0 +1,4740 @@
+1
+00:00:00,000 --> 00:00:01,154
+Picture a hospital.
+
+2
+00:00:01,154 --> 00:00:06,923
+Not just any hospital — one that has made a public promise to every patient
+
+3
+00:00:06,923 --> 00:00:10,000
+inside it: the lights will never go out.
+
+4
+00:00:10,000 --> 00:00:11,538
+Not during a storm.
+
+5
+00:00:11,538 --> 00:00:13,846
+Not during a power grid failure.
+
+6
+00:00:13,846 --> 00:00:19,231
+Not even if a transformer a block away explodes at three in the morning.
+
+7
+00:00:19,231 --> 00:00:21,923
+That promise isn't kept by hoping hard.
+
+8
+00:00:21,923 --> 00:00:27,692
+It's kept by architecture: two separate generators, in two separate rooms, fed by two separate
+
+9
+00:00:27,692 --> 00:00:33,462
+fuel lines, so that no single failure — no matter how bad — can plunge
+
+10
+00:00:33,462 --> 00:00:37,692
+the building into darkness at the exact moment someone is mid-surgery.
+
+11
+00:00:37,692 --> 00:00:43,462
+That hospital's promise is, structurally, identical to the promise your SOC 2 report makes about
+
+12
+00:00:43,462 --> 00:00:44,162
+availability.
+
+13
+00:00:44,162 --> 00:00:49,931
+And the surgery happening inside your system, right now, might be someone checking a brokerage
+
+14
+00:00:49,931 --> 00:00:55,700
+balance before making a trade, or a compliance officer pulling a report five minutes before
+
+15
+00:00:55,700 --> 00:00:56,854
+a filing deadline.
+
+16
+00:00:56,854 --> 00:01:01,085
+To them, "the system was briefly down" isn't a shrug-worthy inconvenience.
+
+17
+00:01:01,085 --> 00:01:06,469
+It's the moment your product failed them at the exact moment they needed it.
+
+18
+00:01:06,469 --> 00:01:08,008
+Welcome to Phase 6.
+
+19
+00:01:08,008 --> 00:01:13,777
+Over the next hour and fifty minutes, we're going to build the electrical architecture of
+
+20
+00:01:13,777 --> 00:01:19,546
+that hospital, layer by layer, for a real production system — and by the end,
+
+21
+00:01:19,546 --> 00:01:25,315
+you'll understand not just how to configure Multi-AZ databases and autoscaling, but why each layer
+
+22
+00:01:25,315 --> 00:01:31,085
+exists, which specific failure it defends against, and — just as importantly — where the
+
+23
+00:01:31,085 --> 00:01:33,777
+honest limits of each defense actually are.
+
+24
+00:01:33,777 --> 00:01:38,008
+This entire phase maps to one SOC 2 control: CC7.1, availability.
+
+25
+00:01:38,008 --> 00:01:43,777
+And here's what makes CC7.1 genuinely different from most of the controls you've built in
+
+26
+00:01:43,777 --> 00:01:45,700
+earlier phases of this course.
+
+27
+00:01:45,700 --> 00:01:51,469
+Access control and audit logging are things you can largely configure once and verify are
+
+28
+00:01:51,469 --> 00:01:53,008
+still correctly configured later.
+
+29
+00:01:53,008 --> 00:01:58,777
+Availability is different — it's not a static configuration, it's a claim about behavior under
+
+30
+00:01:58,777 --> 00:02:04,546
+stress, and the only honest way to back up a claim about behavior under stress
+
+31
+00:02:04,546 --> 00:02:08,008
+is to actually apply stress and watch what happens.
+
+32
+00:02:08,008 --> 00:02:11,085
+You cannot screenshot your way to proving availability.
+
+33
+00:02:11,085 --> 00:02:15,315
+You have to break things, on purpose, and film the recovery.
+
+34
+00:02:15,315 --> 00:02:21,085
+Let's set up the mental model that's going to organize everything in this phase, because
+
+35
+00:02:21,085 --> 00:02:26,085
+there's a genuinely useful hierarchy hiding underneath what looks like eight unrelated topics.
+
+36
+00:02:26,085 --> 00:02:31,854
+Think of availability threats as existing on a scale, from "annoying" to "catastrophic." At the
+
+37
+00:02:31,854 --> 00:02:34,931
+bottom of that scale: a single pod crashes.
+
+38
+00:02:34,931 --> 00:02:40,700
+That's routine, and Kubernetes already handles it by restarting the container — barely worth calling
+
+39
+00:02:40,700 --> 00:02:42,623
+an availability incident at all.
+
+40
+00:02:42,623 --> 00:02:48,392
+One level up: an entire node dies — the physical or virtual machine underneath several
+
+41
+00:02:48,392 --> 00:02:49,931
+pods disappears at once.
+
+42
+00:02:49,931 --> 00:02:55,700
+Above that: an entire availability zone, essentially a whole data center, goes offline — a
+
+43
+00:02:55,700 --> 00:03:01,469
+genuinely rare event, but one that has happened to every major cloud provider, including AWS,
+
+44
+00:03:01,469 --> 00:03:02,623
+more than once.
+
+45
+00:03:02,623 --> 00:03:08,392
+And at the very top of that scale: sustained, unpredictable traffic that has nothing to
+
+46
+00:03:08,392 --> 00:03:14,162
+do with hardware failing at all, but simply exceeds what your current capacity can absorb,
+
+47
+00:03:14,162 --> 00:03:19,931
+which — if you're not prepared for it — is functionally indistinguishable from an outage
+
+48
+00:03:19,931 --> 00:03:24,546
+to the person trying to use your product at that exact moment.
+
+49
+00:03:24,546 --> 00:03:29,546
+Every technique in this phase defends against one specific rung of that ladder.
+
+50
+00:03:29,546 --> 00:03:33,777
+Multi-AZ RDS and topology spread constraints defend against the AZ-failure rung.
+
+51
+00:03:33,777 --> 00:03:39,546
+Redis persistence defends against a narrower, sneakier threat: not availability exactly, but data durability when
+
+52
+00:03:39,546 --> 00:03:42,238
+a pod restarts for entirely mundane reasons.
+
+53
+00:03:42,238 --> 00:03:45,315
+HPA and Karpenter defend against the traffic-spike rung.
+
+54
+00:03:45,315 --> 00:03:51,085
+PodDisruptionBudgets defend against a threat that's easy to forget entirely: your own maintenance work accidentally
+
+55
+00:03:51,085 --> 00:03:52,238
+becoming the outage.
+
+56
+00:03:52,238 --> 00:03:58,008
+Read replicas defend against a slow, creeping form of unavailability — a database quietly buckling
+
+57
+00:03:58,008 --> 00:04:01,469
+under read load until every query becomes agonizingly slow.
+
+58
+00:04:01,469 --> 00:04:07,238
+And chaos engineering, backup restore testing, and SLO monitoring aren't really separate defenses at all
+
+59
+00:04:07,238 --> 00:04:13,008
+— they're how you verify, honestly and repeatedly, that everything above them actually works the
+
+60
+00:04:13,008 --> 00:04:14,931
+way you're claiming it does.
+
+61
+00:04:14,931 --> 00:04:20,700
+One quick, important detour before we start building, because it changes how you should read
+
+62
+00:04:20,700 --> 00:04:22,623
+every claim in this phase.
+
+63
+00:04:22,623 --> 00:04:28,392
+In SOC 2 language, availability doesn't mean "always perfectly up." It means you've defined a
+
+64
+00:04:28,392 --> 00:04:34,162
+specific, measurable service level objective — say, 99.9 percent uptime over a rolling month —
+
+65
+00:04:34,162 --> 00:04:39,931
+and you can demonstrate, with real evidence, that you're meeting it, or that you know
+
+66
+00:04:39,931 --> 00:04:42,238
+exactly when and why you didn't.
+
+67
+00:04:42,238 --> 00:04:48,008
+Ninety-nine point nine percent, done honestly, still leaves you about forty-three minutes of allowed downtime
+
+68
+00:04:48,008 --> 00:04:49,162
+every single month.
+
+69
+00:04:49,162 --> 00:04:52,623
+That's not a loophole — it's the entire point.
+
+70
+00:04:52,623 --> 00:04:58,008
+Nobody, including AWS itself, promises zero downtime, because that promise would be a lie.
+
+71
+00:04:58,008 --> 00:05:03,777
+What SOC 2 actually wants from you is intellectual honesty: a stated target, real measurement
+
+72
+00:05:03,777 --> 00:05:09,546
+against that target, and a demonstrated ability to recover quickly when something breaks — not
+
+73
+00:05:09,546 --> 00:05:11,085
+a fantasy of perfection.
+
+74
+00:05:11,085 --> 00:05:16,854
+One more piece of vocabulary worth nailing down before we start building, because you'll hear
+
+75
+00:05:16,854 --> 00:05:22,623
+both terms constantly for the rest of this phase, and auditors use them with real
+
+76
+00:05:22,623 --> 00:05:23,777
+precision, not loosely.
+
+77
+00:05:23,777 --> 00:05:29,546
+RTO — Recovery Time Objective — is how long you're allowed to be down before
+
+78
+00:05:29,546 --> 00:05:31,854
+you've failed your own stated commitment.
+
+79
+00:05:31,854 --> 00:05:37,623
+RPO — Recovery Point Objective — is how much data you're allowed to lose, measured
+
+80
+00:05:37,623 --> 00:05:42,238
+in time, if a failure happens right in the middle of things.
+
+81
+00:05:42,238 --> 00:05:48,008
+A four-hour RTO means "we commit to being fully back up within four hours of
+
+82
+00:05:48,008 --> 00:05:53,777
+a serious incident." A five-minute RPO means "in the worst case, we might lose up
+
+83
+00:05:53,777 --> 00:05:59,546
+to five minutes of the very latest data, but never more than that." These two
+
+84
+00:05:59,546 --> 00:06:05,315
+numbers aren't abstract compliance jargon — they're the actual yardsticks every single technique in this
+
+85
+00:06:05,315 --> 00:06:06,854
+phase gets measured against.
+
+86
+00:06:06,854 --> 00:06:12,623
+Multi-AZ failover, done right, gives you an RTO measured in minutes and an RPO close
+
+87
+00:06:12,623 --> 00:06:16,085
+to zero, because the standby was never meaningfully behind.
+
+88
+00:06:16,085 --> 00:06:21,854
+Our quarterly restore test, later in this phase, exists specifically to prove your stated RTO
+
+89
+00:06:21,854 --> 00:06:27,623
+for full disaster recovery is actually true, rather than a comforting number someone wrote in
+
+90
+00:06:27,623 --> 00:06:30,315
+a document once and never actually tested.
+
+91
+00:06:30,315 --> 00:06:36,085
+Let's start at the foundation, the same place the hospital's electricians would start: the single
+
+92
+00:06:36,085 --> 00:06:41,854
+most important piece of equipment in the whole building, and what happens the instant its
+
+93
+00:06:41,854 --> 00:06:43,008
+room goes dark.
+
+94
+00:06:43,008 --> 00:06:46,469
+Here's a genuinely uncomfortable thought experiment to open with.
+
+95
+00:06:46,469 --> 00:06:52,238
+Suppose your entire application — beautifully engineered, perfectly logged, immaculately secured — runs happily for
+
+96
+00:06:52,238 --> 00:06:55,315
+a year in a single AWS Availability Zone.
+
+97
+00:06:55,315 --> 00:06:57,623
+One day, that AZ goes down.
+
+98
+00:06:57,623 --> 00:06:58,777
+Not your fault.
+
+99
+00:06:58,777 --> 00:07:00,700
+Not a bug you wrote.
+
+100
+00:07:00,700 --> 00:07:06,469
+Just a data center, hundreds of miles away from anything you control, losing power or
+
+101
+00:07:06,469 --> 00:07:08,008
+cooling or network connectivity.
+
+102
+00:07:08,008 --> 00:07:13,777
+Your system is now completely down, for as long as that AZ stays down, and
+
+103
+00:07:13,777 --> 00:07:19,546
+there was nothing in your architecture that could have prevented it — because your architecture
+
+104
+00:07:19,546 --> 00:07:24,162
+never gave itself the option of surviving without that one specific building.
+
+105
+00:07:24,162 --> 00:07:29,931
+This is the single point of failure problem, and it's worth understanding why it's so
+
+106
+00:07:29,931 --> 00:07:31,469
+seductive to accidentally build.
+
+107
+00:07:31,469 --> 00:07:33,392
+A single-AZ system is simpler.
+
+108
+00:07:33,392 --> 00:07:34,162
+It's cheaper.
+
+109
+00:07:34,162 --> 00:07:39,931
+It works perfectly in every test you run, right up until the one day it
+
+110
+00:07:39,931 --> 00:07:45,700
+doesn't — and that one day is precisely the day your availability SLO, and your
+
+111
+00:07:45,700 --> 00:07:48,777
+credibility with your customers, gets tested for real.
+
+112
+00:07:48,777 --> 00:07:54,546
+Let's fix this at the database layer first, because if your database is down, nothing
+
+113
+00:07:54,546 --> 00:08:00,315
+else in your architecture matters at all — every other service in the stack is
+
+114
+00:08:00,315 --> 00:08:01,854
+just waiting on it.
+
+115
+00:08:01,854 --> 00:08:07,623
+RDS Multi-AZ solves this with a technique that's elegant once you understand it: AWS maintains
+
+116
+00:08:07,623 --> 00:08:13,392
+a synchronous standby replica of your primary database, physically located in a different Availability Zone.
+
+117
+00:08:13,392 --> 00:08:19,162
+"Synchronous" is the key word — every single write to your primary database is also
+
+118
+00:08:19,162 --> 00:08:24,931
+confirmed on the standby before your application even receives an acknowledgment that the write succeeded.
+
+119
+00:08:24,931 --> 00:08:30,700
+This matters enormously, and it's worth contrasting with the read replicas we'll build later in
+
+120
+00:08:30,700 --> 00:08:34,162
+this phase, which replicate asynchronously and can lag behind.
+
+121
+00:08:34,162 --> 00:08:36,469
+The Multi-AZ standby is never behind.
+
+122
+00:08:36,469 --> 00:08:42,238
+It is, at every moment, a mirror-perfect copy of your primary, just sitting in a
+
+123
+00:08:42,238 --> 00:08:46,085
+different building, ready to take over the instant it's needed.
+
+124
+00:08:46,085 --> 00:08:51,854
+When the primary fails — hardware issue, an AZ-wide outage, whatever the cause — AWS
+
+125
+00:08:51,854 --> 00:08:57,623
+detects it and automatically promotes the standby to become the new primary, typically completing that
+
+126
+00:08:57,623 --> 00:08:59,546
+failover in under two minutes.
+
+127
+00:08:59,546 --> 00:09:02,238
+Your application doesn't need custom failover logic.
+
+128
+00:09:02,238 --> 00:09:08,008
+It reconnects to the same database endpoint — AWS handles the DNS-level redirection underneath —
+
+129
+00:09:08,008 --> 00:09:13,777
+and after a brief connection interruption, it's talking to what is now the primary database,
+
+130
+00:09:13,777 --> 00:09:19,546
+seamlessly, with zero data loss, because the standby was never out of sync in the
+
+131
+00:09:19,546 --> 00:09:20,315
+first place.
+
+132
+00:09:20,315 --> 00:09:21,469
+On screen: terraform/modules/rds/main.tf.
+
+133
+00:09:21,469 --> 00:09:27,238
+The setting that does all this work is a single boolean, multi_az, set to true
+
+134
+00:09:27,238 --> 00:09:28,008
+for production.
+
+135
+00:09:28,008 --> 00:09:33,392
+Notice we also explicitly set availability_zone to null — a small but meaningful detail.
+
+136
+00:09:33,392 --> 00:09:39,162
+If you pin the primary to a specific AZ, you're quietly reintroducing bias into a
+
+137
+00:09:39,162 --> 00:09:44,931
+system that's supposed to be AZ-agnostic; letting AWS choose keeps your infrastructure honest about not
+
+138
+00:09:44,931 --> 00:09:47,238
+depending on any one particular zone.
+
+139
+00:09:47,238 --> 00:09:53,008
+We add deletion_protection, because an accidentally deleted production database is a self-inflicted availability incident that
+
+140
+00:09:53,008 --> 00:09:58,777
+Multi-AZ cannot save you from — no standby in the world helps if a human
+
+141
+00:09:58,777 --> 00:10:00,700
+being deletes the whole instance.
+
+142
+00:10:00,700 --> 00:10:06,469
+And we set a thirty-day backup retention window with automated snapshots, which becomes relevant again
+
+143
+00:10:06,469 --> 00:10:10,315
+later in this phase, when we get to restore testing.
+
+144
+00:10:10,315 --> 00:10:14,546
+We also attach a CloudWatch alarm specifically watching for failover events.
+
+145
+00:10:14,546 --> 00:10:20,315
+Here's a subtlety worth sitting with: Multi-AZ failover being fast and automatic is genuinely good
+
+146
+00:10:20,315 --> 00:10:25,315
+news for your uptime, but it should never be invisible to your team.
+
+147
+00:10:25,315 --> 00:10:31,085
+A failover happening means something actually failed — maybe transiently, maybe not — and if
+
+148
+00:10:31,085 --> 00:10:36,854
+failovers start happening every week instead of once a year, that's a serious underlying infrastructure
+
+149
+00:10:36,854 --> 00:10:38,392
+problem quietly announcing itself.
+
+150
+00:10:38,392 --> 00:10:44,162
+The alarm ensures a human finds out, even though the system recovered on its own
+
+151
+00:10:44,162 --> 00:10:45,315
+without needing one.
+
+152
+00:10:45,315 --> 00:10:49,931
+With the database covered, let's move up a layer, to Kubernetes itself.
+
+153
+00:10:49,931 --> 00:10:55,700
+Here's something that surprises a lot of engineers the first time they hear it: the
+
+154
+00:10:55,700 --> 00:11:01,469
+EKS control plane — the brain coordinating your entire cluster — is already Multi-AZ by
+
+155
+00:11:01,469 --> 00:11:02,169
+default.
+
+156
+00:11:02,169 --> 00:11:07,554
+AWS manages that redundancy for you, and there's no configuration required on your part.
+
+157
+00:11:07,554 --> 00:11:13,323
+What is entirely your responsibility, and what most teams get wrong by accident rather than
+
+158
+00:11:13,323 --> 00:11:19,092
+on purpose, is where your worker nodes and your actual application pods end up running.
+
+159
+00:11:19,092 --> 00:11:20,246
+On screen: terraform/modules/eks/main.tf.
+
+160
+00:11:20,246 --> 00:11:26,015
+The node group configuration specifies subnet_ids drawn from all three private subnets — one per
+
+161
+00:11:26,015 --> 00:11:29,862
+Availability Zone — rather than pointing at a single subnet.
+
+162
+00:11:29,862 --> 00:11:34,477
+This alone doesn't guarantee even distribution; it just makes even distribution possible.
+
+163
+00:11:34,477 --> 00:11:40,246
+We set a desired size of six nodes specifically because six divides evenly by three
+
+164
+00:11:40,246 --> 00:11:46,015
+AZs, giving Kubernetes a clean, balanced number to distribute — an oddly satisfying but genuinely
+
+165
+00:11:46,015 --> 00:11:50,246
+practical bit of arithmetic that saves you from lopsided placement later.
+
+166
+00:11:50,246 --> 00:11:56,015
+But here's the trap, and it's worth naming explicitly, because it's the most common Multi-AZ
+
+167
+00:11:56,015 --> 00:11:59,477
+mistake in the entire industry, not just this course.
+
+168
+00:11:59,477 --> 00:12:05,246
+Having nodes spread across three AZs does absolutely nothing, by itself, to guarantee your pods
+
+169
+00:12:05,246 --> 00:12:07,938
+are spread across those same three AZs.
+
+170
+00:12:07,938 --> 00:12:13,708
+Kubernetes' default scheduler is optimizing for resource efficiency — bin-packing pods onto nodes efficiently —
+
+171
+00:12:13,708 --> 00:12:15,246
+not for AZ diversity.
+
+172
+00:12:15,246 --> 00:12:21,015
+Left to its own devices, it will quite happily place all six replicas of your
+
+173
+00:12:21,015 --> 00:12:26,785
+API deployment onto nodes that all happen to sit in the same Availability Zone, if
+
+174
+00:12:26,785 --> 00:12:29,862
+that's what looks most resource-efficient at scheduling time.
+
+175
+00:12:29,862 --> 00:12:35,631
+You'd have three healthy AZs of infrastructure and one giant, invisible single point of failure
+
+176
+00:12:35,631 --> 00:12:40,631
+sitting right in the middle of it, disguised as a "highly available" deployment.
+
+177
+00:12:40,631 --> 00:12:43,708
+This is exactly what topologySpreadConstraints exist to prevent.
+
+178
+00:12:43,708 --> 00:12:44,862
+On screen: helm/templates/api-deployment.yaml.
+
+179
+00:12:44,862 --> 00:12:50,631
+The first constraint uses topology.kubernetes.io/zone as its key, with maxSkew set to 1 — meaning
+
+180
+00:12:50,631 --> 00:12:56,400
+the difference between the AZ with the most replicas and the AZ with the fewest
+
+181
+00:12:56,400 --> 00:13:02,169
+can never exceed one pod — and whenUnsatisfiable set to DoNotSchedule, which is the strict,
+
+182
+00:13:02,169 --> 00:13:07,938
+uncompromising setting: if honoring this constraint isn't possible right now, the pod simply stays pending
+
+183
+00:13:07,938 --> 00:13:11,400
+rather than landing somewhere that violates our spread requirement.
+
+184
+00:13:11,400 --> 00:13:17,169
+A second, softer constraint spreads pods across individual nodes within each zone too, using ScheduleAnyway
+
+185
+00:13:17,169 --> 00:13:22,938
+instead, because a slightly uneven distribution within a single zone is a minor inefficiency, not
+
+186
+00:13:22,938 --> 00:13:26,015
+a genuine availability risk worth blocking scheduling over.
+
+187
+00:13:26,015 --> 00:13:31,785
+We add one more layer on top: pod anti-affinity, specifically discouraging — though not strictly
+
+188
+00:13:31,785 --> 00:13:36,785
+forbidding — two API replicas from landing on the exact same physical node.
+
+189
+00:13:36,785 --> 00:13:39,862
+Why does this matter separately from AZ spread?
+
+190
+00:13:39,862 --> 00:13:45,631
+Because a single node dying is a far more common event than an entire AZ
+
+191
+00:13:45,631 --> 00:13:46,331
+dying.
+
+192
+00:13:46,331 --> 00:13:52,100
+If four of your six API replicas happen to be sharing one large node, that
+
+193
+00:13:52,100 --> 00:13:57,869
+one node's failure takes out two-thirds of your API capacity in one shot, even though
+
+194
+00:13:57,869 --> 00:14:01,331
+your AZ-level spread constraint was satisfied the whole time.
+
+195
+00:14:01,331 --> 00:14:04,792
+AZ spread protects you from the rare, catastrophic event.
+
+196
+00:14:04,792 --> 00:14:09,792
+Node-level anti-affinity protects you from the far more mundane, far more frequent one.
+
+197
+00:14:09,792 --> 00:14:15,562
+Let's verify all of this actually worked, because — and this is a lesson worth
+
+198
+00:14:15,562 --> 00:14:21,331
+internalizing early in this entire phase — a Terraform apply completing successfully and a kubectl
+
+199
+00:14:21,331 --> 00:14:25,177
+apply returning "deployment configured" tell you your configuration was accepted.
+
+200
+00:14:25,177 --> 00:14:29,023
+Neither one tells you your system is actually distributed correctly.
+
+201
+00:14:29,023 --> 00:14:32,485
+Verification is its own separate, mandatory step, every time.
+
+202
+00:14:32,485 --> 00:14:38,254
+On screen: aws rds describe-db-instances, querying specifically for the MultiAZ field, which should return true.
+
+203
+00:14:38,254 --> 00:14:44,023
+Then a query for which specific AZ currently holds the primary — useful context, not
+
+204
+00:14:44,023 --> 00:14:47,100
+a pass or fail signal on its own.
+
+205
+00:14:47,100 --> 00:14:52,869
+Then, on the Kubernetes side: kubectl get nodes, piped through jq to extract each node's
+
+206
+00:14:52,869 --> 00:14:55,177
+zone label, then sorted and counted.
+
+207
+00:14:55,177 --> 00:15:00,946
+You're looking for something close to an even three-way split — two nodes per zone,
+
+208
+00:15:00,946 --> 00:15:06,331
+roughly, not five nodes crammed into one zone and one node lonely in another.
+
+209
+00:15:06,331 --> 00:15:12,100
+Finally, the check that actually matters most for real-world resilience: querying pod placement specifically for
+
+210
+00:15:12,100 --> 00:15:17,869
+your API deployment, confirming that your topology spread constraint didn't just get accepted by the
+
+211
+00:15:17,869 --> 00:15:23,638
+API server, but is genuinely holding in practice, right now, on your actual running cluster.
+
+212
+00:15:23,638 --> 00:15:29,408
+Here's your first checkpoint for this phase, and it's the most important one, because everything
+
+213
+00:15:29,408 --> 00:15:31,715
+after it builds on this foundation.
+
+214
+00:15:31,715 --> 00:15:34,792
+Confirm your RDS instance reports Multi-AZ as true.
+
+215
+00:15:34,792 --> 00:15:38,254
+Confirm your nodes are evenly spread across three zones.
+
+216
+00:15:38,254 --> 00:15:43,254
+Confirm your API pods are evenly spread too — not just your nodes.
+
+217
+00:15:43,254 --> 00:15:49,023
+And then do the genuinely useful part: pick one Availability Zone, and cordon every node
+
+218
+00:15:49,023 --> 00:15:52,100
+in it, simulating that entire zone going dark.
+
+219
+00:15:52,100 --> 00:15:55,177
+Watch what actually happens to your running pods.
+
+220
+00:15:55,177 --> 00:15:58,638
+Do they reschedule cleanly onto the remaining two zones?
+
+221
+00:15:58,638 --> 00:16:00,562
+How long does that take?
+
+222
+00:16:00,562 --> 00:16:06,331
+Document it, because "I configured Multi-AZ" and "I watched Multi-AZ actually save my system during
+
+223
+00:16:06,331 --> 00:16:12,100
+a simulated failure" are two very different sentences to be able to say to an
+
+224
+00:16:12,100 --> 00:16:15,946
+auditor — and only one of them is genuinely convincing.
+
+225
+00:16:15,946 --> 00:16:21,715
+Let's make this concrete against our own two systems rather than talking about it only
+
+226
+00:16:21,715 --> 00:16:22,869
+in the abstract.
+
+227
+00:16:22,869 --> 00:16:28,638
+Financial RAG's production database, financial-rag-prod, is exactly the instance we just configured — Multi-AZ, deletion
+
+228
+00:16:28,638 --> 00:16:32,485
+protection, thirty-day backups, the CloudWatch failover alarm, all of it.
+
+229
+00:16:32,485 --> 00:16:38,254
+RiskOracle runs its own separate RDS instance, holding portfolio risk calculations rather than SEC filing
+
+230
+00:16:38,254 --> 00:16:44,023
+embeddings, and it gets the identical treatment, not a lighter version because it feels like
+
+231
+00:16:44,023 --> 00:16:45,562
+the less customer-facing system.
+
+232
+00:16:45,562 --> 00:16:51,331
+Cordon a zone against both instances, not just one, and watch each one fail over
+
+233
+00:16:51,331 --> 00:16:52,031
+independently.
+
+234
+00:16:52,031 --> 00:16:57,800
+If you've only ever tested this against financial-rag, you don't actually know RiskOracle survives an
+
+235
+00:16:57,800 --> 00:17:02,415
+AZ failure — you're assuming it does because the Terraform looks similar.
+
+236
+00:17:02,415 --> 00:17:08,185
+Before we move to the next lecture, a quick, honest aside about the two most
+
+237
+00:17:08,185 --> 00:17:13,954
+common ways teams mess up exactly what we just built, because I'd rather you hear
+
+238
+00:17:13,954 --> 00:17:18,185
+about these now than discover them during an actual AZ outage.
+
+239
+00:17:18,185 --> 00:17:23,954
+The first mistake: nailing the AZ spread for your main API deployment, and then quietly
+
+240
+00:17:23,954 --> 00:17:28,954
+forgetting to apply the same discipline to every other component in the system.
+
+241
+00:17:28,954 --> 00:17:30,108
+Your agent workers.
+
+242
+00:17:30,108 --> 00:17:31,646
+Your background job processors.
+
+243
+00:17:31,646 --> 00:17:33,569
+Any sidecar or supporting service.
+
+244
+00:17:33,569 --> 00:17:39,338
+If your API is beautifully spread across three zones but your job queue processor is
+
+245
+00:17:39,338 --> 00:17:45,108
+a single replica sitting in one zone with no spread constraint at all, you haven't
+
+246
+00:17:45,108 --> 00:17:50,877
+actually eliminated your single point of failure — you've just moved it to a less
+
+247
+00:17:50,877 --> 00:17:56,646
+obvious place, one that's easy to forget about entirely until the exact AZ holding it
+
+248
+00:17:56,646 --> 00:17:59,723
+happens to be the one that goes down.
+
+249
+00:17:59,723 --> 00:18:05,492
+The second mistake is subtler, and it's about StatefulSets specifically — which matters because we're
+
+250
+00:18:05,492 --> 00:18:08,954
+about to build one, in the very next lecture.
+
+251
+00:18:08,954 --> 00:18:14,723
+Deployments reschedule freely; if a pod dies, Kubernetes creates a fresh replacement wherever makes sense.
+
+252
+00:18:14,723 --> 00:18:20,492
+StatefulSets, by design, are far more attached to their identity and their storage volume, which
+
+253
+00:18:20,492 --> 00:18:26,262
+is exactly why they're used for stateful things in the first place — but it
+
+254
+00:18:26,262 --> 00:18:32,031
+also means AZ spread constraints on a StatefulSet interact with storage in ways that trip
+
+255
+00:18:32,031 --> 00:18:32,800
+people up.
+
+256
+00:18:32,800 --> 00:18:38,569
+An Amazon EBS volume lives in one specific Availability Zone, permanently, for its entire life.
+
+257
+00:18:38,569 --> 00:18:44,338
+If your StatefulSet pod gets rescheduled onto a node in a different zone than the
+
+258
+00:18:44,338 --> 00:18:50,108
+one holding its volume, it simply cannot reattach to its own data — it will
+
+259
+00:18:50,108 --> 00:18:55,877
+sit there, pending, forever, looking every bit like your system successfully "recovered" from a failure
+
+260
+00:18:55,877 --> 00:18:58,954
+while actually silently failing to start at all.
+
+261
+00:18:58,954 --> 00:19:03,954
+Keep that specific trap in mind, because it's about to become directly relevant.
+
+262
+00:19:03,954 --> 00:19:09,723
+Let's talk about a kind of failure that's easy to underestimate, precisely because it happens
+
+263
+00:19:09,723 --> 00:19:13,569
+constantly and is almost always harmless: a pod simply restarts.
+
+264
+00:19:13,569 --> 00:19:14,723
+Maybe it crashed.
+
+265
+00:19:14,723 --> 00:19:18,569
+Maybe Kubernetes evicted it to make room for something else.
+
+266
+00:19:18,569 --> 00:19:20,877
+Maybe you deployed a new version.
+
+267
+00:19:20,877 --> 00:19:26,646
+For a stateless API pod, a restart is a non-event — a fresh copy starts
+
+268
+00:19:26,646 --> 00:19:32,415
+up, reconnects to the database, and nothing was ever lost, because nothing important was ever
+
+269
+00:19:32,415 --> 00:19:35,108
+stored inside that pod to begin with.
+
+270
+00:19:35,108 --> 00:19:40,877
+Redis is a different animal entirely, and here's the analogy that makes the danger click
+
+271
+00:19:40,877 --> 00:19:46,646
+immediately: think of default, unconfigured Redis as a brilliant colleague with absolutely no long-term memory.
+
+272
+00:19:46,646 --> 00:19:52,415
+Ask them anything during the workday, and they'll answer instantly, from memory, faster than anyone
+
+273
+00:19:52,415 --> 00:19:53,954
+else in the building.
+
+274
+00:19:53,954 --> 00:19:59,338
+But the moment they step out for lunch and come back, they remember nothing.
+
+275
+00:19:59,338 --> 00:20:00,877
+Not who you are.
+
+276
+00:20:00,877 --> 00:20:03,569
+Not what you discussed an hour ago.
+
+277
+00:20:03,569 --> 00:20:05,877
+Every conversation starts completely from scratch.
+
+278
+00:20:05,877 --> 00:20:11,646
+For some workloads, that's genuinely fine — a rate-limiting counter that resets itself is barely
+
+279
+00:20:11,646 --> 00:20:12,415
+worth mourning.
+
+280
+00:20:12,415 --> 00:20:18,185
+But for agent state, session continuity, and query result caching, quietly losing everything on every
+
+281
+00:20:18,185 --> 00:20:20,877
+routine pod restart isn't a minor inconvenience.
+
+282
+00:20:20,877 --> 00:20:26,646
+It's a real, repeated, entirely avoidable degradation of your product, happening every single time Kubernetes
+
+283
+00:20:26,646 --> 00:20:31,262
+does something completely ordinary and unremarkable, like rolling out a routine update.
+
+284
+00:20:31,262 --> 00:20:37,031
+Redis solves its own amnesia with something called AOF — Append Only File — persistence,
+
+285
+00:20:37,031 --> 00:20:42,800
+and the underlying idea is refreshingly close to what we built for audit logging back
+
+286
+00:20:42,800 --> 00:20:44,338
+in an earlier phase.
+
+287
+00:20:44,338 --> 00:20:50,108
+Every single write operation gets appended to a log file on disk, in the exact
+
+288
+00:20:50,108 --> 00:20:51,262
+order it happened.
+
+289
+00:20:51,262 --> 00:20:57,031
+When Redis restarts, rather than starting with a blank memory, it reads through that entire
+
+290
+00:20:57,031 --> 00:21:02,800
+log from the beginning and replays every operation, exactly as it happened, reconstructing its complete
+
+291
+00:21:02,800 --> 00:21:06,262
+in-memory state before it starts serving any new requests.
+
+292
+00:21:06,262 --> 00:21:12,031
+It's less like a colleague getting their memory wiped, and more like a colleague who,
+
+293
+00:21:12,031 --> 00:21:17,800
+every single time they step away, immediately and instinctively re-reads their own meticulous notebook the
+
+294
+00:21:17,800 --> 00:21:23,569
+moment they return — and instead of "what did we talk about," they're right back
+
+295
+00:21:23,569 --> 00:21:25,492
+up to speed in seconds.
+
+296
+00:21:25,492 --> 00:21:26,646
+Let's configure it.
+
+297
+00:21:26,646 --> 00:21:27,800
+On screen: helm/templates/redis-statefulset.yaml.
+
+298
+00:21:27,800 --> 00:21:33,569
+First, notice this is a StatefulSet, not a Deployment — directly connecting to the caution
+
+299
+00:21:33,569 --> 00:21:39,338
+from a moment ago, because Redis, once we give it persistent data on disk, needs
+
+300
+00:21:39,338 --> 00:21:45,108
+a stable identity and a stable volume, exactly the kind of stateful component that AZ-and-storage
+
+301
+00:21:45,108 --> 00:21:48,954
+mismatch trap can quietly break if you're not paying attention.
+
+302
+00:21:48,954 --> 00:21:52,800
+The persistence configuration itself lives in the container's startup arguments.
+
+303
+00:21:52,800 --> 00:21:58,569
+appendonly yes turns AOF on at all — without this single flag, everything else in
+
+304
+00:21:58,569 --> 00:22:02,800
+this section is meaningless, because Redis defaults to pure in-memory operation.
+
+305
+00:22:02,800 --> 00:22:08,569
+appendfsync everysec is the setting that actually determines your real durability guarantee, and it's worth
+
+306
+00:22:08,569 --> 00:22:14,338
+understanding the trade-off explicitly rather than trusting the default blindly: Redis batches writes to disk
+
+307
+00:22:14,338 --> 00:22:17,800
+once per second, rather than after every single command.
+
+308
+00:22:17,800 --> 00:22:23,569
+This is a deliberate, reasonable compromise — syncing after literally every write would be dramatically
+
+309
+00:22:23,569 --> 00:22:29,338
+safer but would also devastate performance, turning Redis from "blazing fast in-memory store" into "a
+
+310
+00:22:29,338 --> 00:22:35,108
+fairly ordinary disk-bound database wearing Redis's name." Syncing once a second means that, in the
+
+311
+00:22:35,108 --> 00:22:40,877
+absolute worst case — the exact instant of a hard crash, mid-second — you could
+
+312
+00:22:40,877 --> 00:22:45,492
+lose up to roughly one second's worth of the most recent writes.
+
+313
+00:22:45,492 --> 00:22:50,492
+For a caching and agent-state layer, that's a genuinely sensible trade to make.
+
+314
+00:22:50,492 --> 00:22:56,262
+For something like financial transaction data, that same trade-off would likely be unacceptable, and you'd
+
+315
+00:22:56,262 --> 00:23:02,031
+want a different tool entirely, or a stricter, always-sync setting despite the performance cost —
+
+316
+00:23:02,031 --> 00:23:07,800
+which is exactly the kind of judgment call worth making deliberately, not by leaving whatever
+
+317
+00:23:07,800 --> 00:23:09,723
+the default happens to be.
+
+318
+00:23:09,723 --> 00:23:15,492
+We also configure automatic AOF rewriting, triggered once the file has grown by 100 percent
+
+319
+00:23:15,492 --> 00:23:21,262
+since the last rewrite, with a 64-megabyte minimum size before that trigger even becomes relevant.
+
+320
+00:23:21,262 --> 00:23:27,031
+Without this, the append-only log would grow forever, unboundedly, because it never removes old, superseded
+
+321
+00:23:27,031 --> 00:23:32,800
+entries on its own — rewriting periodically compacts it down to just the operations needed
+
+322
+00:23:32,800 --> 00:23:38,569
+to reconstruct current state, similar in spirit to how we handled data retention with table
+
+323
+00:23:38,569 --> 00:23:41,262
+partitioning back in the audit logging phase.
+
+324
+00:23:41,262 --> 00:23:47,031
+And as a genuine belt-and-suspenders backup, we layer in periodic RDB snapshots too — full
+
+325
+00:23:47,031 --> 00:23:52,800
+point-in-time memory dumps, taken on three different schedules depending on how much write activity has
+
+326
+00:23:52,800 --> 00:23:58,569
+occurred, giving you a second, independent recovery path if the AOF log itself were ever
+
+327
+00:23:58,569 --> 00:23:59,338
+somehow corrupted.
+
+328
+00:23:59,338 --> 00:24:05,108
+Notice the storage class specifically: gp3-encrypted, backed by a persistent volume claim requesting fifty gigabytes.
+
+329
+00:24:05,108 --> 00:24:10,877
+This is the actual physical disk AOF writes are landing on, and it's what makes
+
+330
+00:24:10,877 --> 00:24:16,646
+the whole scheme work at all — without a persistent volume surviving the pod's own
+
+331
+00:24:16,646 --> 00:24:22,415
+lifecycle, "append to disk" would just mean appending to storage that vanishes right alongside the
+
+332
+00:24:22,415 --> 00:24:25,492
+pod, which would make the entire exercise pointless.
+
+333
+00:24:25,492 --> 00:24:28,954
+Losing data on a crash is one failure mode.
+
+334
+00:24:28,954 --> 00:24:34,723
+Losing the entire underlying volume — a corrupted disk, an accidental deletion, a far worse
+
+335
+00:24:34,723 --> 00:24:40,492
+day than a routine restart — is a different, more serious one, and AOF alone
+
+336
+00:24:40,492 --> 00:24:42,031
+doesn't protect against it.
+
+337
+00:24:42,031 --> 00:24:44,338
+That's what the backup CronJob handles.
+
+338
+00:24:44,338 --> 00:24:47,031
+On screen: k8s/redis-backup.yaml, running every six hours.
+
+339
+00:24:47,031 --> 00:24:52,800
+It triggers a BGSAVE — a background snapshot that doesn't block Redis from continuing to
+
+340
+00:24:52,800 --> 00:24:58,569
+serve live traffic while it's being taken — waits for it to complete, then copies
+
+341
+00:24:58,569 --> 00:25:04,338
+the resulting dump file to S3, directly into Glacier storage class, since these are backups
+
+342
+00:25:04,338 --> 00:25:09,723
+you hope to never actually need, making cold, cheap storage the obviously correct choice.
+
+343
+00:25:09,723 --> 00:25:15,492
+It also prunes anything older than thirty days, keeping cost under control rather than accumulating
+
+344
+00:25:15,492 --> 00:25:16,262
+backups indefinitely.
+
+345
+00:25:16,262 --> 00:25:18,569
+Configuration and good intentions aren't evidence.
+
+346
+00:25:18,569 --> 00:25:21,262
+Let's actually watch data survive a restart.
+
+347
+00:25:21,262 --> 00:25:26,646
+On screen: we write a test key directly with redis-cli — SET test-key "important-value".
+
+348
+00:25:26,646 --> 00:25:32,415
+Then we do something that would have been genuinely catastrophic against a default, non-persistent Redis:
+
+349
+00:25:32,415 --> 00:25:37,415
+we forcibly delete the pod outright, not a graceful restart, a hard delete.
+
+350
+00:25:37,415 --> 00:25:43,185
+Kubernetes, because this is a StatefulSet, creates a fresh replacement pod with the same identity
+
+351
+00:25:43,185 --> 00:25:45,492
+and reattaches the same persistent volume.
+
+352
+00:25:45,492 --> 00:25:49,723
+We wait for it to report ready, then run GET test-key.
+
+353
+00:25:49,723 --> 00:25:55,492
+If AOF is genuinely configured and working, that value comes back exactly as we set
+
+354
+00:25:55,492 --> 00:26:01,262
+it — "important-value" — recovered entirely from the replayed log on disk, not from some
+
+355
+00:26:01,262 --> 00:26:05,877
+memory that magically survived, because nothing about a pod deletion preserves memory.
+
+356
+00:26:05,877 --> 00:26:11,646
+If it comes back empty, something in this configuration is wrong, and you've found that
+
+357
+00:26:11,646 --> 00:26:17,415
+out now, in a deliberate test, rather than during a real incident when it actually
+
+358
+00:26:17,415 --> 00:26:18,115
+mattered.
+
+359
+00:26:18,115 --> 00:26:20,423
+Here's your checkpoint for this lecture.
+
+360
+00:26:20,423 --> 00:26:23,500
+Deploy Redis with AOF persistence exactly as configured.
+
+361
+00:26:23,500 --> 00:26:29,269
+Write test data, then forcibly delete the pod — not a graceful kubectl rollout restart,
+
+362
+00:26:29,269 --> 00:26:33,115
+an actual hard delete — and confirm your data survives.
+
+363
+00:26:33,115 --> 00:26:38,885
+Then separately verify the backup CronJob is actually running on schedule and producing real, retrievable
+
+364
+00:26:38,885 --> 00:26:44,654
+objects in S3, because a backup job that silently fails every six hours, quietly, for
+
+365
+00:26:44,654 --> 00:26:50,423
+months, is arguably worse than having no backup job at all — it gives you
+
+366
+00:26:50,423 --> 00:26:56,192
+false confidence right up until the exact moment you desperately need it to have actually
+
+367
+00:26:56,192 --> 00:26:56,962
+been working.
+
+368
+00:26:56,962 --> 00:27:02,731
+Financial RAG's Redis instance caches embedding lookups and recent query results — lose it, and
+
+369
+00:27:02,731 --> 00:27:08,500
+the system gets slower for a few minutes while the cache rebuilds, genuinely annoying but
+
+370
+00:27:08,500 --> 00:27:09,269
+not catastrophic.
+
+371
+00:27:09,269 --> 00:27:15,038
+RiskOracle's Redis instance is a different animal: it caches intermediate risk calculations mid-pipeline, and losing
+
+372
+00:27:15,038 --> 00:27:20,808
+an in-flight calculation without AOF persistence means silently re-running a computation that may have already
+
+373
+00:27:20,808 --> 00:27:24,269
+fed into a report someone downstream is relying on.
+
+374
+00:27:24,269 --> 00:27:30,038
+Run the exact same hard-delete test against RiskOracle's Redis pod that you just ran against
+
+375
+00:27:30,038 --> 00:27:30,808
+Financial RAG's.
+
+376
+00:27:30,808 --> 00:27:36,577
+If RiskOracle's Redis was ever deployed from an older Helm values file without the AOF
+
+377
+00:27:36,577 --> 00:27:42,346
+settings we just walked through, this is precisely the moment you'll find out, before an
+
+378
+00:27:42,346 --> 00:27:43,115
+auditor does.
+
+379
+00:27:43,115 --> 00:27:48,885
+Let's shift from "surviving failure" to a genuinely different kind of threat, one that has
+
+380
+00:27:48,885 --> 00:27:51,962
+nothing to do with anything breaking at all.
+
+381
+00:27:51,962 --> 00:27:57,731
+Imagine your hospital, generators humming perfectly, both buildings fully powered — and then a bus
+
+382
+00:27:57,731 --> 00:28:03,500
+crash happens three blocks away, and forty patients arrive in the emergency room within twenty
+
+383
+00:28:03,500 --> 00:28:06,192
+minutes, ten times the normal Tuesday-afternoon volume.
+
+384
+00:28:06,192 --> 00:28:06,962
+Nothing failed.
+
+385
+00:28:06,962 --> 00:28:08,885
+The building is completely intact.
+
+386
+00:28:08,885 --> 00:28:14,654
+But if staffing doesn't scale to meet that sudden, legitimate demand, patients wait, care suffers,
+
+387
+00:28:14,654 --> 00:28:20,423
+and from the outside, it looks exactly like an outage, even though every generator is
+
+388
+00:28:20,423 --> 00:28:21,192
+running flawlessly.
+
+389
+00:28:21,192 --> 00:28:22,731
+That's a traffic spike.
+
+390
+00:28:22,731 --> 00:28:28,500
+Not a hardware failure, not an AZ going dark — just far more legitimate demand
+
+391
+00:28:28,500 --> 00:28:31,577
+than your current capacity was provisioned to handle.
+
+392
+00:28:31,577 --> 00:28:37,346
+And the standard, blunt-instrument way to defend against it — simply provisioning for worst-case load,
+
+393
+00:28:37,346 --> 00:28:43,115
+permanently, all the time — is staggeringly wasteful, paying peak-capacity prices twenty-four hours a day
+
+394
+00:28:43,115 --> 00:28:48,115
+for a spike that might only materialize a handful of afternoons a year.
+
+395
+00:28:48,115 --> 00:28:53,885
+The right answer is elasticity: capacity that grows automatically when demand actually shows up, and
+
+396
+00:28:53,885 --> 00:28:59,654
+shrinks back down once it passes, without needing a human being to notice and manually
+
+397
+00:28:59,654 --> 00:29:01,962
+intervene at two in the morning.
+
+398
+00:29:01,962 --> 00:29:07,731
+In Kubernetes, that elasticity operates on two genuinely distinct layers, and it's worth being precise
+
+399
+00:29:07,731 --> 00:29:12,346
+about the difference, because conflating them is a common source of confusion.
+
+400
+00:29:12,346 --> 00:29:17,731
+The Horizontal Pod Autoscaler, HPA, controls how many copies of your application are running.
+
+401
+00:29:17,731 --> 00:29:23,115
+Karpenter controls how many physical nodes exist underneath those copies in the first place.
+
+402
+00:29:23,115 --> 00:29:28,885
+HPA can decide it wants twenty API replicas running, but if your existing nodes don't
+
+403
+00:29:28,885 --> 00:29:34,654
+have room for that many pods, those extra replicas just sit pending, uselessly, until something
+
+404
+00:29:34,654 --> 00:29:36,577
+provisions more room for them.
+
+405
+00:29:36,577 --> 00:29:42,346
+You need both layers working in concert — more staff, and more space for that
+
+406
+00:29:42,346 --> 00:29:48,115
+staff to actually work in — or scaling stalls out halfway through, and your customers
+
+407
+00:29:48,115 --> 00:29:52,731
+experience that half-finished scale-up as an outage indistinguishable from any other kind.
+
+408
+00:29:52,731 --> 00:29:55,038
+Let's build the pod layer first.
+
+409
+00:29:55,038 --> 00:29:56,192
+On screen: helm/templates/api-hpa.yaml.
+
+410
+00:29:56,192 --> 00:30:01,962
+We set minReplicas to 3 — never scaling below a baseline that still respects our
+
+411
+00:30:01,962 --> 00:30:07,731
+earlier AZ-spread and PodDisruptionBudget requirements, which we'll properly formalize in the very next lecture —
+
+412
+00:30:07,731 --> 00:30:13,500
+and maxReplicas to 20, an explicit ceiling that exists for a specific, deliberate reason: without
+
+413
+00:30:13,500 --> 00:30:19,269
+an upper bound, a sufficiently aggressive traffic spike, or worse, a runaway bug generating requests
+
+414
+00:30:19,269 --> 00:30:25,038
+in an infinite loop, could scale your fleet essentially without limit, and your AWS bill
+
+415
+00:30:25,038 --> 00:30:26,192
+along with it.
+
+416
+00:30:26,192 --> 00:30:31,962
+A cap isn't a limitation you're grudgingly accepting — it's a guardrail you're deliberately choosing,
+
+417
+00:30:31,962 --> 00:30:37,731
+converting "potentially unlimited cost" into "capacity ceiling I've consciously decided is my absolute worst case."
+
+418
+00:30:37,731 --> 00:30:41,962
+Notice HPA is watching three separate signals simultaneously, not just one.
+
+419
+00:30:41,962 --> 00:30:44,269
+CPU utilization, targeting 70 percent average.
+
+420
+00:30:44,269 --> 00:30:46,192
+Memory utilization, targeting 80 percent.
+
+421
+00:30:46,192 --> 00:30:50,423
+And a custom metric, requests per second, targeting 100 per pod.
+
+422
+00:30:50,423 --> 00:30:55,038
+Why three, instead of picking the one that seems most obviously relevant?
+
+423
+00:30:55,038 --> 00:31:00,808
+Because different kinds of load stress different resources, and a system watching only CPU can
+
+424
+00:31:00,808 --> 00:31:06,577
+be caught completely flat-footed by a memory-bound spike, or by a request pattern that's cheap
+
+425
+00:31:06,577 --> 00:31:11,962
+on compute but expensive in some other way HPA wasn't told to watch for.
+
+426
+00:31:11,962 --> 00:31:17,731
+HPA takes the maximum recommended replica count across all configured metrics, so any one of
+
+427
+00:31:17,731 --> 00:31:23,500
+the three tripping its threshold is enough to trigger scaling — the metrics work as
+
+428
+00:31:23,500 --> 00:31:29,269
+independent, parallel tripwires, not as a single averaged signal that a spike in one dimension
+
+429
+00:31:29,269 --> 00:31:30,808
+could get diluted by.
+
+430
+00:31:30,808 --> 00:31:36,577
+The behavior block underneath is where a lot of the actual engineering judgment lives, and
+
+431
+00:31:36,577 --> 00:31:41,577
+it's worth reading closely, because the asymmetry here is deliberate, not an oversight.
+
+432
+00:31:41,577 --> 00:31:47,346
+Scaling up is configured to happen essentially instantly — a zero-second stabilization window, with policies
+
+433
+00:31:47,346 --> 00:31:53,115
+allowing either doubling the current replica count or adding four pods every fifteen seconds, whichever
+
+434
+00:31:53,115 --> 00:31:54,654
+adds more capacity faster.
+
+435
+00:31:54,654 --> 00:32:00,423
+Scaling down, by sharp contrast, waits a full five-minute stabilization window before removing anything, and
+
+436
+00:32:00,423 --> 00:32:05,038
+even then only removes at most 10 percent of replicas per minute.
+
+437
+00:32:05,038 --> 00:32:10,808
+This asymmetry reflects a genuinely important, generally-true principle in reliability engineering: the cost of scaling
+
+438
+00:32:10,808 --> 00:32:16,577
+up too slowly is customers experiencing real, immediate degradation, right now, while the cost of
+
+439
+00:32:16,577 --> 00:32:22,346
+scaling down too slowly is a comparatively small amount of wasted compute spend for a
+
+440
+00:32:22,346 --> 00:32:23,500
+few extra minutes.
+
+441
+00:32:23,500 --> 00:32:29,269
+Given that asymmetric downside, react to growth in demand aggressively and immediately, and retreat from
+
+442
+00:32:29,269 --> 00:32:35,038
+a passing spike cautiously and gradually — because a spike that looks over might just
+
+443
+00:32:35,038 --> 00:32:40,808
+be a brief lull in the middle of a bigger one, and you'd rather find
+
+444
+00:32:40,808 --> 00:32:46,577
+that out from slightly excess capacity sitting idle for a few minutes than from a
+
+445
+00:32:46,577 --> 00:32:51,577
+second wave of traffic hitting a fleet you already prematurely scaled back down.
+
+446
+00:32:51,577 --> 00:32:57,346
+Let's make that asymmetry concrete with real numbers, because the abstract principle is easy to
+
+447
+00:32:57,346 --> 00:33:00,808
+nod along with and easy to configure wrong anyway.
+
+448
+00:33:00,808 --> 00:33:04,654
+Say your baseline is three replicas, comfortably handling normal traffic.
+
+449
+00:33:04,654 --> 00:33:10,423
+A spike hits, CPU utilization crosses 70 percent, and within fifteen seconds HPA can add
+
+450
+00:33:10,423 --> 00:33:16,192
+up to four new pods, or double your current count, whichever is larger — so
+
+451
+00:33:16,192 --> 00:33:21,962
+within fifteen seconds you could be at seven replicas, and within thirty seconds, if the
+
+452
+00:33:21,962 --> 00:33:25,038
+spike is still climbing, considerably more than that.
+
+453
+00:33:25,038 --> 00:33:29,269
+That's the "react immediately" half of the asymmetry, doing real work.
+
+454
+00:33:29,269 --> 00:33:35,038
+Now the spike passes, load drops back to baseline, and utilization falls comfortably under 70
+
+455
+00:33:35,038 --> 00:33:35,808
+percent again.
+
+456
+00:33:35,808 --> 00:33:41,577
+Scaling down does not mirror that speed at all — it waits a full five
+
+457
+00:33:41,577 --> 00:33:47,346
+minutes of sustained lower load before removing anything, and even then removes at most 10
+
+458
+00:33:47,346 --> 00:33:53,115
+percent of current replicas per minute, a slow, deliberate crawl back down rather than the
+
+459
+00:33:53,115 --> 00:33:55,808
+same immediate snap we saw scaling up.
+
+460
+00:33:55,808 --> 00:34:01,577
+Fifteen seconds to add capacity, multiple minutes to remove it — and that lopsided ratio
+
+461
+00:34:01,577 --> 00:34:07,346
+is the entire design philosophy of this behavior block, expressed in two numbers instead of
+
+462
+00:34:07,346 --> 00:34:08,885
+one paragraph of explanation.
+
+463
+00:34:08,885 --> 00:34:14,654
+Now for the layer underneath: Karpenter, watching for pods that HPA has created but that
+
+464
+00:34:14,654 --> 00:34:18,885
+can't actually be scheduled anywhere, because no existing node has room.
+
+465
+00:34:18,885 --> 00:34:20,038
+On screen: karpenter/nodepool.yaml.
+
+466
+00:34:20,038 --> 00:34:25,808
+The requirements section is genuinely interesting, and it's where cost engineering and availability engineering turn
+
+467
+00:34:25,808 --> 00:34:30,038
+out to be more compatible than people often assume going in.
+
+468
+00:34:30,038 --> 00:34:35,808
+We allow both on-demand and spot instance types — spot instances cost meaningfully less, often
+
+469
+00:34:35,808 --> 00:34:41,577
+somewhere in the range of 60 to 90 percent less than on-demand pricing, but AWS
+
+470
+00:34:41,577 --> 00:34:46,577
+can reclaim them with only a short warning if capacity is needed elsewhere.
+
+471
+00:34:46,577 --> 00:34:52,346
+For a stateless API layer that's already resilient to individual pod loss — remember, we
+
+472
+00:34:52,346 --> 00:34:58,115
+built exactly that resilience with topology spread and PDBs — a spot instance disappearing is
+
+473
+00:34:58,115 --> 00:35:00,038
+a shrug, not a crisis.
+
+474
+00:35:00,038 --> 00:35:05,808
+Your other replicas, spread across other zones and other nodes, absorb the loss instantly, and
+
+475
+00:35:05,808 --> 00:35:07,731
+Karpenter simply provisions a replacement.
+
+476
+00:35:07,731 --> 00:35:13,500
+This is precisely the kind of workload spot instances were built for, and it's a
+
+477
+00:35:13,500 --> 00:35:19,269
+genuinely good trade: meaningfully lower cost, in exchange for a risk your architecture has already
+
+478
+00:35:19,269 --> 00:35:21,962
+been engineered to absorb without customer impact.
+
+479
+00:35:21,962 --> 00:35:27,731
+The disruption block governs Karpenter's other job: not just adding nodes when needed, but consolidating
+
+480
+00:35:27,731 --> 00:35:30,038
+them back down when they're not.
+
+481
+00:35:30,038 --> 00:35:35,808
+consolidationPolicy set to WhenUnderutilized means Karpenter continuously looks for opportunities to replace several partially-empty, wastefully-provisioned
+
+482
+00:35:35,808 --> 00:35:41,577
+nodes with fewer, more tightly-packed ones — actively fighting the kind of slow, silent cost
+
+483
+00:35:41,577 --> 00:35:47,346
+creep that happens when a cluster scales up under load and simply never scales back
+
+484
+00:35:47,346 --> 00:35:48,500
+down cleanly afterward.
+
+485
+00:35:48,500 --> 00:35:54,269
+We also set expireAfter to 720 hours, thirty days — forcing nodes to cycle out
+
+486
+00:35:54,269 --> 00:36:00,038
+periodically even if nothing else prompts it, which ensures nodes are periodically replaced with fresh
+
+487
+00:36:00,038 --> 00:36:05,808
+images carrying the latest security patches, rather than quietly aging for a year, accumulating unpatched
+
+488
+00:36:05,808 --> 00:36:07,346
+vulnerabilities the whole time.
+
+489
+00:36:07,346 --> 00:36:10,423
+Let's actually watch this work under real load.
+
+490
+00:36:10,423 --> 00:36:16,192
+On screen: a load test using a tool called hey, generating sustained concurrent traffic against
+
+491
+00:36:16,192 --> 00:36:18,115
+our API for five minutes.
+
+492
+00:36:18,115 --> 00:36:23,885
+We tail kubectl get hpa with the watch flag, observing the current replica count climb
+
+493
+00:36:23,885 --> 00:36:28,500
+in real time as CPU and request-rate metrics cross their configured thresholds.
+
+494
+00:36:28,500 --> 00:36:34,269
+Simultaneously, we tail Karpenter's own controller logs, watching a specific, satisfying sequence unfold: a burst
+
+495
+00:36:34,269 --> 00:36:40,038
+of newly-pending pods triggers a scale-up decision, Karpenter provisions new nodes to make room, and
+
+496
+00:36:40,038 --> 00:36:44,654
+moments later those pending pods get successfully scheduled onto the freshly-provisioned capacity.
+
+497
+00:36:44,654 --> 00:36:50,423
+Three layers — HPA deciding more pods are needed, Karpenter deciding more room is needed,
+
+498
+00:36:50,423 --> 00:36:56,192
+the scheduler placing pods onto that new room — working in a coordinated sequence that,
+
+499
+00:36:56,192 --> 00:37:01,962
+done right, an actual user experiences as nothing more than the site staying responsive throughout
+
+500
+00:37:01,962 --> 00:37:07,731
+a traffic spike they never even knew was happening on the other side of the
+
+501
+00:37:07,731 --> 00:37:08,431
+screen.
+
+502
+00:37:08,431 --> 00:37:09,585
+Here's your checkpoint.
+
+503
+00:37:09,585 --> 00:37:15,354
+Run a sustained load test against your API and watch HPA scale replicas upward in
+
+504
+00:37:15,354 --> 00:37:18,046
+response to real metrics, not synthetic ones.
+
+505
+00:37:18,046 --> 00:37:21,123
+Watch Karpenter provision new nodes to accommodate them.
+
+506
+00:37:21,123 --> 00:37:26,892
+Once the load test ends, keep watching — confirm the system actually scales back down
+
+507
+00:37:26,892 --> 00:37:32,662
+afterward, on its own, rather than staying pinned at peak capacity, quietly burning money for
+
+508
+00:37:32,662 --> 00:37:34,585
+a spike that already ended.
+
+509
+00:37:34,585 --> 00:37:40,354
+Time the whole cycle, from the first sign of increased load to new pods genuinely
+
+510
+00:37:40,354 --> 00:37:46,123
+serving live traffic, and separately, from load ending to the fleet settling back to baseline.
+
+511
+00:37:46,123 --> 00:37:51,892
+Both numbers matter, and for very different reasons — one tells your auditor how fast
+
+512
+00:37:51,892 --> 00:37:57,662
+you respond to a real spike, the other tells your finance team how efficiently you
+
+513
+00:37:57,662 --> 00:38:01,892
+stop paying for capacity the moment you no longer need it.
+
+514
+00:38:01,892 --> 00:38:07,662
+Financial RAG's traffic spikes are user-driven — a research note goes out, everyone's suddenly asking
+
+515
+00:38:07,662 --> 00:38:09,200
+about the same ticker.
+
+516
+00:38:09,200 --> 00:38:14,969
+RiskOracle's spikes are calendar-driven instead: end of day, end of quarter, when every portfolio's risk
+
+517
+00:38:14,969 --> 00:38:20,738
+gets recalculated at once, in a tight window, whether or not any human is actively
+
+518
+00:38:20,738 --> 00:38:21,438
+watching.
+
+519
+00:38:21,438 --> 00:38:25,669
+That's a meaningfully different load pattern, worth configuring HPA differently for.
+
+520
+00:38:25,669 --> 00:38:29,515
+A user-driven spike justifies reacting fast and scaling down cautiously.
+
+521
+00:38:29,515 --> 00:38:35,285
+A calendar-driven spike you can actually predict — RiskOracle can scale up proactively a few
+
+522
+00:38:35,285 --> 00:38:41,054
+minutes before the known daily batch starts, rather than reacting to CPU metrics after the
+
+523
+00:38:41,054 --> 00:38:41,754
+fact.
+
+524
+00:38:41,754 --> 00:38:47,523
+Same HPA and Karpenter mechanics, genuinely different tuning, because the two systems are being stressed
+
+525
+00:38:47,523 --> 00:38:50,215
+by two different kinds of real-world pressure.
+
+526
+00:38:50,215 --> 00:38:55,985
+Here's a genuinely uncomfortable statistic worth sitting with before we go any further: a meaningful
+
+527
+00:38:55,985 --> 00:39:01,754
+share of real-world "availability incidents" that companies report to auditors weren't caused by an attacker,
+
+528
+00:39:01,754 --> 00:39:07,523
+weren't caused by a hardware failure, and weren't caused by a traffic spike at all.
+
+529
+00:39:07,523 --> 00:39:10,985
+They were caused by the company's own maintenance work.
+
+530
+00:39:10,985 --> 00:39:12,908
+A routine Kubernetes version upgrade.
+
+531
+00:39:12,908 --> 00:39:15,985
+A node getting patched for a security update.
+
+532
+00:39:15,985 --> 00:39:21,754
+Someone on the infrastructure team doing exactly what they were supposed to be doing —
+
+533
+00:39:21,754 --> 00:39:27,523
+and, in doing it, accidentally taking down every single replica of a critical service at
+
+534
+00:39:27,523 --> 00:39:33,292
+once, because nothing in the system's configuration told Kubernetes "don't ever do that." This is
+
+535
+00:39:33,292 --> 00:39:39,062
+precisely the gap PodDisruptionBudgets exist to close, and it's worth being crisp about a distinction
+
+536
+00:39:39,062 --> 00:39:44,831
+most engineers blur together the first time they encounter it: Kubernetes has always distinguished between
+
+537
+00:39:44,831 --> 00:39:50,600
+involuntary disruptions — a node hardware failure, an out-of-memory kill, the unpredictable stuff you genuinely
+
+538
+00:39:50,600 --> 00:39:56,369
+cannot schedule around — and voluntary disruptions — a node drain for maintenance, a rolling
+
+539
+00:39:56,369 --> 00:39:59,446
+deployment, a manual scale-down someone chose to trigger.
+
+540
+00:39:59,446 --> 00:40:05,215
+Nothing in this phase can eliminate involuntary disruptions; that's what everything from Multi-AZ through Karpenter
+
+541
+00:40:05,215 --> 00:40:07,138
+is already busy defending against.
+
+542
+00:40:07,138 --> 00:40:11,369
+But voluntary disruptions are, definitionally, choices your own team is making.
+
+543
+00:40:11,369 --> 00:40:17,138
+A PodDisruptionBudget is how you tell Kubernetes: "you're allowed to evict pods from this deployment
+
+544
+00:40:17,138 --> 00:40:22,908
+for routine maintenance, but never past this specific line — even if it means the
+
+545
+00:40:22,908 --> 00:40:28,677
+maintenance operation itself has to wait." Let's build these for every stateful and critical component
+
+546
+00:40:28,677 --> 00:40:34,446
+in our system, because a PDB on your API but nowhere else is exactly the
+
+547
+00:40:34,446 --> 00:40:40,215
+kind of half-finished protection we warned about back in Lecture 6.1's common-mistakes aside — solving
+
+548
+00:40:40,215 --> 00:40:45,985
+the visible, obvious case while quietly leaving an identical gap sitting right next to it.
+
+549
+00:40:45,985 --> 00:40:47,138
+On screen: helm/templates/api-pdb.yaml.
+
+550
+00:40:47,138 --> 00:40:49,831
+minAvailable set to 2 for our API.
+
+551
+00:40:49,831 --> 00:40:55,600
+This is a floor, not a target — it says at least two replicas must
+
+552
+00:40:55,600 --> 00:41:01,369
+remain healthy and running at all times, no matter how many total replicas currently exist
+
+553
+00:41:01,369 --> 00:41:04,831
+or how urgently a node needs draining for maintenance.
+
+554
+00:41:04,831 --> 00:41:10,600
+For our agent deployment, we instead use maxUnavailable set to 1 — a ceiling rather
+
+555
+00:41:10,600 --> 00:41:16,369
+than a floor, saying at most one replica may be disrupted at any given moment.
+
+556
+00:41:16,369 --> 00:41:22,138
+These two phrasings — minAvailable and maxUnavailable — are mathematically related but not identical, and
+
+557
+00:41:22,138 --> 00:41:27,908
+choosing between them is a genuine design decision worth making deliberately rather than by habit.
+
+558
+00:41:27,908 --> 00:41:33,677
+minAvailable is the more intuitive choice when you have a hard floor you never want
+
+559
+00:41:33,677 --> 00:41:38,677
+crossed, regardless of how the deployment's total replica count might change over time.
+
+560
+00:41:38,677 --> 00:41:44,446
+maxUnavailable is often more natural for a fleet where the replica count itself scales up
+
+561
+00:41:44,446 --> 00:41:50,215
+and down — like our HPA-scaled API and agent deployments — since it automatically expresses
+
+562
+00:41:50,215 --> 00:41:55,985
+"one at a time" whether your current fleet size is three replicas or twenty, without
+
+563
+00:41:55,985 --> 00:42:00,215
+needing to be manually recalculated every time HPA changes the total.
+
+564
+00:42:00,215 --> 00:42:05,985
+For our stateful components — the pgvector database pod and Redis, both built as StatefulSets
+
+565
+00:42:05,985 --> 00:42:11,754
+specifically because of the storage-and-identity requirements we discussed back in Lecture 6.2 — we set
+
+566
+00:42:11,754 --> 00:42:12,908
+minAvailable to 1.
+
+567
+00:42:12,908 --> 00:42:18,677
+This deserves honest, specific attention, because it exposes a genuine limitation baked into how we've
+
+568
+00:42:18,677 --> 00:42:23,677
+configured Redis so far in this course, not a flaw in PDBs themselves.
+
+569
+00:42:23,677 --> 00:42:27,138
+Recall that our Redis StatefulSet runs a single replica.
+
+570
+00:42:27,138 --> 00:42:32,908
+A PDB requiring "at least 1 available" on a single-replica deployment doesn't actually prevent disruption
+
+571
+00:42:32,908 --> 00:42:38,677
+at all — it just means Kubernetes will refuse to voluntarily evict that one and
+
+572
+00:42:38,677 --> 00:42:44,446
+only pod unless a legitimate replacement can be scheduled first, which, for a genuine node
+
+573
+00:42:44,446 --> 00:42:50,215
+drain, buys you very little real protection, since there's no second replica standing by to
+
+574
+00:42:50,215 --> 00:42:52,908
+absorb traffic while the first one moves.
+
+575
+00:42:52,908 --> 00:42:58,677
+A PDB is a coordination mechanism between multiple replicas — it has real teeth on
+
+576
+00:42:58,677 --> 00:43:04,446
+our three-replica pgvector StatefulSet, but it's closer to a formality than a genuine safety net
+
+577
+00:43:04,446 --> 00:43:10,215
+on our single-replica Redis, and it's worth being honest with yourself, and eventually with your
+
+578
+00:43:10,215 --> 00:43:15,215
+auditor, about exactly where that real protection begins and where it's mostly symbolic.
+
+579
+00:43:15,215 --> 00:43:18,292
+Let's watch a PDB actually do its job.
+
+580
+00:43:18,292 --> 00:43:24,062
+On screen: kubectl drain, targeting a node currently hosting API pods, run first with the
+
+581
+00:43:24,062 --> 00:43:29,831
+dry-run flag so we can see what would happen without actually forcing anything to occur.
+
+582
+00:43:29,831 --> 00:43:35,600
+If draining that particular node would push our healthy API replica count below the minAvailable
+
+583
+00:43:35,600 --> 00:43:41,369
+threshold of 2, the drain command simply refuses, returning a clear, specific message naming the
+
+584
+00:43:41,369 --> 00:43:43,292
+exact PodDisruptionBudget that's blocking it.
+
+585
+00:43:43,292 --> 00:43:49,062
+This is, genuinely, the system working as intended — not a bug, not an inconvenience,
+
+586
+00:43:49,062 --> 00:43:54,831
+but Kubernetes actively protecting your stated availability commitment from your own team's routine maintenance work,
+
+587
+00:43:54,831 --> 00:43:57,908
+exactly the way a good safety interlock should.
+
+588
+00:43:57,908 --> 00:44:03,677
+Notice there's also a way to force the issue anyway — kubectl drain with the
+
+589
+00:44:03,677 --> 00:44:09,446
+disable-eviction flag — and it's worth being explicit about why we're showing it to you
+
+590
+00:44:09,446 --> 00:44:15,215
+at all: not as a recommended technique, but as a documented escape hatch that exists
+
+591
+00:44:15,215 --> 00:44:18,677
+precisely because emergencies sometimes require overriding normal safety rails.
+
+592
+00:44:18,677 --> 00:44:24,446
+If you ever find yourself reaching for that flag in production, it should be a
+
+593
+00:44:24,446 --> 00:44:30,215
+deliberate, documented, consciously-made exception — not a habit that quietly becomes how your team handles
+
+594
+00:44:30,215 --> 00:44:35,985
+every inconvenient PDB block, which would defeat the entire purpose of having configured one in
+
+595
+00:44:35,985 --> 00:44:37,138
+the first place.
+
+596
+00:44:37,138 --> 00:44:42,908
+We also wire up Prometheus alerting specifically for PDB-related events — watching for cases where
+
+597
+00:44:42,908 --> 00:44:48,677
+the current number of healthy pods for a given PDB drops below its desired healthy
+
+598
+00:44:48,677 --> 00:44:50,600
+count, sustained for five minutes.
+
+599
+00:44:50,600 --> 00:44:56,369
+This matters because a PDB silently blocking a drain isn't inherently a crisis on its
+
+600
+00:44:56,369 --> 00:45:02,138
+own — it might just mean maintenance has to wait a few minutes for HPA
+
+601
+00:45:02,138 --> 00:45:07,908
+to spin up one more replica first — but if it's happening constantly, or blocking
+
+602
+00:45:07,908 --> 00:45:13,677
+indefinitely, that's a genuine signal that your baseline replica counts and your maintenance cadence have
+
+603
+00:45:13,677 --> 00:45:19,446
+quietly drifted out of alignment with each other, and a human needs to go look
+
+604
+00:45:19,446 --> 00:45:20,215
+at why.
+
+605
+00:45:20,215 --> 00:45:21,369
+Here's your checkpoint.
+
+606
+00:45:21,369 --> 00:45:27,138
+Set up PodDisruptionBudgets for every critical component — API, agent workers, pgvector, and Redis —
+
+607
+00:45:27,138 --> 00:45:32,908
+being honest with yourself, as we just discussed, about how much real protection each one
+
+608
+00:45:32,908 --> 00:45:36,754
+is actually providing given the underlying replica count it's protecting.
+
+609
+00:45:36,754 --> 00:45:42,523
+Simulate a node failure by cordoning and draining a node hosting API pods, and confirm
+
+610
+00:45:42,523 --> 00:45:48,292
+the PDB correctly blocks the drain if — and only if — it would violate
+
+611
+00:45:48,292 --> 00:45:49,446
+your configured minimum.
+
+612
+00:45:49,446 --> 00:45:55,215
+Then verify the opposite case too, which people often skip: confirm that when you have
+
+613
+00:45:55,215 --> 00:46:00,985
+genuine spare replica capacity, the exact same drain command succeeds cleanly, without needing the force
+
+614
+00:46:00,985 --> 00:46:02,138
+flag at all.
+
+615
+00:46:02,138 --> 00:46:07,908
+A safety rail that blocks every single operation indiscriminately isn't actually protecting availability — it's
+
+616
+00:46:07,908 --> 00:46:13,677
+just gotten in everyone's way so consistently that your team has learned to route around
+
+617
+00:46:13,677 --> 00:46:18,677
+it entirely, which is arguably worse than not having the rail at all.
+
+618
+00:46:18,677 --> 00:46:22,908
+Financial RAG's PodDisruptionBudget protects its API and its single pgvector instance.
+
+619
+00:46:22,908 --> 00:46:28,292
+RiskOracle needs its own, separately configured, and here's the detail worth being honest about.
+
+620
+00:46:28,292 --> 00:46:34,062
+If RiskOracle's risk-scoring service happens to run with only two replicas because it's comparatively expensive
+
+621
+00:46:34,062 --> 00:46:39,831
+to run, a PDB requiring one available replica minimum is providing real but genuinely thin
+
+622
+00:46:39,831 --> 00:46:44,831
+protection, the same honest limitation we just discussed for our own single-replica Redis.
+
+623
+00:46:44,831 --> 00:46:50,215
+Check RiskOracle's actual replica count before you assume its PDB is doing meaningful work.
+
+624
+00:46:50,215 --> 00:46:55,985
+A PDB wrapped around a two-replica service is a real control, but it's a noticeably
+
+625
+00:46:55,985 --> 00:47:01,754
+weaker one than the same PDB wrapped around six replicas, and your evidence should say
+
+626
+00:47:01,754 --> 00:47:04,062
+so honestly rather than implying otherwise.
+
+627
+00:47:04,062 --> 00:47:09,831
+Before we move to the database's read side, let's pause for four questions that come
+
+628
+00:47:09,831 --> 00:47:15,600
+up constantly at exactly this point in the course, and answer each one precisely rather
+
+629
+00:47:15,600 --> 00:47:17,138
+than hand-waving past it.
+
+630
+00:47:17,138 --> 00:47:22,138
+Doesn't running spot instances through Karpenter contradict everything we just built for availability?
+
+631
+00:47:22,138 --> 00:47:27,523
+Good instinct, and the answer is no, specifically because of what we already built.
+
+632
+00:47:27,523 --> 00:47:32,908
+Topology spread constraints keep any single instance from holding a disproportionate share of capacity.
+
+633
+00:47:32,908 --> 00:47:37,523
+PodDisruptionBudgets keep any single loss from dropping you below your safe floor.
+
+634
+00:47:37,523 --> 00:47:40,215
+Karpenter replaces a reclaimed spot instance automatically.
+
+635
+00:47:40,215 --> 00:47:45,985
+Spot instances are a reasonable trade precisely because the surrounding resilience layer already makes losing
+
+636
+00:47:45,985 --> 00:47:47,138
+one a non-event.
+
+637
+00:47:47,138 --> 00:47:52,908
+What's the actual difference between Multi-AZ failover and our quarterly restore test, since they sound
+
+638
+00:47:52,908 --> 00:47:55,215
+like they solve the same problem?
+
+639
+00:47:55,215 --> 00:47:55,985
+They don't.
+
+640
+00:47:55,985 --> 00:48:01,754
+Multi-AZ handles infrastructure failure, a server or data center physically breaking, by switching to an
+
+641
+00:48:01,754 --> 00:48:05,215
+already-synchronized standby in minutes with essentially no data loss.
+
+642
+00:48:05,215 --> 00:48:10,985
+It does nothing for a human mistake, a DELETE without a WHERE clause, or slow
+
+643
+00:48:10,985 --> 00:48:11,754
+data corruption.
+
+644
+00:48:11,754 --> 00:48:17,523
+That's what point-in-time restore exists for instead: recovering to a moment before the mistake, on
+
+645
+00:48:17,523 --> 00:48:20,985
+a timescale measured in tens of minutes, not seconds.
+
+646
+00:48:20,985 --> 00:48:22,523
+You genuinely need both.
+
+647
+00:48:22,523 --> 00:48:27,523
+Our PDB blocked a node drain during an actual maintenance window last week.
+
+648
+00:48:27,523 --> 00:48:29,062
+Was it right to?
+
+649
+00:48:29,062 --> 00:48:34,831
+Check first: were you already at your configured minimum for some other reason, an earlier
+
+650
+00:48:34,831 --> 00:48:37,908
+unrelated node failure that hadn't been replaced yet?
+
+651
+00:48:37,908 --> 00:48:40,985
+If so, the PDB did exactly its job.
+
+652
+00:48:40,985 --> 00:48:46,754
+If you had genuine spare capacity sitting idle, that's worth investigating as a possible misconfiguration,
+
+653
+00:48:46,754 --> 00:48:51,369
+not a reason to reach for the force-drain flag out of habit.
+
+654
+00:48:51,369 --> 00:48:57,138
+How do we actually decide our SLO target, or is ninety-nine point nine percent just
+
+655
+00:48:57,138 --> 00:48:58,677
+the default everyone copies?
+
+656
+00:48:58,677 --> 00:49:00,985
+It should be specific to you.
+
+657
+00:49:00,985 --> 00:49:03,677
+Check what your customers' contracts actually require.
+
+658
+00:49:03,677 --> 00:49:06,754
+Check honestly what your current architecture can support.
+
+659
+00:49:06,754 --> 00:49:12,523
+And respect the real cost curve: each additional nine costs disproportionately more than the one
+
+660
+00:49:12,523 --> 00:49:13,292
+before it.
+
+661
+00:49:13,292 --> 00:49:19,062
+Pick a number you can genuinely defend with real evidence, not one that simply sounds
+
+662
+00:49:19,062 --> 00:49:20,985
+impressive on a sales page.
+
+663
+00:49:20,985 --> 00:49:26,754
+With those questions answered, let's talk about a failure mode that doesn't announce itself the
+
+664
+00:49:26,754 --> 00:49:32,523
+way a crashed pod or a downed AZ does — it doesn't show up as
+
+665
+00:49:32,523 --> 00:49:34,062
+a dramatic red alert.
+
+666
+00:49:34,062 --> 00:49:39,831
+It shows up as everything just getting slower, and slower, and slower, until one day
+
+667
+00:49:39,831 --> 00:49:45,600
+it crosses an invisible line and your availability SLO is blown, without a single obvious,
+
+668
+00:49:45,600 --> 00:49:51,369
+discrete event you could point to as "the moment it broke." Here's how it happens.
+
+669
+00:49:51,369 --> 00:49:57,138
+Your primary database is handling both jobs at once: every write your application makes, and
+
+670
+00:49:57,138 --> 00:50:02,523
+every single read too — every ticker lookup, every history query, every dashboard render.
+
+671
+00:50:02,523 --> 00:50:07,138
+Writes are relatively rare and cheap, if your table design is sound.
+
+672
+00:50:07,138 --> 00:50:12,908
+Reads, in a system like ours, are usually the overwhelming majority of total database traffic,
+
+673
+00:50:12,908 --> 00:50:15,985
+often by an order of magnitude or more.
+
+674
+00:50:15,985 --> 00:50:21,754
+As your user base grows, read volume grows right alongside it, and eventually your primary
+
+675
+00:50:21,754 --> 00:50:27,523
+database is spending the vast majority of its capacity just answering questions, leaving less and
+
+676
+00:50:27,523 --> 00:50:33,292
+less headroom for the writes that actually matter most for your data's integrity — the
+
+677
+00:50:33,292 --> 00:50:37,523
+exact writes we spent an entire earlier phase making cryptographically bulletproof.
+
+678
+00:50:37,523 --> 00:50:43,292
+A read replica is the fix, and the underlying idea is genuinely simple, even if
+
+679
+00:50:43,292 --> 00:50:49,062
+the engineering has some real subtlety hiding underneath it: create one or more additional database
+
+680
+00:50:49,062 --> 00:50:54,831
+instances that continuously receive a copy of every change made to the primary, and route
+
+681
+00:50:54,831 --> 00:51:00,600
+your read-only queries to those replicas instead, freeing the primary to focus overwhelmingly on writes.
+
+682
+00:51:00,600 --> 00:51:06,369
+Here's the critical distinction worth understanding clearly, especially coming right after Multi-AZ, because the two
+
+683
+00:51:06,369 --> 00:51:09,446
+mechanisms sound similar but serve genuinely different purposes.
+
+684
+00:51:09,446 --> 00:51:15,215
+Multi-AZ, from Lecture 6.1, uses synchronous replication specifically for failover readiness — the standby is
+
+685
+00:51:15,215 --> 00:51:20,985
+never allowed to be behind, precisely because it might need to become the primary at
+
+686
+00:51:20,985 --> 00:51:22,908
+any given moment, without warning.
+
+687
+00:51:22,908 --> 00:51:28,677
+Read replicas use asynchronous replication instead, optimized for scaling read throughput rather than for instant
+
+688
+00:51:28,677 --> 00:51:34,446
+failover — meaning a read replica can lag behind the primary by some measurable amount,
+
+689
+00:51:34,446 --> 00:51:37,138
+typically milliseconds, occasionally longer under heavy load.
+
+690
+00:51:37,138 --> 00:51:40,600
+That lag isn't a defect somebody forgot to fix.
+
+691
+00:51:40,600 --> 00:51:46,369
+It's the direct, unavoidable consequence of the specific trade-off being made: asynchronous replication lets the
+
+692
+00:51:46,369 --> 00:51:52,138
+primary acknowledge a write instantly, without needing to wait for a replica sitting in possibly
+
+693
+00:51:52,138 --> 00:51:57,908
+a different Availability Zone to confirm receipt first, which is exactly the design choice that
+
+694
+00:51:57,908 --> 00:52:01,754
+makes replicas practical at meaningful scale in the first place.
+
+695
+00:52:01,754 --> 00:52:07,523
+That lag has a real, occasionally surprising consequence worth internalizing before you build anything on
+
+696
+00:52:07,523 --> 00:52:13,292
+top of it: a user could, in principle, write new data through your API, and
+
+697
+00:52:13,292 --> 00:52:19,062
+then immediately re-query it and briefly not see their own update yet, if that particular
+
+698
+00:52:19,062 --> 00:52:23,677
+read happens to land on a replica that hasn't quite caught up.
+
+699
+00:52:23,677 --> 00:52:29,446
+This is exactly why read-your-own-writes consistency is a genuine architectural decision, not an accident to
+
+700
+00:52:29,446 --> 00:52:35,215
+stumble into — for any workflow where a user needs to see their own change
+
+701
+00:52:35,215 --> 00:52:40,985
+reflected immediately, you deliberately route that specific follow-up read to the primary rather than to
+
+702
+00:52:40,985 --> 00:52:46,754
+a replica, accepting slightly less scaling benefit for that one narrow case in exchange for
+
+703
+00:52:46,754 --> 00:52:52,523
+a UI that doesn't briefly, confusingly appear to have silently dropped someone's own recent action.
+
+704
+00:52:52,523 --> 00:52:53,677
+Let's build it.
+
+705
+00:52:53,677 --> 00:52:54,831
+On screen: terraform/modules/rds/read-replica.tf.
+
+706
+00:52:54,831 --> 00:53:00,600
+We provision two replicas for production, each one explicitly pinned to a specific Availability Zone
+
+707
+00:53:00,600 --> 00:53:06,369
+via count.index, spreading them intentionally rather than leaving placement to chance — the same underlying
+
+708
+00:53:06,369 --> 00:53:11,754
+AZ-diversity principle from Lecture 6.1, applied here to read capacity instead of write capacity.
+
+709
+00:53:11,754 --> 00:53:15,600
+Notice backup_retention_period is explicitly set to zero on the replicas.
+
+710
+00:53:15,600 --> 00:53:21,369
+Backups on a replica would be redundant work, and genuinely a little bit of a
+
+711
+00:53:21,369 --> 00:53:27,138
+category error — a replica's data is, by definition, already a live, continuously-updating copy of
+
+712
+00:53:27,138 --> 00:53:32,908
+the primary, and the primary itself is already where our actual backup strategy, and its
+
+713
+00:53:32,908 --> 00:53:35,600
+own thirty-day retention, correctly and deliberately lives.
+
+714
+00:53:35,600 --> 00:53:38,292
+Now let's wire this into the application.
+
+715
+00:53:38,292 --> 00:53:40,985
+On screen: src/financial_rag/storage/database.py, a class called DatabaseClient.
+
+716
+00:53:40,985 --> 00:53:46,754
+It maintains a single write_engine, pointed permanently at the primary, and a list of read_engines,
+
+717
+00:53:46,754 --> 00:53:48,677
+one connection pool per replica.
+
+718
+00:53:48,677 --> 00:53:54,446
+The method get_write_session always routes to the primary — no exceptions, no cleverness, every INSERT,
+
+719
+00:53:54,446 --> 00:53:57,138
+UPDATE, and DELETE goes there, full stop.
+
+720
+00:53:57,138 --> 00:54:02,908
+get_read_session, by contrast, distributes across the available replicas using simple round-robin — cycling through them
+
+721
+00:54:02,908 --> 00:54:08,677
+in strict sequence — spreading read load roughly evenly rather than hammering whichever replica happens
+
+722
+00:54:08,677 --> 00:54:10,985
+to be first in a list.
+
+723
+00:54:10,985 --> 00:54:16,754
+There's also a get_random_read_session variant using random selection instead of strict round-robin, worth knowing about
+
+724
+00:54:16,754 --> 00:54:22,523
+specifically because round-robin, in a system with many concurrent, independently-running application instances, can sometimes accidentally
+
+725
+00:54:22,523 --> 00:54:28,292
+synchronize into an uneven pattern purely by unlucky timing coincidence, in a way pure randomness
+
+726
+00:54:28,292 --> 00:54:32,908
+tends to avoid more reliably over a large enough sample of requests.
+
+727
+00:54:32,908 --> 00:54:38,677
+Down in the repository layer, the pattern becomes genuinely simple to apply consistently: get_analysis_by_ticker, a
+
+728
+00:54:38,677 --> 00:54:40,215
+read-only lookup, uses get_read_session.
+
+729
+00:54:40,215 --> 00:54:43,292
+record_analysis, which performs an actual write, uses get_write_session.
+
+730
+00:54:43,292 --> 00:54:49,062
+This distinction has to be made deliberately and consistently, method by method, throughout your entire
+
+731
+00:54:49,062 --> 00:54:54,831
+codebase — there's no automatic mechanism forcing correctness here, which means a single careless line
+
+732
+00:54:54,831 --> 00:55:00,600
+of code routing a write operation to a read replica connection will fail loudly and
+
+733
+00:55:00,600 --> 00:55:06,369
+immediately, since replicas are configured read-only at the database engine level and simply reject write
+
+734
+00:55:06,369 --> 00:55:12,138
+attempts outright — a genuinely reassuring fail-safe, much better than the alternative of a write
+
+735
+00:55:12,138 --> 00:55:17,908
+attempt silently succeeding against the wrong target and quietly, invisibly diverging from your actual source
+
+736
+00:55:17,908 --> 00:55:18,677
+of truth.
+
+737
+00:55:18,677 --> 00:55:24,446
+Because replication lag is real and can genuinely vary under load, monitoring it isn't optional
+
+738
+00:55:24,446 --> 00:55:30,215
+— it's how you'd actually notice if the gap between primary and replica quietly started
+
+739
+00:55:30,215 --> 00:55:33,677
+growing beyond what's healthy for your specific use case.
+
+740
+00:55:33,677 --> 00:55:39,446
+On screen: a direct SQL query against pg_stat_replication, showing each connected replica's sync state and,
+
+741
+00:55:39,446 --> 00:55:45,215
+critically, pg_wal_lsn_diff — the write-ahead-log byte distance between what the primary has committed and what
+
+742
+00:55:45,215 --> 00:55:49,831
+each specific replica has actually caught up to and replayed so far.
+
+743
+00:55:49,831 --> 00:55:55,600
+We also expose this as a proper Prometheus metric, pg_replication_lag_seconds, letting you graph it over
+
+744
+00:55:55,600 --> 00:56:01,369
+time and alert automatically if lag ever creeps past a threshold that would actually start
+
+745
+00:56:01,369 --> 00:56:04,446
+to matter for your application's specific consistency needs.
+
+746
+00:56:04,446 --> 00:56:05,600
+Here's your checkpoint.
+
+747
+00:56:05,600 --> 00:56:11,369
+Provision read replicas for your RDS instance and update your repository layer so that reads
+
+748
+00:56:11,369 --> 00:56:17,138
+and writes are routed to the correct destination — consistently, deliberately, method by method, not
+
+749
+00:56:17,138 --> 00:56:19,062
+by accident or convention alone.
+
+750
+00:56:19,062 --> 00:56:24,831
+Confirm, using actual database logs, that your SELECT traffic really is landing on the replicas
+
+751
+00:56:24,831 --> 00:56:26,369
+rather than the primary.
+
+752
+00:56:26,369 --> 00:56:32,138
+And specifically, deliberately test the read-your-own-writes scenario we discussed: write a record, then immediately try
+
+753
+00:56:32,138 --> 00:56:37,908
+to read it back through a path that would normally hit a replica, and observe
+
+754
+00:56:37,908 --> 00:56:41,754
+directly whether you can reproduce that brief, disorienting lag firsthand.
+
+755
+00:56:41,754 --> 00:56:46,754
+Understanding a limitation by reading about it in a lecture is one thing.
+
+756
+00:56:46,754 --> 00:56:52,523
+Watching it happen on your own screen, to data you just wrote yourself sixty milliseconds
+
+757
+00:56:52,523 --> 00:56:58,292
+ago, tends to make the underlying trade-off click in a way no explanation alone quite
+
+758
+00:56:58,292 --> 00:56:58,992
+manages.
+
+759
+00:56:58,992 --> 00:57:04,762
+RiskOracle is actually the more compelling case for read replicas of the two systems, worth
+
+760
+00:57:04,762 --> 00:57:05,915
+walking through directly.
+
+761
+00:57:05,915 --> 00:57:11,685
+Its dashboards run heavy, aggregate queries, portfolio-wide risk summaries, historical trend charts, that can genuinely
+
+762
+00:57:11,685 --> 00:57:15,146
+hammer a primary database if they land there directly.
+
+763
+00:57:15,146 --> 00:57:20,915
+Route RiskOracle's dashboard queries to a read replica, keep its actual risk calculation writes on
+
+764
+00:57:20,915 --> 00:57:26,685
+the primary, and a slow analyst dashboard query can no longer compete with, or slow
+
+765
+00:57:26,685 --> 00:57:30,531
+down, the actual risk engine writing fresh calculations underneath it.
+
+766
+00:57:30,531 --> 00:57:36,300
+Financial RAG benefits from this pattern too, but RiskOracle's read-heavy reporting workload is where the
+
+767
+00:57:36,300 --> 00:57:38,608
+trade-off earns its keep most clearly.
+
+768
+00:57:38,608 --> 00:57:42,454
+Build it there first if you're deciding where to start.
+
+769
+00:57:42,454 --> 00:57:48,223
+Let me tell you about a pattern that shows up constantly across real post-incident reviews,
+
+770
+00:57:48,223 --> 00:57:51,300
+the kind shared, slightly anonymized, at infrastructure conferences.
+
+771
+00:57:51,300 --> 00:57:57,069
+A company builds exactly what we've built across this phase so far — Multi-AZ, autoscaling,
+
+772
+00:57:57,069 --> 00:58:00,915
+PDBs, read replicas, all of it, carefully and correctly configured.
+
+773
+00:58:00,915 --> 00:58:03,608
+Their architecture diagram is genuinely, legitimately excellent.
+
+774
+00:58:03,608 --> 00:58:09,377
+Then, eighteen months later, a real AZ outage actually happens — not a drill, the
+
+775
+00:58:09,377 --> 00:58:15,146
+genuine article — and instead of the clean, seconds-long failover the documentation promised, the system
+
+776
+00:58:15,146 --> 00:58:17,454
+stays degraded for nearly forty minutes.
+
+777
+00:58:17,454 --> 00:58:20,146
+Nothing in the architecture was wrong, exactly.
+
+778
+00:58:20,146 --> 00:58:25,915
+It was something nobody had thought to test directly: a piece of internal tooling, written
+
+779
+00:58:25,915 --> 00:58:31,685
+eight months after the original architecture was designed, that happened to hard-code one specific database
+
+780
+00:58:31,685 --> 00:58:37,454
+endpoint rather than using the properly load-balanced, failover-aware connection string everyone else in the system
+
+781
+00:58:37,454 --> 00:58:38,223
+correctly used.
+
+782
+00:58:38,223 --> 00:58:43,992
+It had worked flawlessly, silently, for eight uneventful months, precisely because nothing had ever actually
+
+783
+00:58:43,992 --> 00:58:47,454
+forced a real failover to occur and expose it.
+
+784
+00:58:47,454 --> 00:58:50,146
+That's not a story about bad engineering.
+
+785
+00:58:50,146 --> 00:58:55,915
+It's a story about the specific, sneaky gap between "we built resilient architecture" and "we
+
+786
+00:58:55,915 --> 00:59:01,685
+have actually, recently, personally watched that architecture survive a real failure." Every piece of tooling,
+
+787
+00:59:01,685 --> 00:59:07,454
+every script, every internal dashboard that gets built after your original resilience work is finished
+
+788
+00:59:07,454 --> 00:59:13,223
+is a fresh opportunity for exactly this kind of quiet, invisible assumption to creep back
+
+789
+00:59:13,223 --> 00:59:18,992
+in, one hard-coded connection string at a time, completely unnoticed until the one day it
+
+790
+00:59:18,992 --> 00:59:19,762
+genuinely matters.
+
+791
+00:59:19,762 --> 00:59:25,531
+Let's pause here, because we've now built five genuinely serious layers of resilience — Multi-AZ
+
+792
+00:59:25,531 --> 00:59:31,300
+everywhere, persistent Redis, two-layer autoscaling, PodDisruptionBudgets, read replicas — and it would be completely reasonable
+
+793
+00:59:31,300 --> 00:59:35,915
+at this point to feel like the hard work is essentially done.
+
+794
+00:59:35,915 --> 00:59:41,685
+Here's the uncomfortable question worth asking honestly before we move forward: how do you actually
+
+795
+00:59:41,685 --> 00:59:43,608
+know any of it works?
+
+796
+00:59:43,608 --> 00:59:49,377
+Not "how confident are you," not "does the configuration look correct on paper" — how
+
+797
+00:59:49,377 --> 00:59:53,608
+do you know, with real, demonstrated evidence, rather than architectural optimism?
+
+798
+00:59:53,608 --> 00:59:59,377
+Every fire department in the world has an answer to this exact question, and it's
+
+799
+00:59:59,377 --> 01:00:00,531
+not a document.
+
+800
+01:00:00,531 --> 01:00:01,685
+It's a drill.
+
+801
+01:00:01,685 --> 01:00:07,454
+You don't discover whether an evacuation plan actually works by reading it closely and nodding
+
+802
+01:00:07,454 --> 01:00:08,223
+along thoughtfully.
+
+803
+01:00:08,223 --> 01:00:13,992
+You discover it by pulling the alarm on a random Tuesday afternoon when nobody's expecting
+
+804
+01:00:13,992 --> 01:00:19,762
+it, and watching, with a stopwatch, what actually happens — which stairwells get congested, which
+
+805
+01:00:19,762 --> 01:00:25,531
+exits people forget exist, which assumptions on paper turn out to be quietly wrong in
+
+806
+01:00:25,531 --> 01:00:29,762
+practice, the moment reality gets involved instead of just the plan.
+
+807
+01:00:29,762 --> 01:00:35,531
+Chaos engineering is that same fire drill, applied to distributed systems, and it rests on
+
+808
+01:00:35,531 --> 01:00:41,300
+a genuinely important, slightly uncomfortable insight: the only way to know your system tolerates failure
+
+809
+01:00:41,300 --> 01:00:47,069
+is to inject real failure into it, deliberately, ideally on your own schedule rather than
+
+810
+01:00:47,069 --> 01:00:52,838
+waiting for reality to pick the timing for you at 3 AM on a night
+
+811
+01:00:52,838 --> 01:00:54,762
+you're least prepared for it.
+
+812
+01:00:54,762 --> 01:01:00,531
+LitmusChaos is the specific tool we'll use to run these controlled fire drills against our
+
+813
+01:01:00,531 --> 01:01:01,300
+Kubernetes cluster.
+
+814
+01:01:01,300 --> 01:01:05,146
+On screen: our first, simplest experiment, pod-delete, defined in chaos/pod-delete.yaml.
+
+815
+01:01:05,146 --> 01:01:10,915
+It targets our API deployment specifically and deletes 50 percent of its running pods, repeating
+
+816
+01:01:10,915 --> 01:01:15,531
+that deletion every ten seconds for a total window of sixty seconds.
+
+817
+01:01:15,531 --> 01:01:21,300
+Think carefully for a moment about exactly what this is actually testing, because it's easy
+
+818
+01:01:21,300 --> 01:01:25,146
+to conflate with something else it's not testing at all.
+
+819
+01:01:25,146 --> 01:01:30,915
+This experiment isn't primarily testing HPA's ability to add capacity under genuine load — that's
+
+820
+01:01:30,915 --> 01:01:33,992
+what Lecture 6.3's load test already specifically covered.
+
+821
+01:01:33,992 --> 01:01:39,762
+It's testing something more foundational and, in some ways, more basic: does Kubernetes' own self-healing
+
+822
+01:01:39,762 --> 01:01:45,531
+correctly and promptly recreate pods that simply vanish, for any reason at all, and do
+
+823
+01:01:45,531 --> 01:01:51,300
+our topology spread constraints and anti-affinity rules from Lecture 6.1 still hold up correctly under
+
+824
+01:01:51,300 --> 01:01:57,069
+the specific stress of genuinely losing running pods, not just scaling up gracefully from a
+
+825
+01:01:57,069 --> 01:01:58,608
+position of comfortable strength.
+
+826
+01:01:58,608 --> 01:02:01,300
+A more ambitious experiment, on screen: chaos/network-partition.yaml.
+
+827
+01:02:01,300 --> 01:02:07,069
+This one is doing something considerably more aggressive and more revealing — it identifies which
+
+828
+01:02:07,069 --> 01:02:12,838
+pods are running in two specific Availability Zones, then applies iptables rules that actively drop
+
+829
+01:02:12,838 --> 01:02:18,608
+traffic flowing between them, simulating exactly the kind of network-level split that a genuine AZ-level
+
+830
+01:02:18,608 --> 01:02:24,377
+networking incident could realistically cause, distinct from an entire AZ simply and cleanly disappearing all
+
+831
+01:02:24,377 --> 01:02:28,223
+at once, the way our Lecture 6.1 cordon test simulated.
+
+832
+01:02:28,223 --> 01:02:33,992
+Here's why that specific distinction between "AZ disappears cleanly" and "AZ becomes unreachable but is
+
+833
+01:02:33,992 --> 01:02:38,992
+still technically running" matters more than it might initially sound like it should.
+
+834
+01:02:38,992 --> 01:02:44,762
+A clean AZ failure is, in a strange way, the easier failure mode to handle
+
+835
+01:02:44,762 --> 01:02:50,531
+correctly — Kubernetes can clearly and unambiguously see that every node in that zone has
+
+836
+01:02:50,531 --> 01:02:55,146
+gone unresponsive, and it reschedules everything elsewhere without much genuine ambiguity involved.
+
+837
+01:02:55,146 --> 01:03:00,915
+A network partition is messier and more dangerous, precisely because it can create what's called
+
+838
+01:03:00,915 --> 01:03:06,685
+a split-brain scenario: pods in zone A are still very much alive and believe they're
+
+839
+01:03:06,685 --> 01:03:12,454
+healthy and fully operational, pods in zone B are equally alive and equally convinced of
+
+840
+01:03:12,454 --> 01:03:18,223
+their own health, but the two groups can no longer communicate with each other or
+
+841
+01:03:18,223 --> 01:03:19,377
+coordinate at all.
+
+842
+01:03:19,377 --> 01:03:25,146
+If your system has any component anywhere that assumes it can always freely reach every
+
+843
+01:03:25,146 --> 01:03:30,915
+other component — some shared, unprotected state, some naive assumption baked into application logic —
+
+844
+01:03:30,915 --> 01:03:36,685
+a partition is precisely the failure mode most likely to expose that hidden, previously invisible
+
+845
+01:03:36,685 --> 01:03:42,454
+assumption, in ways a simple, clean pod deletion or a clean AZ cordon never quite
+
+846
+01:03:42,454 --> 01:03:43,608
+manages to reveal.
+
+847
+01:03:43,608 --> 01:03:48,608
+Let's make split-brain concrete with a specific example rather than leaving it abstract.
+
+848
+01:03:48,608 --> 01:03:54,377
+Suppose some piece of your system implements a naive, in-memory rate limiter — a counter
+
+849
+01:03:54,377 --> 01:04:00,146
+living inside each pod's own local memory, incrementing every time a particular user makes a
+
+850
+01:04:00,146 --> 01:04:03,223
+request, with no shared, coordinated state across replicas.
+
+851
+01:04:03,223 --> 01:04:08,992
+Under normal conditions, this is a mild inefficiency at worst, since a user's requests get
+
+852
+01:04:08,992 --> 01:04:13,992
+spread somewhat randomly across pods, and each pod's local count stays roughly proportional.
+
+853
+01:04:13,992 --> 01:04:19,762
+During a network partition, it becomes something genuinely worse: zone A's pods and zone B's
+
+854
+01:04:19,762 --> 01:04:25,531
+pods each keep counting independently, neither aware the other exists at all, and a user
+
+855
+01:04:25,531 --> 01:04:31,300
+who happens to get bounced between zones could suddenly, briefly exceed a rate limit that
+
+856
+01:04:31,300 --> 01:04:37,069
+was designed to be a single, unified ceiling, simply because two separate, mutually unaware halves
+
+857
+01:04:37,069 --> 01:04:41,300
+of your system were each independently, correctly enforcing half of it.
+
+858
+01:04:41,300 --> 01:04:42,069
+Nothing crashed.
+
+859
+01:04:42,069 --> 01:04:43,608
+Nothing threw an error.
+
+860
+01:04:43,608 --> 01:04:49,377
+The system just quietly stopped agreeing with itself about a rule it was supposed to
+
+861
+01:04:49,377 --> 01:04:55,146
+be enforcing consistently — and a network partition chaos experiment is exactly the kind of
+
+862
+01:04:55,146 --> 01:05:00,915
+deliberate, controlled test that would actually surface a subtle, easy-to-miss bug like that, long before
+
+863
+01:05:00,915 --> 01:05:03,992
+a real partition ever gets the chance to.
+
+864
+01:05:03,992 --> 01:05:09,762
+While chaos experiments run, we watch specific metrics closely, on screen: pod restart counts climbing,
+
+865
+01:05:09,762 --> 01:05:13,608
+which is generally expected and healthy during a pod-delete experiment.
+
+866
+01:05:13,608 --> 01:05:19,377
+p95 request latency, tagged specifically with a chaos label so this traffic is cleanly distinguishable
+
+867
+01:05:19,377 --> 01:05:21,300
+from your regular baseline dashboards.
+
+868
+01:05:21,300 --> 01:05:24,377
+And error rate, filtered the same deliberate way.
+
+869
+01:05:24,377 --> 01:05:30,146
+The single most important, genuinely revealing number across the entire experiment isn't really any one
+
+870
+01:05:30,146 --> 01:05:35,915
+of these snapshotted in isolation — it's the shape of the recovery curve over time.
+
+871
+01:05:35,915 --> 01:05:41,685
+Does error rate spike briefly and recover cleanly within a handful of seconds, exactly as
+
+872
+01:05:41,685 --> 01:05:43,608
+your architecture promises it should?
+
+873
+01:05:43,608 --> 01:05:49,377
+Or does it spike and then linger, stubbornly, well past when the chaos experiment itself
+
+874
+01:05:49,377 --> 01:05:53,992
+has already ended and every deleted pod has technically already come back?
+
+875
+01:05:53,992 --> 01:05:59,762
+A slow, straggling recovery curve is often the very first hard, undeniable evidence that something
+
+876
+01:05:59,762 --> 01:06:05,531
+in your resilience story is more theoretical than actually true in practice — evidence you'd
+
+877
+01:06:05,531 --> 01:06:11,300
+very strongly rather discover here, on a Tuesday afternoon, running a deliberate, scheduled test, than
+
+878
+01:06:11,300 --> 01:06:16,300
+during an unplanned real incident with real customers actively affected in real time.
+
+879
+01:06:16,300 --> 01:06:22,069
+Because chaos experiments genuinely lose most of their value if they only ever get run
+
+880
+01:06:22,069 --> 01:06:27,838
+manually, once, right after this lecture, and then quietly forgotten about for the next six
+
+881
+01:06:27,838 --> 01:06:30,531
+months, we schedule them to run automatically.
+
+882
+01:06:30,531 --> 01:06:36,300
+On screen: .github/workflows/chaos-test.yml, triggered every Sunday at 10 AM — a deliberately chosen off-peak window,
+
+883
+01:06:36,300 --> 01:06:42,069
+minimizing genuine customer impact from a test that, however controlled and well-intentioned, is still deliberately
+
+884
+01:06:42,069 --> 01:06:45,146
+breaking things on purpose in a production-adjacent environment.
+
+885
+01:06:45,146 --> 01:06:50,915
+The workflow applies the pod-delete experiment, waits for it to fully complete, and then explicitly
+
+886
+01:06:50,915 --> 01:06:56,685
+asserts that the API deployment genuinely returns to a ready state within a two-minute timeout.
+
+887
+01:06:56,685 --> 01:07:02,454
+If it doesn't — if recovery takes meaningfully longer than that specific, chosen threshold, or
+
+888
+01:07:02,454 --> 01:07:08,223
+simply never happens cleanly at all — the workflow itself fails loudly, turning "resilience quietly
+
+889
+01:07:08,223 --> 01:07:13,992
+degraded at some point without anyone noticing" into "a CI job is now red and
+
+890
+01:07:13,992 --> 01:07:19,762
+actively demanding someone's attention," which is a dramatically better, faster, and cheaper way to find
+
+891
+01:07:19,762 --> 01:07:20,462
+out.
+
+892
+01:07:20,462 --> 01:07:26,231
+Now, an honest note before your checkpoint, and one worth taking seriously rather than glossing
+
+893
+01:07:26,231 --> 01:07:32,000
+over: chaos engineering carries real, genuine risk, and it deserves to be treated with real
+
+894
+01:07:32,000 --> 01:07:33,923
+operational respect, not casual enthusiasm.
+
+895
+01:07:33,923 --> 01:07:39,692
+Running these exact experiments against an actual, unmodified production environment, especially early on before you've
+
+896
+01:07:39,692 --> 01:07:45,462
+built real confidence in your resilience story, can itself directly cause the very outage you're
+
+897
+01:07:45,462 --> 01:07:48,538
+trying to responsibly guard against and rule out.
+
+898
+01:07:48,538 --> 01:07:54,308
+Most mature teams start these experiments in staging environments that closely mirror production, then graduate
+
+899
+01:07:54,308 --> 01:08:00,077
+carefully to production itself only once they've built substantial, demonstrated confidence, and even then, only
+
+900
+01:08:00,077 --> 01:08:05,846
+during clearly defined low-traffic windows, with a human actively watching dashboards in real time and
+
+901
+01:08:05,846 --> 01:08:11,615
+a very clear, well-rehearsed plan for immediately aborting the experiment the moment something looks meaningfully
+
+902
+01:08:11,615 --> 01:08:12,769
+worse than expected.
+
+903
+01:08:12,769 --> 01:08:13,923
+Here's your checkpoint.
+
+904
+01:08:13,923 --> 01:08:19,692
+Run the pod-delete experiment against a non-production environment first, and confirm HPA and Kubernetes' own
+
+905
+01:08:19,692 --> 01:08:23,154
+native self-healing correctly and promptly recreate the deleted pods.
+
+906
+01:08:23,154 --> 01:08:28,923
+Then run the network partition experiment, and specifically verify that once it ends, cross-zone traffic
+
+907
+01:08:28,923 --> 01:08:34,692
+genuinely, fully resumes — don't just assume it does because the experiment's own script reported
+
+908
+01:08:34,692 --> 01:08:35,846
+a clean exit.
+
+909
+01:08:35,846 --> 01:08:41,615
+Document the recovery time for each experiment individually, and treat any recovery that takes meaningfully
+
+910
+01:08:41,615 --> 01:08:47,385
+longer than you expected, or genuinely surprises you in any way, not as a chaos-engineering
+
+911
+01:08:47,385 --> 01:08:53,154
+failure, but as exactly the valuable, load-bearing signal this entire practice exists to surface in
+
+912
+01:08:53,154 --> 01:08:54,308
+the first place.
+
+913
+01:08:54,308 --> 01:09:00,077
+Run both experiments against RiskOracle too, not only Financial RAG, and pay attention to something
+
+914
+01:09:00,077 --> 01:09:05,846
+specific: does a mid-pipeline risk calculation that gets interrupted by a deleted pod ever silently
+
+915
+01:09:05,846 --> 01:09:10,462
+disappear, or does it correctly resume from where AOF persistence left off?
+
+916
+01:09:10,462 --> 01:09:16,231
+That's precisely the scenario our earlier Redis checkpoint was built to protect against, and a
+
+917
+01:09:16,231 --> 01:09:22,000
+chaos experiment is what actually proves that protection holds under a real, unscripted interruption, rather
+
+918
+01:09:22,000 --> 01:09:26,231
+than the tidy, deliberate test we ran earlier in this lecture.
+
+919
+01:09:26,231 --> 01:09:32,000
+Here's a phrase worth tattooing somewhere visible on every infrastructure team's shared wiki: a backup
+
+920
+01:09:32,000 --> 01:09:35,462
+you have never actually restored is not a backup.
+
+921
+01:09:35,462 --> 01:09:40,077
+It's a hope, dressed up convincingly in the language of engineering rigor.
+
+922
+01:09:40,077 --> 01:09:45,846
+And this isn't a hypothetical, abstract concern — the specific, recurring failure pattern shows up
+
+923
+01:09:45,846 --> 01:09:51,615
+constantly in real post-incident write-ups, across companies who otherwise had genuinely competent infrastructure teams: automated
+
+924
+01:09:51,615 --> 01:09:57,385
+snapshots had been running flawlessly, without a single reported failure, for well over a year.
+
+925
+01:09:57,385 --> 01:10:03,154
+Nobody had ever actually tried using one to restore anything, under any real or simulated
+
+926
+01:10:03,154 --> 01:10:05,077
+pressure, in all that time.
+
+927
+01:10:05,077 --> 01:10:10,846
+Then a real incident happens, someone finally reaches for the very first real restore in
+
+928
+01:10:10,846 --> 01:10:16,615
+the system's entire history — and discovers, at the worst possible moment, that the backup
+
+929
+01:10:16,615 --> 01:10:22,385
+format had silently changed months ago after some unrelated engine upgrade, or that required credentials
+
+930
+01:10:22,385 --> 01:10:28,154
+had quietly expired, or that the restore process itself, which had genuinely never once been
+
+931
+01:10:28,154 --> 01:10:33,923
+executed end to end, simply doesn't work the way absolutely everyone had confidently assumed it
+
+932
+01:10:33,923 --> 01:10:34,623
+did.
+
+933
+01:10:34,623 --> 01:10:40,392
+SOC 2 requires you to actually test your restore process, on a regular cadence, and
+
+934
+01:10:40,392 --> 01:10:46,162
+this lecture builds exactly that discipline directly into your infrastructure, rather than leaving it as
+
+935
+01:10:46,162 --> 01:10:51,931
+a manual task that's uncomfortably easy for a busy team to quietly defer, quarter after
+
+936
+01:10:51,931 --> 01:10:52,700
+quarter, indefinitely.
+
+937
+01:10:52,700 --> 01:10:58,469
+On screen: k8s/backup-restore-test.yaml, a CronJob scheduled for 2 AM on the first day of every
+
+938
+01:10:58,469 --> 01:11:04,238
+third month — a genuine, real quarterly cadence, not an aspirational one that exists only
+
+939
+01:11:04,238 --> 01:11:10,008
+in a policy document somewhere and never actually in a crontab anyone can point to.
+
+940
+01:11:10,008 --> 01:11:15,777
+Let's walk through exactly what it does, step by careful step, because the specific sequence
+
+941
+01:11:15,777 --> 01:11:19,623
+itself is the actual evidence your auditor cares about seeing.
+
+942
+01:11:19,623 --> 01:11:25,392
+First, it creates a fully isolated test namespace, deliberately separated from anything touching production, so
+
+943
+01:11:25,392 --> 01:11:31,162
+that whatever happens during this restore test genuinely cannot bleed into or disrupt real customer
+
+944
+01:11:31,162 --> 01:11:32,700
+traffic in any way.
+
+945
+01:11:32,700 --> 01:11:38,469
+Second, it queries AWS directly for your most recent automated RDS snapshot — deliberately not
+
+946
+01:11:38,469 --> 01:11:44,238
+a snapshot cherry-picked in advance for being unusually clean or convenient, but whatever real snapshot
+
+947
+01:11:44,238 --> 01:11:50,008
+your actual, ordinary backup schedule most recently produced on its own, because testing a hand-picked
+
+948
+01:11:50,008 --> 01:11:54,623
+best-case snapshot would quietly defeat the entire honest point of the exercise.
+
+949
+01:11:54,623 --> 01:12:00,392
+Third, it restores that snapshot into a genuinely new, temporary RDS instance — importantly, using
+
+950
+01:12:00,392 --> 01:12:06,162
+a smaller, cheaper instance class than production, because for the specific purpose of validating that
+
+951
+01:12:06,162 --> 01:12:11,931
+a restore mechanically works and the data inside it is intact, you don't need production-grade
+
+952
+01:12:11,931 --> 01:12:17,700
+compute sitting behind it, you just need the actual data itself to be genuinely, verifiably
+
+953
+01:12:17,700 --> 01:12:18,854
+present and correct.
+
+954
+01:12:18,854 --> 01:12:24,623
+Fourth — and this is the step that meaningfully separates a real, honest test from
+
+955
+01:12:24,623 --> 01:12:30,392
+mere theater — it doesn't stop at "the restore command completed without throwing an error."
+
+956
+01:12:30,392 --> 01:12:36,162
+It actively queries the freshly restored database and counts real rows from the last thirty
+
+957
+01:12:36,162 --> 01:12:41,931
+days, confirming actual, meaningful data genuinely exists inside the restored instance, not just that AWS
+
+958
+01:12:41,931 --> 01:12:44,238
+reported a technically successful restore operation.
+
+959
+01:12:44,238 --> 01:12:50,008
+Fifth, it cleans up completely — deleting the temporary test instance and tearing down the
+
+960
+01:12:50,008 --> 01:12:55,777
+isolated namespace, ensuring this quarterly exercise doesn't quietly leave behind a permanent, ever-growing pile of
+
+961
+01:12:55,777 --> 01:13:00,008
+forgotten test infrastructure that someone stumbles across, confused, eight months later.
+
+962
+01:13:00,008 --> 01:13:05,777
+And sixth, it generates a clean, dated, human-readable report and uploads it to S3, becoming
+
+963
+01:13:05,777 --> 01:13:11,546
+a permanent piece of evidence your team can hand directly to an auditor without needing
+
+964
+01:13:11,546 --> 01:13:14,623
+to reconstruct or explain anything after the fact.
+
+965
+01:13:14,623 --> 01:13:19,238
+On screen, an example of exactly what that generated report looks like.
+
+966
+01:13:19,238 --> 01:13:22,315
+Total restore duration: twelve minutes and thirty-four seconds.
+
+967
+01:13:22,315 --> 01:13:28,085
+Data validation: forty-five thousand two hundred and thirty-one rows successfully verified as present and intact.
+
+968
+01:13:28,085 --> 01:13:33,854
+And critically, a specific, deliberate comparison against your stated Recovery Time Objective — your RTO,
+
+969
+01:13:33,854 --> 01:13:39,623
+the maximum acceptable time your organization has formally committed to for restoring from backup during
+
+970
+01:13:39,623 --> 01:13:40,777
+a genuine incident.
+
+971
+01:13:40,777 --> 01:13:46,546
+If your stated RTO is four hours and your test genuinely completes in twelve minutes,
+
+972
+01:13:46,546 --> 01:13:52,315
+that's not just a reassuring, feel-good number — it's concrete, dated, reproducible evidence that your
+
+973
+01:13:52,315 --> 01:13:58,085
+recovery commitment is realistic and, more importantly, that it's demonstrably true right now, this quarter,
+
+974
+01:13:58,085 --> 01:14:03,854
+not merely true in theory or true the one time someone happened to test it
+
+975
+01:14:03,854 --> 01:14:05,008
+two years ago.
+
+976
+01:14:05,008 --> 01:14:10,777
+Worth being honest about a real limitation here too, because a good auditor will eventually
+
+977
+01:14:10,777 --> 01:14:16,546
+probe at it directly: this specific test validates RDS restoration thoroughly and well, but a
+
+978
+01:14:16,546 --> 01:14:22,315
+genuinely complete disaster recovery story for a Kubernetes-based system also needs to validate restoring your
+
+979
+01:14:22,315 --> 01:14:28,085
+actual cluster state — deployments, services, configmaps, and the rest — typically using a tool
+
+980
+01:14:28,085 --> 01:14:30,392
+purpose-built for that job, like Velero.
+
+981
+01:14:30,392 --> 01:14:36,162
+The report template shown here does include placeholder sections for exactly that, and a genuinely
+
+982
+01:14:36,162 --> 01:14:41,931
+mature restore-testing practice validates both halves of the story together, side by side, rather than
+
+983
+01:14:41,931 --> 01:14:47,700
+confidently, thoroughly testing the database half alone while quietly, silently leaving the Kubernetes-state half as
+
+984
+01:14:47,700 --> 01:14:48,854
+an untested assumption.
+
+985
+01:14:48,854 --> 01:14:54,623
+Worth also being honest about what happens when a restore test doesn't go well, because
+
+986
+01:14:54,623 --> 01:15:00,392
+the checkpoint's value depends entirely on treating a bad result as useful information rather than
+
+987
+01:15:00,392 --> 01:15:01,931
+something to quietly bury.
+
+988
+01:15:01,931 --> 01:15:07,700
+Suppose your stated RTO is four hours, and your first real quarterly test comes back
+
+989
+01:15:07,700 --> 01:15:13,469
+at three hours and fifty minutes — technically passing, but only just, with almost no
+
+990
+01:15:13,469 --> 01:15:14,623
+margin at all.
+
+991
+01:15:14,623 --> 01:15:20,008
+That's not a green checkmark to file away and forget about until next quarter.
+
+992
+01:15:20,008 --> 01:15:25,777
+That's a specific, concrete warning that your current process is running uncomfortably close to its
+
+993
+01:15:25,777 --> 01:15:31,546
+own stated limit, and the very next incident that happens to be slightly larger than
+
+994
+01:15:31,546 --> 01:15:37,315
+this test, or slightly less lucky in timing, could easily push you over a commitment
+
+995
+01:15:37,315 --> 01:15:40,777
+you've made publicly, possibly contractually, to your own customers.
+
+996
+01:15:40,777 --> 01:15:46,546
+A restore test that barely passes deserves exactly the same follow-up attention as one that
+
+997
+01:15:46,546 --> 01:15:52,315
+fails outright — the only difference is how much runway you still have before it
+
+998
+01:15:52,315 --> 01:15:54,238
+becomes a real, live problem.
+
+999
+01:15:54,238 --> 01:15:55,392
+Here's your checkpoint.
+
+1000
+01:15:55,392 --> 01:16:01,162
+Run this restore test manually, once, right now, rather than waiting for its first scheduled
+
+1001
+01:16:01,162 --> 01:16:03,854
+quarterly trigger to happen on its own.
+
+1002
+01:16:03,854 --> 01:16:09,623
+Confirm you can genuinely restore from your most recent real snapshot and that the resulting
+
+1003
+01:16:09,623 --> 01:16:10,777
+data validates correctly.
+
+1004
+01:16:10,777 --> 01:16:16,546
+Document your actual restore duration, and compare it honestly against whatever RTO your organization has
+
+1005
+01:16:16,546 --> 01:16:22,315
+stated, or would state, in its own compliance documentation — because a gap between the
+
+1006
+01:16:22,315 --> 01:16:28,085
+two isn't just an awkward test result to quietly file away, it's exactly the kind
+
+1007
+01:16:28,085 --> 01:16:33,854
+of concrete, specific finding you'd want to surface and fix now, deliberately, on your own
+
+1008
+01:16:33,854 --> 01:16:39,623
+terms and your own schedule, rather than discovering it for the very first time during
+
+1009
+01:16:39,623 --> 01:16:41,162
+a real, unplanned incident.
+
+1010
+01:16:41,162 --> 01:16:46,931
+We've now built an enormous amount of genuine resilience, and tested a meaningful share of
+
+1011
+01:16:46,931 --> 01:16:47,700
+it directly.
+
+1012
+01:16:47,700 --> 01:16:53,469
+But there's a question still sitting there, unanswered, underneath all of it: at any given
+
+1013
+01:16:53,469 --> 01:16:59,238
+moment, right now, this second, are you actually meeting the specific availability target you've committed
+
+1014
+01:16:59,238 --> 01:16:59,938
+to?
+
+1015
+01:16:59,938 --> 01:17:05,708
+Not "probably," not "it feels pretty solid lately" — a precise, current number you could
+
+1016
+01:17:05,708 --> 01:17:09,554
+show an auditor, or your own leadership team, without hesitation.
+
+1017
+01:17:09,554 --> 01:17:15,323
+Here's a mental model that reframes the entire idea of an SLO in a genuinely
+
+1018
+01:17:15,323 --> 01:17:21,092
+useful way, one that fits neatly with everything we've built and tested throughout this phase:
+
+1019
+01:17:21,092 --> 01:17:26,862
+think of your 99.9 percent availability target not as a strict pass-fail grade you either
+
+1020
+01:17:26,862 --> 01:17:31,862
+meet or catastrophically fail, but as a monthly spending budget for allowed downtime.
+
+1021
+01:17:31,862 --> 01:17:37,631
+At 99.9 percent, you're implicitly allowed roughly forty-three minutes of downtime across an entire month
+
+1022
+01:17:37,631 --> 01:17:39,938
+before you've fully exhausted that budget.
+
+1023
+01:17:39,938 --> 01:17:45,708
+Every single minute your system is unavailable, for any reason at all, spends directly against
+
+1024
+01:17:45,708 --> 01:17:51,477
+that finite monthly allowance — and the moment you view it this way, question shifts
+
+1025
+01:17:51,477 --> 01:17:57,246
+from a somewhat unhelpful, binary "are we compliant or not" to a genuinely more useful,
+
+1026
+01:17:57,246 --> 01:18:03,015
+more actionable "how much of our allowed error budget do we currently have left, and
+
+1027
+01:18:03,015 --> 01:18:08,785
+are we spending it faster or slower than a sustainable pace this month." Let's build
+
+1028
+01:18:08,785 --> 01:18:12,246
+the queries that actually calculate this in real time.
+
+1029
+01:18:12,246 --> 01:18:15,323
+On screen: a small set of PromQL queries.
+
+1030
+01:18:15,323 --> 01:18:21,092
+The first computes your current five-minute success rate — the sum of successful queries divided
+
+1031
+01:18:21,092 --> 01:18:25,323
+by the sum of total queries, expressed as a clean percentage.
+
+1032
+01:18:25,323 --> 01:18:31,092
+The second computes the same underlying ratio, but rolled up over a full thirty-day window
+
+1033
+01:18:31,092 --> 01:18:36,862
+instead of a five-minute one — your actual, honest, rolling availability figure, the specific number
+
+1034
+01:18:36,862 --> 01:18:40,323
+that genuinely maps directly onto your stated SLO commitment.
+
+1035
+01:18:40,323 --> 01:18:46,092
+The third is the genuinely interesting one: error budget remaining, expressed specifically as a percentage
+
+1036
+01:18:46,092 --> 01:18:51,862
+of your total allowed budget for the entire month, rather than as a raw duration
+
+1037
+01:18:51,862 --> 01:18:57,631
+— this framing tends to communicate urgency far more effectively to a non-engineering audience than
+
+1038
+01:18:57,631 --> 01:19:01,092
+a raw number of minutes ever quite manages to.
+
+1039
+01:19:01,092 --> 01:19:06,862
+Eighty percent of your monthly error budget already spent, with two full weeks still remaining
+
+1040
+01:19:06,862 --> 01:19:12,631
+in the month, is an urgent, actionable signal demanding real attention, in a way that
+
+1041
+01:19:12,631 --> 01:19:18,400
+"we've had about thirty-four minutes of downtime so far this month" alone simply doesn't communicate
+
+1042
+01:19:18,400 --> 01:19:23,015
+nearly as clearly or as immediately to someone without deep infrastructure context.
+
+1043
+01:19:23,015 --> 01:19:28,785
+We surface all of this in a Grafana dashboard, on screen: a JSON definition with
+
+1044
+01:19:28,785 --> 01:19:34,554
+panels for current availability, rolling thirty-day availability, the error budget gauge itself, estimated total downtime
+
+1045
+01:19:34,554 --> 01:19:40,323
+for the month expressed in plain seconds, a full historical trend graph, and a breakdown
+
+1046
+01:19:40,323 --> 01:19:46,092
+table showing availability specifically by individual component — because "the whole system is at 99.95
+
+1047
+01:19:46,092 --> 01:19:51,862
+percent" can quietly hide one specific component sitting at a genuinely concerning 97 percent the
+
+1048
+01:19:51,862 --> 01:19:57,631
+entire time, comfortably averaged out and hidden by several other components running essentially flawlessly right
+
+1049
+01:19:57,631 --> 01:19:58,400
+alongside it.
+
+1050
+01:19:58,400 --> 01:20:04,169
+Beyond simply displaying the number, we alert on how fast you're consuming it — on
+
+1051
+01:20:04,169 --> 01:20:04,938
+screen: prometheus/slo-alerts.yaml.
+
+1052
+01:20:04,938 --> 01:20:10,708
+SLOBurnRateHigh watches specifically for periods where your current, real-time error rate is consuming your monthly
+
+1053
+01:20:10,708 --> 01:20:16,477
+budget faster than a sustainable pace — the specific insight here being genuinely important and
+
+1054
+01:20:16,477 --> 01:20:22,246
+easy to miss: a short, five-minute burn rate spiking dramatically above sustainable pace is a
+
+1055
+01:20:22,246 --> 01:20:28,015
+very different, more urgent situation than a slow, gradual accumulation of many small errors spread
+
+1056
+01:20:28,015 --> 01:20:33,785
+evenly across an entire month, even if the two scenarios could, in principle, eventually add
+
+1057
+01:20:33,785 --> 01:20:37,631
+up to the exact same total downtime by month's end.
+
+1058
+01:20:37,631 --> 01:20:43,400
+ErrorBudgetCritical fires specifically once you've already consumed more than 80 percent of your entire monthly
+
+1059
+01:20:43,400 --> 01:20:49,169
+allowance, regardless of how quickly or slowly you got there — a clear, unambiguous signal
+
+1060
+01:20:49,169 --> 01:20:54,938
+that extreme caution, and probably a genuine freeze on risky, non-essential deployments, is now seriously
+
+1061
+01:20:54,938 --> 01:20:58,400
+warranted for whatever time remains in the current month.
+
+1062
+01:20:58,400 --> 01:21:01,477
+Here's your final checkpoint for this entire phase.
+
+1063
+01:21:01,477 --> 01:21:07,246
+Build the availability dashboard using these exact queries, and confirm the numbers it reports genuinely
+
+1064
+01:21:07,246 --> 01:21:13,015
+match your own manual, independent calculation, at least approximately — don't simply trust a dashboard
+
+1065
+01:21:13,015 --> 01:21:15,323
+you've never once cross-checked by hand.
+
+1066
+01:21:15,323 --> 01:21:21,092
+Set up the burn-rate and error-budget alerts, and if you have any way to safely
+
+1067
+01:21:21,092 --> 01:21:26,862
+do so in a non-production environment, deliberately simulate a failure and confirm the alerts genuinely
+
+1068
+01:21:26,862 --> 01:21:30,708
+fire as expected, rather than assuming quietly that they will.
+
+1069
+01:21:30,708 --> 01:21:36,477
+And then, finally, generate one real, complete monthly availability report — the availability-specific sibling of
+
+1070
+01:21:36,477 --> 01:21:42,246
+the audit report we built back in an earlier phase — because a dashboard that
+
+1071
+01:21:42,246 --> 01:21:48,015
+only you personally ever look at is only ever going to be as reliable, over
+
+1072
+01:21:48,015 --> 01:21:52,631
+the long run, as your own personal memory of checking it consistently.
+
+1073
+01:21:52,631 --> 01:21:58,400
+A monthly report that lands in someone else's inbox automatically, whether you remembered to look
+
+1074
+01:21:58,400 --> 01:22:01,862
+or not, is genuinely, structurally more durable than that.
+
+1075
+01:22:01,862 --> 01:22:07,631
+Before we wrap up this phase, let's give it the same honest, balanced treatment we
+
+1076
+01:22:07,631 --> 01:22:13,400
+owe every serious engineering decision — because everything we've built across these eight lectures comes
+
+1077
+01:22:13,400 --> 01:22:19,169
+with real costs, and a good auditor, and frankly a good engineer, should want to
+
+1078
+01:22:19,169 --> 01:22:22,246
+understand those costs clearly, not just the benefits.
+
+1079
+01:22:22,246 --> 01:22:28,015
+Multi-AZ RDS roughly doubles your database compute cost, since you're continuously running a full standby
+
+1080
+01:22:28,015 --> 01:22:31,477
+instance that, on most days, does nothing but wait.
+
+1081
+01:22:31,477 --> 01:22:34,938
+Read replicas add further cost on top of that.
+
+1082
+01:22:34,938 --> 01:22:40,708
+For an early-stage company with genuinely low traffic, that can reasonably feel like a significant
+
+1083
+01:22:40,708 --> 01:22:46,092
+expense to take on before it's strictly necessary — and honestly, sometimes it is.
+
+1084
+01:22:46,092 --> 01:22:51,862
+A thoughtful case exists for running single-AZ in a lower environment like staging, with an
+
+1085
+01:22:51,862 --> 01:22:57,631
+explicitly documented, higher risk tolerance, reserving full Multi-AZ specifically for whatever system directly touches customer-facing
+
+1086
+01:22:57,631 --> 01:22:58,785
+data or revenue.
+
+1087
+01:22:58,785 --> 01:23:04,554
+SOC 2 doesn't require maximum resilience everywhere, uniformly — it requires resilience that's honestly proportionate
+
+1088
+01:23:04,554 --> 01:23:08,015
+to your stated risk tolerance, and documented as such.
+
+1089
+01:23:08,015 --> 01:23:11,092
+The autoscaling layer adds genuine operational complexity too.
+
+1090
+01:23:11,092 --> 01:23:16,862
+A pod that mysteriously won't schedule now potentially involves reasoning through HPA's decision, Karpenter's decision,
+
+1091
+01:23:16,862 --> 01:23:19,169
+and node capacity all at once.
+
+1092
+01:23:19,169 --> 01:23:24,938
+For genuinely predictable, steady traffic, a fixed replica count can honestly be simpler and cheaper
+
+1093
+01:23:24,938 --> 01:23:29,554
+than tuning autoscaling correctly and keeping it tuned as the system evolves.
+
+1094
+01:23:29,554 --> 01:23:32,246
+Chaos engineering deserves its own honest caveat.
+
+1095
+01:23:32,246 --> 01:23:38,015
+Done carelessly, without real experience and genuine institutional buy-in, it can directly cause the exact
+
+1096
+01:23:38,015 --> 01:23:40,708
+customer-facing outages it was meant to prevent.
+
+1097
+01:23:40,708 --> 01:23:46,477
+Plenty of mature engineering organizations run chaos experiments exclusively in staging, indefinitely, and that's a
+
+1098
+01:23:46,477 --> 01:23:52,246
+completely legitimate choice — as long as staging genuinely, faithfully represents production's real failure modes,
+
+1099
+01:23:52,246 --> 01:23:56,477
+rather than being a smaller toy version wearing the same name.
+
+1100
+01:23:56,477 --> 01:24:01,092
+And here's the broadest point of honest balance to leave you with.
+
+1101
+01:24:01,092 --> 01:24:04,938
+Ninety-nine point nine percent availability is a serious, hard-won target.
+
+1102
+01:24:04,938 --> 01:24:10,708
+It was never meant to be ninety-nine point ninety-nine, or ninety-nine point nine nine nine
+
+1103
+01:24:10,708 --> 01:24:16,477
+— each additional nine costs disproportionately more than the one before it, for steadily diminishing
+
+1104
+01:24:16,477 --> 01:24:18,785
+real value to your actual customers.
+
+1105
+01:24:18,785 --> 01:24:24,554
+Ask honestly whether your specific product needs five nines, or whether three nines, done rigorously
+
+1106
+01:24:24,554 --> 01:24:30,323
+and genuinely tested, actually serves your customers and your business better than chasing an extra
+
+1107
+01:24:30,323 --> 01:24:32,246
+nine you can't really justify.
+
+1108
+01:24:32,246 --> 01:24:38,015
+The honest goal was never build the most resilient system technically possible, at any cost.
+
+1109
+01:24:38,015 --> 01:24:43,785
+It was build a system whose stated target is real, tested, and proportionate to what
+
+1110
+01:24:43,785 --> 01:24:45,323
+your customers actually need.
+
+1111
+01:24:45,323 --> 01:24:47,631
+Let's bring the whole phase together.
+
+1112
+01:24:47,631 --> 01:24:53,400
+We started with a hospital that made a real, binding promise never to go dark,
+
+1113
+01:24:53,400 --> 01:24:59,169
+and every technique here was one deliberate piece of that promise, engineered into working infrastructure
+
+1114
+01:24:59,169 --> 01:25:02,631
+rather than left as a comforting sentence nobody tests.
+
+1115
+01:25:02,631 --> 01:25:08,400
+Multi-AZ RDS and topology spread constraints eliminated the single-AZ blind spot, across both financial-rag and
+
+1116
+01:25:08,400 --> 01:25:09,100
+RiskOracle.
+
+1117
+01:25:09,100 --> 01:25:13,715
+Redis AOF persistence closed a narrower, subtler gap for both systems' caches.
+
+1118
+01:25:13,715 --> 01:25:19,485
+HPA and Karpenter gave you real elasticity, tuned honestly to each system's own real traffic
+
+1119
+01:25:19,485 --> 01:25:20,185
+pattern.
+
+1120
+01:25:20,185 --> 01:25:25,569
+PodDisruptionBudgets made sure your own team's maintenance work could never accidentally become the outage.
+
+1121
+01:25:25,569 --> 01:25:30,569
+Read replicas kept your primaries healthy under real read load, RiskOracle's dashboards especially.
+
+1122
+01:25:30,569 --> 01:25:36,338
+Chaos engineering turned every claim in this phase into something you personally watched hold up
+
+1123
+01:25:36,338 --> 01:25:42,108
+under real, injected pressure — for both systems, not just the one you happen to
+
+1124
+01:25:42,108 --> 01:25:44,031
+spend the most time in.
+
+1125
+01:25:44,031 --> 01:25:48,262
+Quarterly restore testing made sure your backups were genuinely usable insurance.
+
+1126
+01:25:48,262 --> 01:25:54,031
+And SLO monitoring, with real error-budget tracking, turned we think we're pretty reliable into a
+
+1127
+01:25:54,031 --> 01:25:55,185
+precise, defensible number.
+
+1128
+01:25:55,185 --> 01:26:00,569
+Here's what's concretely true about your systems now, in language your auditor will recognize.
+
+1129
+01:26:00,569 --> 01:26:04,415
+No single Availability Zone failure can take either system down.
+
+1130
+01:26:04,415 --> 01:26:09,415
+Data survives routine pod restarts without silent loss, in financial-rag's cache and RiskOracle's.
+
+1131
+01:26:09,415 --> 01:26:15,185
+Both systems demonstrably scale to meet real demand and scale back down again once it
+
+1132
+01:26:15,185 --> 01:26:15,885
+passes.
+
+1133
+01:26:15,885 --> 01:26:20,885
+Your own maintenance work can't accidentally violate your stated commitments, for either system.
+
+1134
+01:26:20,885 --> 01:26:23,962
+Read load no longer threatens either primary's health.
+
+1135
+01:26:23,962 --> 01:26:29,731
+You have real, dated evidence — not architectural theory — that both systems recover correctly
+
+1136
+01:26:29,731 --> 01:26:31,269
+from deliberately injected failure.
+
+1137
+01:26:31,269 --> 01:26:37,038
+Your backups are proven to work, and you can state your current availability and remaining
+
+1138
+01:26:37,038 --> 01:26:40,115
+error budget precisely, for both systems, without hedging.
+
+1139
+01:26:40,115 --> 01:26:45,885
+Let's turn that into a self-audit checklist for CC7.1, walked through the way an auditor's
+
+1140
+01:26:45,885 --> 01:26:51,654
+own working papers are actually structured — and this time, run through it twice, once
+
+1141
+01:26:51,654 --> 01:26:57,423
+for financial-rag and once for RiskOracle, because a checklist you've only ever completed for one
+
+1142
+01:26:57,423 --> 01:27:00,500
+of your two production systems isn't actually complete.
+
+1143
+01:27:00,500 --> 01:27:06,269
+On infrastructure redundancy: can you show, live, both RDS instances reporting Multi-AZ as true, with
+
+1144
+01:27:06,269 --> 01:27:10,500
+a real CloudWatch alarm wired to notify a human on failover?
+
+1145
+01:27:10,500 --> 01:27:16,269
+Can you show pods, not just nodes, evenly distributed across three zones, for both systems?
+
+1146
+01:27:16,269 --> 01:27:22,038
+Have you actually cordoned a zone and watched both workloads reschedule cleanly, or are you
+
+1147
+01:27:22,038 --> 01:27:23,962
+still trusting that they would?
+
+1148
+01:27:23,962 --> 01:27:29,731
+On data durability: is Redis configured with AOF persistence for both financial-rag and RiskOracle, and
+
+1149
+01:27:29,731 --> 01:27:35,115
+have you personally watched a hard pod deletion followed by full recovery, for both?
+
+1150
+01:27:35,115 --> 01:27:40,500
+Have you actually restored from a backup, for both, or only ever written one?
+
+1151
+01:27:40,500 --> 01:27:46,269
+On elasticity: can you demonstrate, with real load-test data, that both systems scale up and
+
+1152
+01:27:46,269 --> 01:27:47,423
+back down correctly?
+
+1153
+01:27:47,423 --> 01:27:53,192
+Do you have an explicit maxReplicas ceiling for each, and can you explain why, in
+
+1154
+01:27:53,192 --> 01:27:54,731
+one sentence, for each?
+
+1155
+01:27:54,731 --> 01:28:00,500
+On your own team's operational safety: does every critical component in both systems have an
+
+1156
+01:28:00,500 --> 01:28:04,346
+appropriately configured PodDisruptionBudget, honestly assessed against its actual replica count?
+
+1157
+01:28:04,346 --> 01:28:10,115
+Have you tested that a drain is genuinely blocked when it should be, and succeeds
+
+1158
+01:28:10,115 --> 01:28:12,808
+cleanly when it shouldn't be, for both?
+
+1159
+01:28:12,808 --> 01:28:18,577
+On read scaling: are read replicas actually configured and correctly used, for whichever of the
+
+1160
+01:28:18,577 --> 01:28:20,500
+two systems genuinely needs them?
+
+1161
+01:28:20,500 --> 01:28:25,885
+Do you monitor replication lag, and know roughly how far behind under normal load?
+
+1162
+01:28:25,885 --> 01:28:31,654
+On proof through testing: have you run a chaos experiment against both systems within the
+
+1163
+01:28:31,654 --> 01:28:36,654
+last quarter, with a documented recovery time in your evidence folder for each?
+
+1164
+01:28:36,654 --> 01:28:42,423
+Have you completed a real restore test, within your stated RTO, with genuine data validation,
+
+1165
+01:28:42,423 --> 01:28:43,192
+for both?
+
+1166
+01:28:43,192 --> 01:28:48,962
+And on measurement: does a real-time dashboard exist for both systems' SLO attainment and remaining
+
+1167
+01:28:48,962 --> 01:28:49,731
+error budget?
+
+1168
+01:28:49,731 --> 01:28:55,500
+Are burn-rate alerts configured and wired to a real human, and do you generate an
+
+1169
+01:28:55,500 --> 01:29:01,269
+automated monthly report for each, the same way we automated a monthly compliance report back
+
+1170
+01:29:01,269 --> 01:29:02,808
+in an earlier phase?
+
+1171
+01:29:02,808 --> 01:29:08,577
+If you can answer yes to every one of those, for both systems, with real
+
+1172
+01:29:08,577 --> 01:29:12,808
+dated evidence rather than confident recollection, you're not just theoretically resilient.
+
+1173
+01:29:12,808 --> 01:29:18,577
+You have two systems that have actually been broken on purpose, repeatedly, on your own
+
+1174
+01:29:18,577 --> 01:29:23,962
+schedule, and have proven, over and over, that they get back up every time.
+
+1175
+01:29:23,962 --> 01:29:29,731
+In our next phase, we shift from keeping systems reliably up to controlling, carefully and
+
+1176
+01:29:29,731 --> 01:29:35,500
+deliberately, exactly how changes get introduced into them in the first place — branch protection,
+
+1177
+01:29:35,500 --> 01:29:38,577
+mandatory review, GitOps-driven audit trails, clean rollback procedures.
+
+1178
+01:29:38,577 --> 01:29:44,346
+Because a meaningful share of the availability incidents this entire phase defended against don't originate
+
+1179
+01:29:44,346 --> 01:29:46,269
+from failing hardware at all.
+
+1180
+01:29:46,269 --> 01:29:52,038
+They originate from a well-intentioned, perfectly ordinary deployment going out badly, without the right guardrails
+
+1181
+01:29:52,038 --> 01:29:52,808
+around it.
+
+1182
+01:29:52,808 --> 01:29:55,500
+You've built systems that survive failure gracefully.
+
+1183
+01:29:55,500 --> 01:30:01,269
+Next, we make sure change itself, the most common cause of real incidents industry-wide, gets
+
+1184
+01:30:01,269 --> 01:30:02,423
+introduced safely too.
+
+1185
+01:30:02,423 --> 01:30:04,731
+I'll see you in Phase 7.
+
